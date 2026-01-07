@@ -1,7 +1,7 @@
-# 🚀 Entra as a Code Workshop 🚀
+# Entra as a Code Workshop
 Manage your Tenant with Infrastructure as Code: it works for Workforce and Customer instances
 
-## 🎯 Interactive Workshop Mode
+## Interactive Workshop Mode (via GitHub Temaplate)
 
 This workshop supports **interactive tracking via GitHub Issues**! Each stage creates a dedicated issue with:
 - Full documentation and instructions
@@ -10,15 +10,17 @@ This workshop supports **interactive tracking via GitHub Issues**! Each stage cr
 
 ### How to Start Interactive Mode
 
-1. **Fork the repository:**
+1. ![Static Badge](https://img.shields.io/badge/COPY?style=flat)
+
+2. **Copy the workshop to your account - the pipeline will create GitHub Issues:**
    - Go to **Issues** tab
 
-2. **Track Your Progress:**
+3. **Track Your Progress:**
    - Each stage has its own GitHub Issue with checkboxes
    - Check the boxes as you complete each step
    - Close the issue when you finish the stage
 
-3. **Recommended Workflow:**
+4. **Recommended Workflow:**
    | Step | Action |
    |------|--------|
    | 1 | Open the stage issue |
@@ -28,9 +30,9 @@ This workshop supports **interactive tracking via GitHub Issues**! Each stage cr
    | 5 | Close the issue |
    | 6 | Move to next stage |
 
-> **Pro Tip:** Use the issue comments to note any problems or learnings during each stage!
+> **Tip:** Use the issue comments to note any problems or learnings during each stage!
 
-## 📚 Changelog 
+## Changelog 
 | Version | Date       | Description                                        |
 |---------|------------|----------------------------------------------------|
 | v0.8    | 2025.04.28 | Alpha                                              |
@@ -38,7 +40,8 @@ This workshop supports **interactive tracking via GitHub Issues**! Each stage cr
 | v0.9.1  | 2025.05.16 | For Self-Workshop: more pictures and description   |
 | v0.10  | 2026.01.03 | Typos and doc improvment & update provider version |
 | v1.0  | 2026.01.05 | 🎆 Public repository version |
-## ❔Q&A
+
+## Q&A
 | Question                                           | Answer                                                                       |
 |----------------------------------------------------|------------------------------------------------------------------------------|
 | Do I need an Entra ID Tenant?                      | Yes, when you run a workshop on your own; no, during an online or onsite workshop. |
@@ -47,7 +50,7 @@ This workshop supports **interactive tracking via GitHub Issues**! Each stage cr
 | Do I need the Global Admin role?                       | Yes.                                                                         |
 | Is the workshop to learn Terraform?                | No, the workshop is to manage Entra ID as code with Terraform.               |
 
-## 🛠️ Prerequisites
+## Prerequisites
 ### Technical
 - ✅ [Entra ID Tenant](https://www.microsoft.com/en-gb/security/business/identity-access/microsoft-entra-id)
 - ✅ A global administrator or the authentication policy administrator permission is required.
@@ -73,14 +76,14 @@ This workshop supports **interactive tracking via GitHub Issues**! Each stage cr
 - ✅ Familiarity with Azure Portal navigation
 
 
-## 🥇 Achievements
+## Achievements
 - Authenticate with service access (Service Principal)
 - Set up basic Entra ID elements with Terraform.
 - Understand limitations.
 
-## ⏱️ Total Workshop Duration: ~90-120 minutes
+## Total Workshop Duration: ~90-120 minutes
 
-## 🗝️ Workshop key points
+## Workshop key points
 1. Set up the workstation environment
 2. Create a Service Principal
 3. Prepare the Terraform file structure
@@ -123,52 +126,13 @@ destroy
 terraform destroy
 ```
 
-## Structure of the project - code organisation
-1. Recommended: The interactive version of the workshop is prepared to work as a fork - the pipeline will create GitHub Issues for each stage.
-   - Mark the process with checkboxes in the issues and close finished steps.
-   - Back to the workshop after a while - based on the marked progress. 
-1. A Workshop is a list of steps in the `doc` folder (same as copy in the GitHub Issues). 
-   - [Stage 0](doc/stage-0/prerequisits.md)
-   - [Stage 1](doc/stage-1/SSO-application.md)
-   - [Stage 2](doc/stage-2/service-principal.md)
-   - [Stage 3](doc/stage-3/workload-federation.md)
-   - [Stage 4](doc/stage-4/conditional-access.md)
-   - [Stage 5](doc/stage-5/access-package.md)
-   - [Stage 6](doc/stage-6/pim.md)
-   - [Stage 7](doc/stage-7/end.md)
-   - [Final Solution](doc/stage-final/main.tf)
-   - [Stage Next](doc/stage-next/what-next.md)
-1. The steps are instructions and requirements for creating module instances (`modules` folder) in the `main.tf` file to create simple Entra ID resources.
-1. To verify the configuration, please use `test` folder.
 
-## 📋 Workshop Stages Overview (Interactive)
-
-| Stage | Topic | Duration | License Required | Issue Label |
-|-------|-------|----------|------------------|-------------|
-| 0 | [Prerequisites](doc/stage-0/prerequisits.md) | 15-20 min | - | `stage-0` |
-| 1 | [SSO Application](doc/stage-1/SSO-application.md) | 10-15 min | - | `stage-1` |
-| 2 | [Service Principal](doc/stage-2/service-principal.md) | 10 min | - | `stage-2` |
-| 3 | [Workload Federation](doc/stage-3/workload-federation.md) | 15 min | - | `stage-3` |
-| 4 | [Conditional Access](doc/stage-4/conditional-access.md) | 15 min | P1 | `stage-4` |
-| 5 | [Access Package](doc/stage-5/access-package.md) | 10 min | P2 | `stage-5` |
-| 6 | [PIM](doc/stage-6/pim.md) | 15 min | P2 | `stage-6` |
-| 7 | [End & Cleanup](doc/stage-7/end.md) | 5 min | - | `stage-7` |
-| Bonus | [What's Next](doc/stage-next/what-next.md) | - | - | `bonus` |
-
-> **Interactive Mode:** Run the GitHub Action to create trackable issues for each stage!
-
-## 📊 Plan
-- Pull the repository to the workstation.
-- Follow the steps in the doc folder from zero to the end.
-- Destroy the resources created in the Entra ID tenant with the command `terraform destroy`.
-
-## ⚠️ Excluded and not covered in this workshop
+## Excluded and not covered in this workshop
 - Cost of the Terraform license (if any).
 - Manage the Terraform state file.
 - Secret management (client_id and client_secret) access to Entra ID tenant and Azure subscription (not covered at all).
 
-## 🔍 Troubleshooting
-
+## Troubleshooting
 | Issue                                | Solution                                                                    |
 |--------------------------------------|-----------------------------------------------------------------------------|
 | No changes in the Terraform plan.    | Always be sure to save the changes in the `main.tf`.                        |
@@ -176,7 +140,6 @@ terraform destroy
 | `Error: Module not installed`        | Run "terraform init" to install all modules required by this configuration. |
 
 ## Report Issues
-
 Found a bug, have a question, or want to suggest an improvement? Please report any issues with the workshop at:
 
 **[https://github.com/mjendza/workshop-entra-as-code-interactive/issues](https://github.com/mjendza/workshop-entra-as-code-interactive/issues)**
