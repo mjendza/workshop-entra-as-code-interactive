@@ -10,7 +10,7 @@ This workshop supports **interactive tracking via GitHub Issues**! Each stage cr
 
 ### How to Start Interactive Mode
 
-1. [![](https://img.shields.io/badge/COPY%20Workshop?style=for-the-badge&logo=github&labelColor=197935)](link=https%3A%2F%2Fgithub.com%2Fnew%3Ftemplatepl_owner%3Dmjendza%26temate_name%3Dworkshop-entra-as-code-interactive%26owner%3D%2540me%26name%3Dworkshop-entra-as-code-interactive%26description%3DEntra%2520ID%2520as%2520Code%2520Interactive%2520Workshop%26visibility%3Dpublic)
+1. [![](https://img.shields.io/badge/COPY%20Workshop-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](link=https%3A%2F%2Fgithub.com%2Fnew%3Ftemplatepl_owner%3Dmjendza%26temate_name%3Dworkshop-entra-as-code-interactive%26owner%3D%2540me%26name%3Dworkshop-entra-as-code-interactive%26description%3DEntra%2520ID%2520as%2520Code%2520Interactive%2520Workshop%26visibility%3Dpublic)
 
 2. **Copy the workshop to your account - the pipeline will create GitHub Issues:**
    - Go to **Issues** tab
