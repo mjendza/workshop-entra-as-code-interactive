@@ -1,64 +1,64 @@
 # Stage 4: Conditional Access
 
-> **Note:** This stage requires Entra ID P1 license. Skip if not available.
+> **Note:** Execution of this stage specifically requires an active Entra ID Premium P1 or P2 license. Skip this section if operating inside an Entra Free tenant.
 
 ## Goals
-- Add Conditional Access policy to the OidcDebugger SSO application.
-- Enable access only from the IP address of the workshop environment.
-- Enable access only from countries in the module list.
+- Automate the assignment of a Conditional Access policy specifically bound to the `OidcDebugger` SSO application.
+- Enforce rigid network segmentation: RESTRICT application ingress strictly scoped to IP ranges reflecting the active workshop environment.
+- Formally scope authorization matching a predefined geographic country configuration block provided inside the underlying module.
 
 ## ⏱️ Estimated Time: 15 minutes
 
-## Requirements
-- Service Principal with: `Policy.ReadWrite.ConditionalAccess` and `Policy.Read.All` permissions.
-- **Entra ID P1 license minimum** (Conditional Access is not available in Free tier).
-- Security Defaults disabled in the tenant (Entra ID → Properties → Manage Security defaults → Disabled).
-- OidcDebugger application registered in the tenant (from Stage 1).
+## Operational Prerequisites
+- The backend Service Principal maintaining pipeline access must be properly scoped across `Policy.ReadWrite.ConditionalAccess` and `Policy.Read.All` Graph API permissions.
+- **Entra ID P1 license minimum** (Conditional Access capabilities are not integrated into Entra ID Free instances).
+- Entra ID "Security Defaults" must be forcefully disabled across the tenant hierarchy (Entra ID → Properties → Manage Security Defaults → Disabled).
+- You must already have a functional OidcDebugger SSO App Registration active inside the tenant (Completed previously in Stage 1).
 
-> ⚠️ **Note:** If you don't have P1 license, you can skip this stage and continue with Stage 5.
+> ⚠️ **Note:** Referencing previous license prerequisites above—if operating on a free tier, safely bypass this stage entirely and resume moving forward to Stage 5.
 
-## Documentation
-- Basic: https://learn.microsoft.com/en-us/entra/identity/conditional-access/
-- https://learn.microsoft.com/en-us/entra/identity/conditional-access/policy-block-by-location
+## Documentation & References
+- [Entra ID: Conditional Access Foundations](https://learn.microsoft.com/en-us/entra/identity/conditional-access/)
+- [Block Access via Geographic Locations or IP Logic](https://learn.microsoft.com/en-us/entra/identity/conditional-access/policy-block-by-location)
 
-## Steps & code
-To create the Service Principal we will use module `./modules/conditional_access`.
-To use one IP Address use `80.80.10.222/32`.
-Link Client ID to inclue the OidcDebugger application.
+## Implementation & Code
+We will be mapping the Conditional Access constraints against the active Service Principal, orchestrated via `./modules/conditional_access`. 
+To dynamically inject an isolated testing IP block, map it statically using CIDR conventions such as `80.80.10.222/32`.
+Provide the App Registration ID logic mapping directly back linking access toward the functional OidcDebugger.
 
-``` hcl
+```hcl
 module "OidcDebugger_Policy" {
-  source = "./modules/conditional_access"
-  business_name = "${var.deployment_unique_name}-EnableWorkshopForDEAndIP"
-  included_applications = ["PUT_YOUR_OIDCDEBUGGER_CLIENT_ID_HERE"]
+  source                      = "./modules/conditional_access"
+  business_name               = "${var.deployment_unique_name}-EnableWorkshopForDEAndIP"
+  included_applications       = ["PUT_YOUR_OIDCDEBUGGER_CLIENT_ID_HERE"]
   trusted_locations_ip_ranges = ["PUT_YOUR_IP_ADDRESS_HERE_OR_ANY_OTHER_IP_ADDRESS_TO_TEST_BLOCK"]
 }
 ```
 
-## Verification
-- Access should be blocked for us. With the provided example IP address and list of countries Conditional Access policy should block access.
-- Run OidcDebugger and check if you can access the application from the IP address of the workshop environment.
-- Review the Conditional Access policy in Azure Portal. Check the new Report: `Analyze Conditional Access Policy Impact` https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-report-only
+## Verification Steps
+- Validate that simulated network traffic explicitly violating the Geographic constraint drops correctly. Map out a scenario evaluating blocking rules reflecting your arbitrary Conditional Access constraint lists.
+- Navigate to the `OidcDebugger` configuration manually via a web browser—attempting authorization simulating external/blocked IP address profiles.
+- Analyze your actively generated policy configuration mapping located within the Azure Portal's Conditional Access Overview. Evaluate telemetry effectively utilizing the feature suite corresponding to `Analyze Conditional Access Policy Impact`: [Reporting on Policy Impact Tracking](https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-report-only).
 
-![blocked](blocked.png)
+![Example of Blocked Request Activity](blocked.png)
 
 ---
 
 ## Stage Completion Checklist
-- [ ] I have read and understood this stage
-- [ ] I have Entra ID P1 license (or skipping this stage)
-- [ ] I have disabled Security Defaults
-- [ ] I have added the Conditional Access module to main.tf
-- [ ] I have configured IP ranges and application ID
-- [ ] I have run `terraform plan`
-- [ ] I have run `terraform apply`
-- [ ] I have verified the Conditional Access policy in Azure Portal
-- [ ] I have tested that access is blocked as expected
-- [ ] Ready to move to the next stage
+- [ ] I have read and assessed the architectural mechanisms surrounding Conditional Access.
+- [ ] I maintain P1 Licensing metrics locally (otherwise skipping section).
+- [ ] I have manually disabled overarching Tenant Security Default configurations overriding Custom Policies.
+- [ ] I successfully mapped Conditional Access policies securely terminating into my static `main.tf` logic.
+- [ ] I reliably declared a functional CIDR Network Range paired safely into the SSO Application payload struct.
+- [ ] I generated a `terraform plan` simulating resource bindings.
+- [ ] I actively pushed these mappings effectively utilizing `terraform apply`.
+- [ ] I manually validated visual routing alongside constraints rendered inside the Azure Portal.
+- [ ] I simulated and confirmed network blocking capabilities natively triggering.
+- [ ] I am securely moving forward onto the next phase seamlessly.
 
-> **Tip:** Check all boxes above and close this issue when completed!
+> **Tip:** Make sure to cross off checkpoints properly prior to resolving Stage interactions!
 
-> **Report Issues:** Found a bug or have a question? [Report it here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues)
+> **Report Issues:** Are pipeline resources operating unexpectedly? [Formulate issue context actively here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← Previous: Stage 3](../stage-3/workload-federation.md) | [Next → Stage 5: Access Package](../stage-5/access-package.md)
+**Navigation:** [← Previous: Stage 3](../stage-3/workload-federation.md) | [Next → Stage 5: Access Packages](../stage-5/access-package.md)

@@ -1,70 +1,71 @@
 # Stage 3: Workload Federation
 
 ## Goals
-- Create the Service Principal in Entra ID with terraform with Workload Identity enabled
-- No secret needed.
-- PUT_TOKEN_ISSUER_URL_HERE use `https://vc.factorlabs.pl`
+- Provision a Service Principal in Entra ID using Terraform with Workload Identity Federation actively enabled.
+- Demonstrate authentication without requiring explicit secret generation or management.
+- Utilize the token issuer configuration targeting `https://vc.factorlabs.pl` for cross-system token exchange.
 
 ## ⏱️ Estimated Time: 15 minutes
 
-## Documentation
-- Basic: https://learn.microsoft.com/en-us/entra/workload-id/workload-identities-overview
-- https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation
-- token exchange: https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-client-creds-grant-flow#third-case-access-token-request-with-a-federated-credential
+## Documentation & References
+- [Overview of Workload Identities in Entra ID](https://learn.microsoft.com/en-us/entra/workload-id/workload-identities-overview)
+- [Workload Identity Federation](https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation)
+- [Exchanging a Federated Credential for an Access Token](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-client-creds-grant-flow#third-case-access-token-request-with-a-federated-credential)
 
-![diagram](diagram.png)
-## Steps & code
-To create the Service Principal we will use module `./modules/service_principal_workload_identity`.
+![Diagram illustrating Workload Federation](diagram.png)
 
-> **Note:** Please use unique business name for each service principal to avoid conflicts with the shared sandbox workshop tenant.
+## Implementation & Code
+To instantiate the Service Principal, we will utilize the localized module located within `./modules/service_principal_workload_identity`.
 
-Find needed Application.Read.All permission on the page: https://learn.microsoft.com/en-us/graph/permissions-reference
+> **Note:** Assign a distinct business prefix for each Service Principal to circumvent naming collisions inside the sandbox environment.
 
-use the code below to create the Service Principal:
+Refer to the official Graph API Permissions page to locate the `Application.Read.All` GUID identifier: [Graph API Permissions Reference](https://learn.microsoft.com/en-us/graph/permissions-reference).
 
-``` hcl
+Utilize the HCL module block below:
+
+```hcl
 module "Demo_WorkloadIdentity_ServicePrincipal" {
-  source = "./modules/service_principal_workload_identity"
-  business_name = "${var.deployment_unique_name}-WorkloadIdentity"
+  source                   = "./modules/service_principal_workload_identity"
+  business_name            = "${var.deployment_unique_name}-WorkloadIdentity"
   enable_workload_identity = true
-  subject_identifier = "system:serviceaccount:default:play-with-workload-identity"
-  issuer_url = "PUT_TOKEN_ISSUER_URL_HERE"
+  subject_identifier       = "system:serviceaccount:default:play-with-workload-identity"
+  issuer_url               = "https://vc.factorlabs.pl"
   graph_permissions = [
-    #application.read.all
+    # Application.Read.All
     "PASTE_YOUR_GRAPH_PERMISSION_GUID_HERE"
-    ]
+  ]
 }
 ```
 
-The partner token should be like on the screen
-![token](federated-token.png)
+The returned partner token should structure similarly to the payload below:
+![Federated Partner Token](federated-token.png)
 
-With https://jwt.ms you can decode the token and check the claims.
+You can effectively analyze any generated Token Claims using [jwt.ms](https://jwt.ms).
 
-## Verification
-- Review AppRegistration and Enterprise Application in Entra ID: check the name and permissions.
-- Check if Global Admin consent is required for the selected permissions.
-- Manual test: get token for 'partner' system and 'exchange' it for the Entra ID token.
+## Verification Steps
+- Inspect the corresponding App Registration and Enterprise Application blades in Entra ID. Validate naming conventions alongside the configured Application permissions.
+- Provide Global Administrator consent across the assigned Graph scopes via the portal.
+- Perform a manual baseline validation: Request an external token corresponding to the federated 'partner' system payload format, then submit an 'exchange' grant resolving via Entra ID against federated credentials.
 
 ## Troubleshooting
-- Check if permissions is valid GUID; For the Application not Delegated permissions.
-- Check if API Permission is granted for the Service Principal.
+- Validate whether the implemented graph permission conforms strictly to a recognized GUID. Confirm the application scope operates via Application/AppRoles logic instead of Delegated scopes.
+- Has Tenant Admin Consent fully finalized? Make sure `Grant admin consent` was formally reviewed if you are seeing arbitrary authentication denials.
 
 ---
 
 ## Stage Completion Checklist
-- [ ] I have read and understood this stage
-- [ ] I have added the Workload Identity module to main.tf
-- [ ] I have configured the issuer URL and subject identifier
-- [ ] I have run `terraform plan`
-- [ ] I have run `terraform apply`
-- [ ] I have verified Workload Identity Federation in Entra ID
-- [ ] I have tested the token exchange
-- [ ] Ready to move to the next stage
+- [ ] I have analyzed and understood this module's scope.
+- [ ] I have functionally added the Workload Identity Federation configuration to `main.tf`.
+- [ ] I have accurately localized and supplied both the Issuer URL and matching Subject Identifier.
+- [ ] I have run `terraform plan` without surfacing warnings.
+- [ ] I have securely run `terraform apply`.
+- [ ] I have manually validated Workload Identity Federation inside of Entra ID.
+- [ ] I successfully verified token exchange mapping leveraging my third-party federated credential payload.
+- [ ] I am ready to jump to the next stage.
 
-> **Tip:** Check all boxes above and close this issue when completed!
+> **Tip:** Complete the checkbox steps prior to declaring the issue closed.
 
-> **Report Issues:** Found a bug or have a question? [Report it here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues)
+> **Report Issues:** Missing documentation or struggling alongside a bug? [Please articulate an issue format here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
 **Navigation:** [← Previous: Stage 2](../stage-2/service-principal.md) | [Next → Stage 4: Conditional Access](../stage-4/conditional-access.md)

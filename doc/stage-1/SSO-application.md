@@ -1,89 +1,92 @@
 # Stage 1: SSO Application
 
-## Why
-Enabling SSO is one of the key features for Entra ID as Identity Provider. To make it simple, for the workshop we will use OIDC Debugger:
-- don't need to deploy any application and code to server or run it locally
-- is perfect here to test terraform, 
-- is free to use
-- we can test advanced scenarios like PKCE, 
+## Rationale
+Enabling Single Sign-On (SSO) is one of the core foundational features associated with using Entra ID as an Identity Provider (IdP). For the sake of simplification and ease during this workshop, we will be utilizing the OIDC Debugger:
+- It removes the requirement to locally run, compile, or host an application to act as a Relying Party.
+- It serves as a perfect testing plane for your Terraform configurations.
+- It is a free, openly accessible tool (OIDC Debugger).
+- It supports advanced validation scenarios such as Proof Key for Code Exchange (PKCE).
 
 ## ⏱️ Estimated Time: 10-15 minutes
 
 ## Goals
-- enable SSO for OIDC Debugger application with terraform (App Registration)
-- generate secret for the application (manual step)
+- Automate the deployment of an App Registration configured for SSO with the OIDC Debugger using Terraform.
+- Manually generate a client secret for the application to observe authentication flows.
 
-## Documentation & Links
-- https://oidcdebugger.com/
-- https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-client-creds-grant-flow#get-a-token
+## Documentation & References
+- [OIDC Debugger Application](https://oidcdebugger.com/)
+- [Microsoft Entra ID: Get a token](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-client-creds-grant-flow#get-a-token)
 
-## Steps & code
-To create the OIDC Debugger Service Principal we will use module `./modules/sso_app`. Will be simple Client Confidential application.
+## Implementation & Code
+To create the Service Principal for the OIDC Debugger, we will leverage the local module located at `./modules/sso_app`. It will automatically configure a standard Confidential Client.
 
-> **Note:** Please use unique business name for each service principal to avoid conflicts with the shared sandbox workshop tenant.
+> **Note:** Please designate a unique business name prefix for each application. This prevents naming conflicts when operating in a shared sandbox workshop tenant.
 
-Find on the https://oidcdebugger.com/ page the redirect URI for the application (our demo) and fill the SSO instance with the URI.
+Open [https://oidcdebugger.com/](https://oidcdebugger.com/) and identify the "Redirect URI" presented on the portal. Update the `web_uri` within your implementation below.
 
-``` hcl
+```hcl
 module "OidcDebugger_SSO" {
-  source = "./modules/sso_app"
+  source        = "./modules/sso_app"
   business_name = "${var.deployment_unique_name}-OidcDebuggerSSO"
-  web_uri = ["PUT_YOUR_WEB_URI_HERE"]
+  web_uri       = ["PUT_YOUR_WEB_URI_HERE"]
 }
 ```
 
-run terraform init - to initialize terraform
-``` hcl
+Run `terraform init` to download your provider requirements and initialize modules.
+```bash
 terraform init
 ```
-result should be similar to
+The output should resemble:
+
 ![](init.png)
 
-```
-
-run terraform plan - to see the changes
-``` hcl
+Run `terraform plan` to view an execution plan and observe exactly what changes will take place.
+```bash
 terraform plan
 ```
-result should be similar to
+The result should appear similar to:
+
 ![](plan.png)
 
-run terraform apply - to apply the changes
-``` hcl
+Run `terraform apply` to instruct Terraform to deploy the configured resources.
+```bash
 terraform apply
 ```
-result should be similar to
-![](apply.png)
+The applying phase output should resemble:
+
+![Terraform Apply](apply.png)
 
 ## Verification Steps
-![](diagram.png)
-- two resources should be created (App Registration and Enterprise Application)
-- terraform.tfstate with changes (feel free to check the file)
-- .terraform directory with modules and providers
-- based on the diagram test with the OIDC Debugger and VS Code `test/sso.http`
+![Verification Diagram](diagram.png)
+
+- Two Entra ID resources should now be provisioned in your tenant: an **App Registration** and an **Enterprise Application** (Service Principal).
+- Your directory should now reflect a populated `terraform.tfstate` tracking file (feel free to inspect the JSON file).
+- The `.terraform` directory is dynamically created containing modules and providers.
+- Use the overarching diagram as a reference to run a test on OIDC Debugger. Use the provided VS Code REST client block located in `test/sso.http`.
 
 ## Troubleshooting
-Not initialized terraform? Error like on the screen?
-run `terraform init` to initialize terraform.
+Getting initialization errors or a provider block discrepancy (like the image below)?
+
+Make sure to always run `terraform init` to prepare the workspace when working from a new folder or upon first launch.
 
 ![terraform init](run-init.png)
 
 ---
 
 ## Stage Completion Checklist
-- [ ] I have read and understood this stage
-- [ ] I have added the OidcDebugger module to main.tf
-- [ ] I have run `terraform init`
-- [ ] I have run `terraform plan`
-- [ ] I have run `terraform apply`
-- [ ] I have verified App Registration in Entra ID
-- [ ] I have verified Enterprise Application in Entra ID
-- [ ] I have tested with OIDC Debugger
-- [ ] Ready to move to the next stage
+- [ ] I have read and comprehended this stage.
+- [ ] I have inserted the OidcDebugger module config into my `main.tf` file.
+- [ ] I have successfully run `terraform init`.
+- [ ] I have successfully run `terraform plan`.
+- [ ] I have successfully run `terraform apply`.
+- [ ] I have verified the deployment of the respective App Registration within Entra ID.
+- [ ] I have verified the respective Enterprise Application generated within Entra ID.
+- [ ] I have tested authentication successfully against the OIDC Debugger.
+- [ ] I am ready to proceed to the next stage.
 
-> **Tip:** Check all boxes above and close this issue when completed!
+> **Tip:** Please mark all boxes above prior to closing out the issue!
 
-> **Report Issues:** Found a bug or have a question? [Report it here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues)
+> **Report Issues:** Did you encounter a bug or hold a question? [Report your issue here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
 **Navigation:** [← Previous: Stage 0](../stage-0/prerequisits.md) | [Next → Stage 2: Service Principal](../stage-2/service-principal.md)

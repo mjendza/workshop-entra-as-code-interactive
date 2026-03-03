@@ -1,56 +1,58 @@
 # Stage 5: Access Package
 
-> **Note:** This stage requires Entra ID P2 or Governance license. Skip if not available.
+> **Note:** Execution of this module necessitates an Entra ID Premium P2 or Entra ID Governance license suite.
 
 ## Goals
-- With the access package we will 'onboard' the users to 'Workshop Developer' program.
-- Self service action (package) will assign the user to the Entra ID group.
+- Provision an Entra ID Access Package structured to formalize 'onboarding' mechanics routing into a centralized 'Workshop Developer' ecosystem.
+- Facilitate the automated binding assigning any self-service validated users actively mapped against a specific core Entra ID Group backend.
 
 ## ⏱️ Estimated Time: 10 minutes
 
-## Requirements
-- Service Principal with:
+## Operational Prerequisites
+- Your programmatic Service Principal must natively map to:
   - `EntitlementManagement.ReadWrite.All`
   - `Group.ReadWrite.All`
   - `Directory.ReadWrite.All`
-- **Entra ID P2 license** (or Entra ID Governance license) for Access Packages.
+- **Entra ID P2 license minimum** (Alternatively an active Governance SKU supporting automated lifecycle controls over Access Packages).
 
-> ⚠️ **Note:** If you don't have P2/Governance license, you can skip this stage and Stage 6.
+> ⚠️ **Note:** If operating inside an Entra standard or P1 tiered environment absent Governance metrics, entirely circumvent the interactions in Steps 5 & 6 gracefully.
 
-## Documentation
-- https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/access_package
+## Documentation Reference
+- [AzureAD Provider - Defining Access Packages natively](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/access_package)
 
-## Steps & code
-![diagram](diagram.png)
+## Implementation Layout
+![Access Package Process Diagram](diagram.png)
 
-``` hcl
+Execute configuration deploying mapping directly traversing custom entitlements linking back into Entra structure mechanics.
+
+```hcl
 module "EntraDeveloper_Package" {
-  source = "./modules/access_package"
+  source        = "./modules/access_package"
   business_name = "${var.deployment_unique_name}-EntraDeveloper"
 }
 ```
 
-## Verification
-- Your access packages https://myaccess.microsoft.com/@{{your-tenant-domain}}#/overview
+## Verification Context
+- Query and evaluate any instantiated Access Packages validating configuration actively reflecting within the user accessibility portal natively supported by Microsoft: [Evaluating Deployment Workspaces](https://myaccess.microsoft.com/@{{your-tenant-domain}}#/overview)
 
-## Homework
-- update the module and add the minimum one approval to the access package.
-![diagram](diagram-what-next.png)
+## Homework/Advanced Configuration
+- Manually upgrade the deployed module incorporating an access workflow maintaining at least an arbitrary one-step approval layer mapped cleanly referencing an organizational admin/evaluator natively.
+![Diagram Representing Multi-Stage Routing](diagram-what-next.png)
 
 ---
 
 ## Stage Completion Checklist
-- [ ] I have read and understood this stage
-- [ ] I have Entra ID P2/Governance license (or skipping this stage)
-- [ ] I have added the Access Package module to main.tf
-- [ ] I have run `terraform plan`
-- [ ] I have run `terraform apply`
-- [ ] I have verified the Access Package in myaccess portal
-- [ ] Ready to move to the next stage
+- [ ] I carefully comprehend the structural scope binding Entitlement controls within Entra interactions.
+- [ ] I actively validated functional licensing mechanisms extending P2 controls locally (or manually circumvented sections gracefully).
+- [ ] I applied relevant Access Package references binding variables against my `main.tf` logic successfully.
+- [ ] I generated a clean structural `terraform plan` output effectively.
+- [ ] I resolved infrastructure mappings fully relying on standard `terraform apply` operations confidently.
+- [ ] I utilized the portal logic actively observing packages listed structurally resolving to users correctly.
+- [ ] I effectively executed staging logic reliably tracking next phase maneuvers properly.
 
-> **Tip:** Check all boxes above and close this issue when completed!
+> **Tip:** Assure manual review checklist progression functions accordingly bridging Stage closure mechanics!
 
-> **Report Issues:** Found a bug or have a question? [Report it here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues)
+> **Report Issues:** Did you break Entitlement capabilities resolving Access workflows? [Establish formalized context here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
 **Navigation:** [← Previous: Stage 4](../stage-4/conditional-access.md) | [Next → Stage 6: PIM](../stage-6/pim.md)
