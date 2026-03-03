@@ -1,97 +1,92 @@
 # Stage 0: Prerequisites
 
 ## Goals
-- create the Service Principal with secret in portal to be used in the next stage.
-- start with simple permissions and add more in the next stages.
-- ask for your Entra ID account: username and password.
+- Create a Service Principal and client secret in the Azure Portal to be used in subsequent stages.
+- Begin with minimal permissions and incrementally assign more throughout the workshop.
+- Retrieve and verify your corresponding Entra ID administrative credentials (username and password).
 
 ## ⏱️ Estimated Time: 15-20 minutes
 
 ## Prerequisites Checklist
-Before starting, ensure you have:
-- [ ] Access to an Entra ID tenant with **Global Administrator** role
-- [ ] **Entra ID P1 license** (for Stage 4) or **P2 license** (for Stages 5-6)
-- [ ] VS Code installed
-- [ ] Terraform installed
-- [ ] Git installed (to clone the repository)
+Before starting, please ensure you have the following:
+- [ ] Access to an Entra ID tenant with the **Global Administrator** role.
+- [ ] An **Entra ID P1 license** (required for Stage 4) or an **Entra ID P2 license** (required for Stages 5 and 6).
+- [ ] Visual Studio Code (VS Code) installed.
+- [ ] HashiCorp Terraform installed.
+- [ ] Git installed (for cloning the repository).
 
 ## Tools
-- VS Code
-```
+
+### Visual Studio Code
+```powershell
 winget install Microsoft.VisualStudioCode
 ```
-- REST Client for VS Code https://marketplace.visualstudio.com/items?itemName=humao.rest-client
-- Terraform
-```
+
+### Necessary VS Code Extensions
+- [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)
+
+### Terraform
+```powershell
 winget install HashiCorp.Terraform
 ```
-- Git (if not installed)
-```
+
+### Git (if not yet installed)
+```powershell
 winget install Git.Git
 ```
 
-### Verify Installation
+### Verify Installations
 ```powershell
 terraform --version
 code --version
 git --version
 ```
 
-## Steps to Create Service Principal in Azure Portal
+## Steps to Create a Service Principal in the Azure Portal
 
-1. **Navigate to Entra ID Portal**
-   - Go to [Azure Portal](https://portal.azure.com) → Microsoft Entra ID → App registrations
+1. **Navigate to the Entra ID Portal**
+   - Access the [Azure Portal](https://portal.azure.com) → Microsoft Entra ID → App registrations.
 
 2. **Register a New Application**
-   - Click "New registration"
-   - Name: `Workshop-Terraform-SP`
-   - Supported account types: "Accounts in this organizational directory only"
-   - Click "Register"
+   - Click "New registration".
+   - Name: `Workshop-Terraform-SP`.
+   - Supported account types: "Accounts in this organizational directory only".
+   - Click "Register".
 
-3. **Create Client Secret**
-   - Go to "Certificates & secrets" → "New client secret"
-   - Description: `workshop-secret`
-   - Expiry: 90 days (for workshop)
-   - Copy the secret value immediately (you won't see it again!)
+3. **Generate a Client Secret**
+   - Navigate to "Certificates & secrets" → "New client secret".
+   - Description: `workshop-secret`.
+   - Expiry: 90 days (sufficient for the workshop).
+   - Copy the secret value immediately and save it securely. You will not be able to view it later.
 
 4. **Assign API Permissions**
-   - Go to "API permissions" → "Add a permission"
-   - Select "Microsoft Graph" → "Application permissions"
-   - Add the following permissions (add more as you progress through stages):
-   
-   | Permission | Required For | Assing Now with Stage 0 | 
-   |------------|--------------|---------|
-   | `Application.ReadWrite.All` | Stages 1-3 | ⚠️ YES |
-   | `Policy.ReadWrite.ConditionalAccess` | Stage 4 | NO |
-   | `Policy.Read.All` | Stage 4 | NO |
-   | `EntitlementManagement.ReadWrite.All` | Stage 5 | NO |
-   | `Group.ReadWrite.All` | Stage 5 | NO |
-   | `Directory.ReadWrite.All` | Stage 5 | NO |
-   | `PrivilegedEligibilitySchedule.ReadWrite.AzureADGroup` | Stage 6 | NO |
-   
-   - Click **"Grant admin consent for [Your Tenant]"**
+   - Navigate to "API permissions" → "Add a permission".
+   - Select "Microsoft Graph" → "Application permissions".
+   - Add the following permission: `Application.ReadWrite.All`.
+   - Click **"Grant admin consent for [Your Tenant]"**.
 
-5. **Note Down Values**
-   - Application (client) ID: Copy from Overview
-   - Directory (tenant) ID: Copy from Overview
-   - Client Secret: Already copied in step 3
+5. **Document the Following Identifiers**
+   - Application (client) ID: Retrieved from the application Overview blade.
+   - Directory (tenant) ID: Retrieved from the application Overview blade.
+   - Client Secret: Copied previously in step 3.
 
-6. **(Stage 4 only) Disable Security Defaults**
-   - Go to Entra ID → Properties → Manage Security defaults
-   - Set to "Disabled"
-   - This is required for Conditional Access policies
+6. **Disable Security Defaults (Required for Stage 4 Only)**
+   - Navigate to Entra ID → Properties → Manage Security defaults.
+   - Toggle to "Disabled".
+   - Note: This must be disabled to create and manage Conditional Access policies.
 
-## Code
-Update the **Basic** section of the [main.tf](../../main.tf) file. Use a prefix with your name or initials for the value of `deployment_unique_name`.
-``` hcl
+## Code Configuration
+
+Update the **Basic** section of the `main.tf` file. Define a unique prefix (such as your initials) as the value for `deployment_unique_name`.
+```hcl
 # Set deployment unique name
 variable "deployment_unique_name" {
   default = "MJ"
 }
 ```
 
-Update the [provider.tf](../../provider.tf) file with your Service Principal credentials:
-``` hcl
+Update the `provider.tf` file using the Service Principal credentials documented earlier:
+```hcl
 provider "azuread" {
   client_id     = "YOUR_CLIENT_ID_HERE"
   client_secret = "YOUR_CLIENT_SECRET_HERE"
@@ -100,33 +95,33 @@ provider "azuread" {
 ```
 
 ## Verification
-- [ ] client_id and client_secret are stored in [provider.tf](../../provider.tf) file.
-- [ ] permissions 'Application.ReadWrite.All' assigned and consented: https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_configuration
-- [ ] Each module should have a unique name `deployment_unique_name` to avoid conflicts (optional).
-- [ ] Run `terraform init` to verify provider configuration works.
+- [ ] Ensure that `client_id` and `client_secret` are properly stored inside the `provider.tf` file.
+- [ ] Confirm the `Application.ReadWrite.All` permission has been granted, including admin consent. For more details, review the [Provider Service Principal Configuration Guide](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_configuration).
+- [ ] Confirm each module has a distinct `deployment_unique_name` to avoid potential collisions (optional).
+- [ ] Execute `terraform init` to ensure the provider dependencies download and initialize successfully.
 
 ## Troubleshooting
 | Issue | Solution |
 |-------|----------|
-| "Insufficient privileges" error | Ensure admin consent is granted for all permissions |
-| "Invalid client secret" | Secret may have expired or was copied incorrectly |
-| Cannot find App registrations | Ensure you're in the correct tenant |
+| "Insufficient privileges" error | Ensure admin consent has been properly granted for the assigned permissions. |
+| "Invalid client secret" | The client secret may have expired or was pasted with trailing spaces. Please regenerate. |
+| Cannot find App registrations | Confirm you are logged into the correct target Entra ID tenant. |
 
 ---
 
 ## Stage Completion Checklist
-- [ ] I have access to an Entra ID tenant with the Global Administrator role
-- [ ] I have installed VS Code, Terraform, and Git
-- [ ] I have created the Service Principal in the Azure Portal
-- [ ] I have copied client_id, client_secret, and tenant_id
-- [ ] I have assigned and consented to API permissions: `Application.ReadWrite.All`
-- [ ] I have updated provider.tf with credentials
-- [ ] I have run `terraform init` successfully
-- [ ] Ready to move to the next stage
+- [ ] I have verified access to an Entra ID tenant using the Global Administrator role.
+- [ ] I have successfully installed VS Code, Terraform, and Git locally.
+- [ ] I have successfully created the Service Principal within the Azure Portal.
+- [ ] I have securely documented the `client_id`, `client_secret`, and `tenant_id`.
+- [ ] I have assigned and granted admin consent for API permissions (`Application.ReadWrite.All`).
+- [ ] I have correctly populated `provider.tf` with the appropriate credentials.
+- [ ] I have successfully run `terraform init` and observed positive output.
+- [ ] I am ready to proceed to the next stage.
 
-> **Tip:** Check all boxes above and close this issue when completed!
+> **Tip:** Make sure to check all of the boxes above before closing this issue and proceeding!
 
-> **Report Issues:** Found a bug or have a question? [Report it here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues)
+> **Report Issues:** Did you encounter a bug or need clarification? [Report the issue here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
 **Navigation:** [Next Stage → Stage 1: SSO Application](../stage-1/SSO-application.md)

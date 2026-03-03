@@ -1,9 +1,22 @@
 name: Create Workshop Issues
 
 on:
-  push:
-    branches:
-      - main
+  # Automatically run when repository is forked/created (runs on default branch creation)
+  create:
+  workflow_dispatch:
+    inputs:
+      prefix:
+        description: 'Issue title prefix (e.g., your initials)'
+        required: false
+        default: ''
+      target_owner:
+        description: 'Target repository owner (leave empty to use current repo owner)'
+        required: false
+        default: ''
+      target_repo:
+        description: 'Target repository name (leave empty to use current repo name)'
+        required: false
+        default: ''
 
 permissions:
   issues: write
@@ -12,8 +25,9 @@ permissions:
 jobs:
   create-issues:
     runs-on: ubuntu-latest
-    if: |
-      !github.event.repository.is_template
+    # Only run on create event if it's a new repository (fork) - check if default branch
+    # For workflow_dispatch, always run
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'create' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch))
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,8 +42,11 @@ jobs:
             const prefixInput = '${{ github.event.inputs.prefix }}';
             const prefix = prefixInput ? `[${prefixInput}] ` : '';
 
-            const owner =  context.repo.owner;
-            const repo =  context.repo.repo;
+            // Allow targeting a different repository (useful when running from a fork)
+            const targetOwnerInput = '${{ github.event.inputs.target_owner }}';
+            const targetRepoInput = '${{ github.event.inputs.target_repo }}';
+            const owner = targetOwnerInput || context.repo.owner;
+            const repo = targetRepoInput || context.repo.repo;
             const branch = context.ref.replace('refs/heads/', '');
             const rawBaseUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}`;
 
@@ -45,7 +62,9 @@ jobs:
               { file: 'doc/stage-4/conditional-access.md', title: 'Stage 4: Conditional Access', labels: ['workshop', 'stage-4'] },
               { file: 'doc/stage-5/access-package.md', title: 'Stage 5: Access Package', labels: ['workshop', 'stage-5'] },
               { file: 'doc/stage-6/pim.md', title: 'Stage 6: PIM (Privileged Identity Management)', labels: ['workshop', 'stage-6'] },
-              { file: 'doc/stage-7/end.md', title: 'Stage 7: End & Cleanup', labels: ['workshop', 'stage-7'] },
+              { file: 'doc/stage-7/tenant-security.md', title: 'Stage 7: Tenant Security', labels: ['workshop', 'stage-7'] },
+              { file: 'doc/stage-8/entra-agent.md', title: 'Stage 8: Entra ID Agent (Preview)', labels: ['workshop', 'stage-8'] },
+              { file: 'doc/stage-cleanup/end.md', title: 'Stage 9: End & Cleanup', labels: ['workshop', 'stage-cleanup'] },
               { file: 'doc/stage-next/what-next.md', title: 'Bonus: What\'s Next?', labels: ['workshop', 'bonus'] }
             ];
 
@@ -58,32 +77,44 @@ jobs:
               '../stage-4/conditional-access.md': 4,
               '../stage-5/access-package.md': 5,
               '../stage-6/pim.md': 6,
-              '../stage-7/end.md': 7,
-              '../stage-next/what-next.md': 8
+              '../stage-7/tenant-security.md': 7,
+              '../stage-8/entra-agent.md': 8,
+              '../stage-cleanup/end.md': 9,
+              '../stage-next/what-next.md': 10
             };
 
+            // Function to convert relative image paths to raw GitHub URLs
             function convertImageUrls(content, docDir) {
-              return content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, imgPath) => {               
+              // Match markdown images: ![alt](path) or ![](path)
+              return content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, imgPath) => {
+                // Skip if already absolute URL
                 if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) {
                   return match;
                 }
+                // Convert relative path to absolute raw GitHub URL
                 const absolutePath = path.posix.join(docDir, imgPath);
                 const rawUrl = `${rawBaseUrl}/${absolutePath}`;
                 return `![${alt}](${rawUrl})`;
               });
             }
 
+            // Function to replace navigation links with issue references
             function replaceNavigationLinks(content, issueNumbers) {
+              // Replace markdown links to other stage files with issue references
+              // Match patterns like [text](../stage-X/file.md)
+              // Use GitHub issue URL format for proper linking
               return content.replace(/\[([^\]]+)\]\((\.\.\/stage-[^)]+\.md|\.\.\/stage-next\/[^)]+\.md)\)/g, (match, linkText, filePath) => {
                 const stageIndex = fileToStageIndex[filePath];
                 if (stageIndex !== undefined && issueNumbers[stageIndex]) {
+                  // Use full GitHub issue URL for proper issue linking
                   const issueUrl = `https://github.com/${owner}/${repo}/issues/${issueNumbers[stageIndex]}`;
                   return `[${linkText}](${issueUrl})`;
                 }
-                return match;
+                return match; // Keep original if no mapping found
               });
             }
 
+            // Function to convert repository file links to GitHub blob URLs
             function convertRepoFileLinks(content, docDir) {
               const blobBaseUrl = `https://github.com/${owner}/${repo}/blob/${branch}`;
               // Match markdown links to relative files (not images, not URLs, not stage navigation)
@@ -92,22 +123,38 @@ jobs:
                 if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
                   return match;
                 }
+                // Skip stage navigation (handled separately)
                 if (filePath.match(/\.\.\/stage-[^)]+\.md/) || filePath.match(/\.\.\/stage-next\/[^)]+\.md/)) {
                   return match;
                 }
+                // Convert relative path to absolute GitHub blob URL
                 const absolutePath = path.posix.normalize(path.posix.join(docDir, filePath));
                 const blobUrl = `${blobBaseUrl}/${absolutePath}`;
                 return `[${linkText}](${blobUrl})`;
               });
             }
+
+            // Store created issue numbers
             const issueNumbers = [];
+
+            // Create issues sequentially and track their numbers
             for (let i = 0; i < stages.length; i++) {
               const stage = stages[i];
               let body = fs.readFileSync(stage.file, 'utf8');
+
+              // Get the directory of the markdown file for resolving relative image paths
               const docDir = path.dirname(stage.file);
+
+              // Convert image URLs to raw GitHub URLs
               body = convertImageUrls(body, docDir);
-              body = convertRepoFileLinks(body, docDir)
-              body = replaceNavigationLinks(body, issueNumbers);              
+
+              // Convert repository file links to GitHub blob URLs
+              body = convertRepoFileLinks(body, docDir);
+
+              // Replace navigation links with issue references (for previously created issues)
+              body = replaceNavigationLinks(body, issueNumbers);
+
+              // Create the issue
               const issue = await github.rest.issues.create({
                 owner: owner,
                 repo: repo,
@@ -115,30 +162,53 @@ jobs:
                 body: body,
                 labels: stage.labels
               });
+
               issueNumbers.push(issue.data.number);
               console.log(`Created issue #${issue.data.number}: ${stage.title}`);
+
               // Small delay to ensure proper ordering
               await new Promise(resolve => setTimeout(resolve, 500));
             }
 
+            // Update all issues to fix "Next" navigation links now that all issues exist
             console.log('\nUpdating navigation links...');
             for (let i = 0; i < stages.length; i++) {
               const stage = stages[i];
               let body = fs.readFileSync(stage.file, 'utf8');
+
+              // Get the directory of the markdown file for resolving relative image paths
               const docDir = path.dirname(stage.file);
+
+              // Convert image URLs to raw GitHub URLs
               body = convertImageUrls(body, docDir);
+
+              // Convert repository file links to GitHub blob URLs
               body = convertRepoFileLinks(body, docDir);
+
+              // Replace ALL navigation links with issue references (now all issues exist)
               body = replaceNavigationLinks(body, issueNumbers);
+
+              // Update the issue with correct navigation
               await github.rest.issues.update({
                 owner: owner,
                 repo: repo,
                 issue_number: issueNumbers[i],
                 body: body
               });
+
               console.log(`Updated issue #${issueNumbers[i]} with correct navigation`);
-            }            
+            }
+
+            console.log('\n✅ All workshop issues created and linked successfully!');
             console.log('Issue numbers:', issueNumbers.join(', '));
 
       - name: Summary
         run: |
+          TARGET_OWNER="${{ github.event.inputs.target_owner }}"
+          TARGET_REPO="${{ github.event.inputs.target_repo }}"
+          OWNER="${TARGET_OWNER:-${{ github.repository_owner }}}"
+          REPO="${TARGET_REPO:-${{ github.event.repository.name }}}"
           echo "Workshop issues created successfully!"
+          echo "Target repository: ${OWNER}/${REPO}"
+          echo "Issues created for all 8 stages + bonus"
+          echo "All issues have been updated with correct navigation links"
