@@ -49,6 +49,14 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 | v1.0    | 2026.01.05 | 🎆 Initial public release                          |
 | v1.1    | 2026.02.19 | Added Stage 7 (Tenant configuration and security changes) using the microsoft/msgraph provider |
 | v1.2    | 2026.02.24 | Added Stage 8 (Entra ID Agent) using the microsoft/msgraph provider |
+| v1.3    | 2026.03.02 | Added Stage 9 (Maester) |
+| v1.4    | 2026.03.03 | Added Stage 10 (EntraExporter) |
+| v1.5    | 2026.03.04 | Added Stage 11 (Zero Trust Assessment)  |
+| v1.6    | 2026.03.11 | Added Stage 12 DIFF via Maester (Maester + EntraExporter) |
+| v1.6    | 2026.03.12 | Added Stage 13 (Lokka MCP) |
+| v1.6.1  | 2026.03.13 | Updated Stage 13 Lokka MCP configurations for GitHub Copilot VS Code and NanoBot integrations |
+
+
 
 ## Frequently Asked Questions (FAQ)
 
@@ -59,6 +67,8 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 | Do I need to have a Workforce or an External ID tenant? | The entire workshop is designed for a Workforce tenant. Stages 1-4 are also compatible with an External ID tenant. |
 | Do I need the Global Admin role?                   | Yes, Global Administrator privileges are required.                           |
 | Is the workshop designed to teach me Terraform?    | No, the primary focus is learning how to manage Entra ID using Infrastructure as Code (Terraform), rather than teaching Terraform from scratch. |
+| Do I need to use terraform to complete all stages? | No, while Terraform is the primary tool used in the workshop, some stages may involve using other tools or scripts (e.g., PowerShell for generating secrets). However, the majority of the workshop is designed around Terraform. Maester, ZTA, Lokka can be managed without Terraform. |
+
 
 ## Prerequisites
 
@@ -83,7 +93,7 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 - Provision and configure core Entra ID resources using Terraform.
 - Understand the current limitations of Managing Entra ID via IaC.
 
-**Estimated Duration:** 90–120 minutes.
+**Estimated Duration:** 180–240 minutes.
 
 ## Workshop Outline
 1. Set up the workstation environment

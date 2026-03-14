@@ -40,6 +40,17 @@ variable "agent_user_upn_domain" {
   default     = ""
 }
 
+variable "graph_permissions" {
+  description = "List of Microsoft Graph delegated permission IDs (Scope) to grant to the agent identity"
+  type        = list(string)
+  default     = []
+}
+
+variable "microsoft_graph_sp_id" {
+  description = "Object ID of the Microsoft Graph service principal in the tenant. Required when graph_permissions is set. Find via: az ad sp show --id 00000003-0000-0000-c000-000000000000 --query id -o tsv"
+  type        = string
+}
+
 resource "msgraph_resource" "agent_blueprint" {
   url         = "applications/graph.agentIdentityBlueprint"
   api_version = "beta"
@@ -96,6 +107,30 @@ resource "msgraph_resource" "agent_blueprint_principal" {
   }
 }
 
+# Declare required Graph API permissions on the blueprint application
+resource "msgraph_resource_action" "agent_blueprint_graph_permissions" {
+  count        = length(var.graph_permissions) > 0 ? 1 : 0
+  resource_url = "applications/${msgraph_resource.agent_blueprint.output.id}"
+  api_version  = "beta"
+  method       = "PATCH"
+
+  body = {
+    requiredResourceAccess = [
+      {
+        resourceAppId = "00000003-0000-0000-c000-000000000000"
+        resourceAccess = [
+          for perm in var.graph_permissions : {
+            id   = perm
+            type = "Scope"
+          }
+        ]
+      }
+    ]
+  }
+
+  depends_on = [msgraph_resource_action.agent_blueprint_api_scope]
+}
+
 resource "msgraph_resource" "agent_identity" {
   url         = "serviceprincipals/graph.agentIdentity"
   api_version = "beta"
@@ -115,6 +150,8 @@ resource "msgraph_resource" "agent_identity" {
     id = "id"
   }
 }
+
+
 
 # Create Agent User (optional)
 resource "msgraph_resource" "agent_user" {

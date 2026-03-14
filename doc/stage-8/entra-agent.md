@@ -26,10 +26,6 @@ $me.Id
 ```
 *(Alternatively, find it in Entra ID Portal -> Users -> Find by email -> Object ID).*
 
-## Step 1: Find your domain name
-Open the Entra ID Portal and navigate to Custom Domain Names to find your primary domain name (e.g., `tenant-name.onmicrosoft.com`). You will need this for the `agent_user_upn_domain` variable in the next step.
-
-
 ### Step 2: Add Logic to `main.tf`
 
 Add the following to `main.tf` and replace placeholders with your info:
@@ -39,7 +35,7 @@ module "EntraAgent" {
   source = "./modules/entra_agent"
 
   deployment_env_name   = var.deployment_env_name
-  business_name         = "${var.deployment_unique_name}-MyFirstAgent"
+  business_name         = "${var.deployment_unique_name}-MyAgent"
   sponsor_user_id       = "<your-user-object-id>"
   oauth2_scope_id       = "<generate-a-uuid>"
 
@@ -92,6 +88,14 @@ Navigate to [Microsoft Entra Admin Center](https://entra.microsoft.com) -> Enter
 - [ ] Added `EntraAgent` module to `main.tf`.
 - [ ] Ran `terraform init -upgrade`, `plan`, and `apply`.
 - [ ] Verified the Agent Blueprint, Principal, and Agent Identity in the portal/PS.
+- [ ] Verified the Agent Identity Blueprint was created. It is a definition.
+- [ ] Verified the Agent Identity Blueprint Principal was created. It is the service principal representing the blueprint in the (current) tenant.
+- [ ] Verified the Agent Identity as Service Principal was created. It is the service principal representing the agent in the tenant.
+
+
+
+
+
 
 > **Tip:** Close this issue when completed!
 
