@@ -1,0 +1,10 @@
+Describe "CISA SCuBA" -Tag "MS.***", "MS.***.#.#", "CISA", "Security" {
+    It "MS.***.#.#: Control Should/Must description." {
+
+        $shortFunctionName = FunctionName
+
+        if ($null -ne $shortFunctionName) {
+            $shortFunctionName | Should -Be $true -Because "..."
+        }
+    }
+}
