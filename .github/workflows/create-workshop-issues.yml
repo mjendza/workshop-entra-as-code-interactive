@@ -47,7 +47,13 @@ jobs:
               { file: 'doc/stage-6/pim.md', title: 'Stage 6: PIM (Privileged Identity Management)', labels: ['workshop', 'stage-6'] },
               { file: 'doc/stage-7/tenant-security.md', title: 'Stage 7: Tenant Security', labels: ['workshop', 'stage-7'] },
               { file: 'doc/stage-8/entra-agent.md', title: 'Stage 8: Entra ID Agent (Preview)', labels: ['workshop', 'stage-8'] },
-              { file: 'doc/stage-cleanup/end.md', title: 'Stage 9: End & Cleanup', labels: ['workshop', 'stage-cleanup'] },
+              { file: 'doc/stage-9/maester.md', title: 'Stage 9: Maester', labels: ['workshop', 'stage-9'] },
+              { file: 'doc/stage-10/entra-exporter.md', title: 'Stage 10: Entra Exporter', labels: ['workshop', 'stage-10'] },
+              { file: 'doc/stage-11/zta.md', title: 'Stage 11: Zero Trust Assessment', labels: ['workshop', 'stage-11'] },
+              { file: 'doc/stage-12/diff.md', title: 'Stage 12: Drift', labels: ['workshop', 'stage-12'] },
+              { file: 'doc/stage-13/lokka.md', title: 'Stage 13: Lokka MCP', labels: ['workshop', 'stage-13'] },
+
+              { file: 'doc/stage-cleanup/end.md', title: 'Stage End & Cleanup', labels: ['workshop', 'stage-cleanup'] },
               { file: 'doc/stage-next/what-next.md', title: 'Bonus: What\'s Next?', labels: ['workshop', 'bonus'] }
             ];
 
@@ -62,12 +68,17 @@ jobs:
               '../stage-6/pim.md': 6,
               '../stage-7/tenant-security.md': 7,
               '../stage-8/entra-agent.md': 8,
-              '../stage-cleanup/end.md': 9,
-              '../stage-next/what-next.md': 10
+              '../stage-9/maester.md': 9,
+              '../stage-10/entra-exporter.md': 10,
+              '../stage-11/zta.md': 11,
+              '../stage-12/diff.md': 12,
+              '../stage-13/lokka.md': 13,
+              '../stage-cleanup/end.md': 14,
+              '../stage-next/what-next.md': 15
             };
 
             function convertImageUrls(content, docDir) {
-              return content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, imgPath) => {               
+              return content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, imgPath) => {
                 if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) {
                   return match;
                 }
@@ -110,8 +121,8 @@ jobs:
               let body = fs.readFileSync(stage.file, 'utf8');
               const docDir = path.dirname(stage.file);
               body = convertImageUrls(body, docDir);
-              body = convertRepoFileLinks(body, docDir)
-              body = replaceNavigationLinks(body, issueNumbers);              
+              body = convertRepoFileLinks(body, docDir);
+              body = replaceNavigationLinks(body, issueNumbers);
               const issue = await github.rest.issues.create({
                 owner: owner,
                 repo: repo,
@@ -140,7 +151,7 @@ jobs:
                 body: body
               });
               console.log(`Updated issue #${issueNumbers[i]} with correct navigation`);
-            }            
+            }
             console.log('Issue numbers:', issueNumbers.join(', '));
 
       - name: Summary
