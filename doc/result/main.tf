@@ -210,5 +210,40 @@ module "Lokka_ServicePrincipal" {
   graph_permissions =[
   "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30",
   "df021288-bdef-4463-88db-98f22de89214"
-]
+  ]
+}
+
+#########################################################################
+# Stage 14: SPA SSO for Application PLACEHOLDER
+#########################################################################
+module "SPA_OidcDebugger_SSO" {
+  source = "./modules/sso_app_rich"
+  business_name = "${var.deployment_unique_name}-SPA-OidcDebuggerSSO"
+  identifier_uris = ["api://workshop.factorlabs.pl"]
+  oauth2_permission_scope_name = "Helpdesk"
+  spa_uri = ["https://oidcdebugger.com/debug"]
+}
+
+#########################################################################
+# Stage 15: Application Roles for SPA SSO PLACEHOLDER
+#########################################################################
+module "Demo_Roles_OidcDebugger_SSO" {
+   source = "./modules/sso_app_rich"
+    business_name = "${var.deployment_unique_name}-Roles-OidcDebuggerSSO"
+    identifier_uris = ["api://premium.factorlabs.pl"]
+    oauth2_permission_scope_name = "PremiumHelpdesk"
+    spa_uri = ["https://oidcdebugger.com/debug"]
+    app_role_values = ["vip", "basic", "premium"]
+}
+
+#########################################################################
+# Stage 16: Certificate-Based SP Authentication
+#########################################################################
+module "Workload_CertSp" {
+  source                      = "./modules/service_principal_rich"
+  business_name               = "${var.deployment_unique_name}-SpWithCertificate"
+  graph_permissions           = ["df021288-bdef-4463-88db-98f22de89214"] # User.Read.All
+  use_certificate             = true
+  certificate_file            = "cert.pem"
+  certificate_validity_months = 12
 }
