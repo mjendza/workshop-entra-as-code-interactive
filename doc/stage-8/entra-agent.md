@@ -40,7 +40,7 @@ module "EntraAgent" {
   oauth2_scope_id       = "<generate-a-uuid>"
 
   create_agent_user     = true
-  agent_user_upn_domain = "tenant-name.onmicrosoft.com"
+  agent_user_upn_domain = "<name-your-agent>"
 }
 ```
 

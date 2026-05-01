@@ -58,7 +58,29 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 | 11      | Zero Trust Assessment                | Automate the provisioning of a Service Principal with the required ZeroTrustAssessment permissions using Terraform. Review the assessment results to proactively understand your tenant's security posture and identify areas for improvement.                                     |
 | 12      | Diff                                 | Combine Maester and EntraExporter to implement a diff-based workflow for configuration change detection. This will allow you to compare Entra ID configurations using diff analysis to detect changes between Terraform runs.                                                      |
 | 13      | Lokka                                | Automate the provisioning of a Service Principal with Lokka MCP permissions using Terraform in Entra ID. Prepare configurations for GitHub Copilot VS Code and NanoBot. This allows you to explore Entra ID configurations using natural language.                                 |
+| 14      | SPA SSO                              | Configure an Entra ID App Registration for Single Page Application (SPA) Single Sign-On. This includes defining SPA redirect URIs, custom API scopes, and identifier URIs. Validate the configuration and test authentication flows using the OIDC Debugger.                        |
+| 15      | Application Roles (App Roles)        | Define application roles for role-based access control (RBAC) in your Entra ID App Registration. This stage demonstrates how to create app roles, assign them to users, and verify role claims in ID tokens using the OIDC Debugger.                                                   |
+| 16      | Use Certificate instead of Client Secret for Service Principal        | Configure a Service Principal to use a certificate for authentication instead of a client secret. This enhances security by leveraging certificate-based authentication.                                                                                                           |
 | Cleanup | Architecture Disassembly             | Execute a broad programmatic tracking destruction mapping using Terraform destroy. Formally complete the deployment workshop and zero the environment successfully. This safely removes all provisioned resources.                                                                 |
+
+## Supported tenant type
+| Step | Workforce tenant | Customer (External ID) tenant |
+|------|------------------|-------------------------------|
+| 1    | ✅               | ✅                           |
+| 2    | ✅               | ✅                           |
+| 3    | ✅               | ✅                           |
+| 4    | ✅               | ✅                           |
+| 5    | ✅               | ❓ Not tested | 
+| 7    | ✅               | ❓ Not tested |
+| 8    | ✅               | ❓ Not tested |
+| 9    | ✅               | ❓ Not tested |
+| 10   | ✅               | ❓ Not tested |
+| 11   | ✅               | ❓ Not tested |
+| 12   | ✅               | ❓ Not tested |
+| 13   | ✅               | ✅ |
+| 14   | ✅               | ✅ |
+| 15   | ✅               | ✅ |
+| 16   | ✅               | ✅ |
 
 ## Changelog 
 | Version | Date       | Description                                                                                    |
@@ -76,7 +98,8 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 | v1.6    | 2026.03.11 | Added Stage 12 DIFF via Maester (Maester + EntraExporter)                                      |
 | v1.6    | 2026.03.12 | Added Stage 13 (Lokka MCP)                                                                     |
 | v1.6.1  | 2026.03.13 | Updated Stage 13 Lokka MCP configurations for GitHub Copilot VS Code and NanoBot integrations  |
-
+| v1.7    | 2026.04.24 | Added Stage 14 (SPA SSO)                                                                       |
+| v1.7    | 2026.04.27 | Added Stage 15 (Application Roles)                                                             |
 
 
 ## Frequently Asked Questions (FAQ)

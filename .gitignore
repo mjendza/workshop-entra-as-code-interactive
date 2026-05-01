@@ -1,6 +1,21 @@
 .idea
+.aider*
 .env
 .terraform*
 *.secret
 
 *.tfstate*
+
+# Test results
+test/TestResults.xml
+test/TestResults*.xml
+
+test-results
+exported
+diff
+
+# Stage 16: certificate private material — never commit
+cert/*.pfx
+cert/*.key
+cert/*.cer
+cert/cert.thumbprint.txt
