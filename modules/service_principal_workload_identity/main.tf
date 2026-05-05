@@ -1,30 +1,30 @@
 
 
 variable "graph_permissions" {
-    description = "List of Graph API permissions"
-    type        = list(string)
-    default     = []
+  description = "List of Graph API permissions"
+  type        = list(string)
+  default     = []
 }
 variable "business_name" {
-    description = "Business name"
-    type        = string
+  description = "Business name"
+  type        = string
 }
-variable deployment_env_name {
+variable "deployment_env_name" {
   description = "Unique name for the deployment"
   type        = string
   default     = "Workshop"
 }
 variable "enable_workload_identity" {
-    description = "Enable workload identity federation"
-    type        = bool
+  description = "Enable workload identity federation"
+  type        = bool
 }
 variable "subject_identifier" {
-    description = "Subject identifier for the federated credential"
-    type        = string
+  description = "Subject identifier for the federated credential"
+  type        = string
 }
 variable "issuer_url" {
-    description = "Issuer URL for the federated credential"
-    type        = string
+  description = "Issuer URL for the federated credential"
+  type        = string
 }
 
 resource "azuread_application" "this" {
@@ -57,13 +57,13 @@ resource "azuread_service_principal" "this" {
 }
 
 resource "azuread_application_federated_identity_credential" "this" {
-  count              = var.enable_workload_identity ? 1 : 0
-  application_id     = azuread_application.this.id
-  display_name       = "TF.${var.deployment_env_name}.${var.business_name}.FederatedCredential"
-  description        = "Workload Identity federation for ${var.business_name}"
-  audiences          = ["api://AzureADTokenExchange"]
-  issuer             = "${var.issuer_url}"
-  subject            = var.subject_identifier
+  count          = var.enable_workload_identity ? 1 : 0
+  application_id = azuread_application.this.id
+  display_name   = "TF.${var.deployment_env_name}.${var.business_name}.FederatedCredential"
+  description    = "Workload Identity federation for ${var.business_name}"
+  audiences      = ["api://AzureADTokenExchange"]
+  issuer         = var.issuer_url
+  subject        = var.subject_identifier
 }
 
 output "application_id" {

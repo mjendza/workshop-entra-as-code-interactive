@@ -2,7 +2,7 @@ variable "business_name" {
   description = "Business name prefix to use for all resources"
   type        = string
 }
-variable deployment_env_name {
+variable "deployment_env_name" {
   description = "Unique name for the deployment"
   type        = string
   default     = "Workshop"
@@ -11,7 +11,7 @@ resource "azuread_group" "entraid_app_developers" {
   display_name     = "TF.${var.deployment_env_name}.${var.business_name}.EntraID.ApplicationDevelopers"
   security_enabled = true
   description      = "Group for developers who need Application Administrator access"
-  
+
   lifecycle {
     prevent_destroy = false
   }
@@ -46,7 +46,7 @@ resource "azuread_access_package_assignment_policy" "no_approval_policy" {
   duration_in_days  = 180 # 6 months validity
 
   requestor_settings {
-    scope_type       = "AllExistingDirectoryMemberUsers"
+    scope_type        = "AllExistingDirectoryMemberUsers"
     requests_accepted = true
   }
 

@@ -70,7 +70,7 @@ resource "msgraph_resource" "agent_blueprint" {
 # Add OAuth2 permission scope to make the agent visible in the portal
 resource "msgraph_resource_action" "agent_blueprint_api_scope" {
   resource_url = "applications/${msgraph_resource.agent_blueprint.output.id}"
-  api_version = "beta"
+  api_version  = "beta"
   method       = "PATCH"
 
   body = {

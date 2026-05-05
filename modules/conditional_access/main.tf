@@ -1,21 +1,21 @@
 variable "business_name" {
-    description = "Business name"
-    type        = string
+  description = "Business name"
+  type        = string
 }
-variable deployment_env_name {
+variable "deployment_env_name" {
   description = "Unique name for the deployment"
   type        = string
   default     = "Workshop"
 }
 variable "included_applications" {
-    description = "List of Client IDs for the applications to include in the policy"
-    type        = list(string)
-    default     = []
+  description = "List of Client IDs for the applications to include in the policy"
+  type        = list(string)
+  default     = []
 }
 variable "trusted_locations_ip_ranges" {
-    description = "List of IP ranges for trusted locations"
-    type        = list(string)
-    default     = null
+  description = "List of IP ranges for trusted locations"
+  type        = list(string)
+  default     = null
 }
 resource "azuread_named_location" "trusted_locations_countries" {
   display_name = "TF.Workshop.${var.business_name}.Trusted Countries"
@@ -37,7 +37,7 @@ resource "azuread_named_location" "trusted_locations_ip_ranges" {
 resource "azuread_conditional_access_policy" "this" {
   display_name = "TF.${var.deployment_env_name}.${var.business_name}.Policy"
   #state        = "enabledForReportingButNotEnforced"
-  state        = "enabled"
+  state = "enabled"
 
   conditions {
     client_app_types = ["all"]

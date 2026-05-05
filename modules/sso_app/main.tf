@@ -1,39 +1,39 @@
 variable "web_uri" {
-    description = "List of Web URIs redirect"
-    type        = list(string)
-    default     = []
+  description = "List of Web URIs redirect"
+  type        = list(string)
+  default     = []
 }
 
 variable "graph_permissions" {
-    description = "List of Graph API permissions for Role"
-    type        = list(string)
-    default     = []
+  description = "List of Graph API permissions for Role"
+  type        = list(string)
+  default     = []
 }
 variable "business_name" {
-    description = "Business name"
-    type        = string
+  description = "Business name"
+  type        = string
 }
-variable deployment_env_name {
+variable "deployment_env_name" {
   description = "Unique name for the deployment"
   type        = string
   default     = "Workshop"
 }
 variable "graph_permissions_basic" {
-    description = "List of Graph API permissions for Scope"
-    type        = list(string)
-    ###scope
-    default     = [
-      #User.Read (sign-in and read user profile)
-      "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
-      #email
-      "64a6cdd6-aab1-4aaf-94b8-3cc8405e90d0",
-      #offline_access
-      "7427e0e9-2fba-42fe-b0c0-848c9e6a8182",
-      #openid
-      "37f7f235-527c-4136-accd-4a02d197296e",
-      #profile
-      "14dad69e-099b-42c9-810b-d002981feec1"
-      ]
+  description = "List of Graph API permissions for Scope"
+  type        = list(string)
+  ###scope
+  default = [
+    #User.Read (sign-in and read user profile)
+    "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+    #email
+    "64a6cdd6-aab1-4aaf-94b8-3cc8405e90d0",
+    #offline_access
+    "7427e0e9-2fba-42fe-b0c0-848c9e6a8182",
+    #openid
+    "37f7f235-527c-4136-accd-4a02d197296e",
+    #profile
+    "14dad69e-099b-42c9-810b-d002981feec1"
+  ]
 }
 resource "azuread_application" "this" {
   display_name     = "TF.${var.deployment_env_name}.${var.business_name}.Application"

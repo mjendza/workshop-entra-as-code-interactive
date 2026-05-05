@@ -2,8 +2,8 @@
 
 # Create a Microsoft Entra ID (Azure AD) group
 resource "azuread_group" "workshop_users" {
-  display_name     = "workshop users"
-  security_enabled = true
+  display_name       = "workshop users"
+  security_enabled   = true
   assignable_to_role = true
 }
 
@@ -14,9 +14,9 @@ resource "azuread_user" "workshop_users" {
   display_name        = "workshop ${count.index + 1}"
   mail_nickname       = "workshop.user${count.index + 1}"
   given_name          = "workshop"
-  surname             = "${count.index + 1}"
-  
-  password = "theft-most$lunch*unpacked-1010"
+  surname             = count.index + 1
+
+  password              = "theft-most$lunch*unpacked-1010"
   force_password_change = false # Set to true if you want users to change password on first sign-in
 }
 
