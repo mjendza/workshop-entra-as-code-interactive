@@ -1,0 +1,50 @@
+name: Terraform CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: Validate & Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Replace main.tf with result version
+        run: cp doc/result/main.tf main.tf
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+
+      - name: TFLint Init
+        run: tflint --init
+
+      - name: TFLint
+        run: |
+          find . -name '*.tf' -not -path './doc/*' -printf '%h\n' \
+            | sort -u \
+            | while read -r dir; do
+                echo "::group::Linting $dir"
+                tflint --chdir "$dir" --minimum-failure-severity=error
+                echo "::endgroup::"
+              done

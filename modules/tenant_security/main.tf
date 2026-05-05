@@ -78,8 +78,8 @@ variable "disable_user_consent_to_apps" {
 }
 
 resource "msgraph_resource_action" "authorization_policy" {
-  resource_url    = "policies/authorizationPolicy"
-  method = "PATCH"
+  resource_url = "policies/authorizationPolicy"
+  method       = "PATCH"
 
   body = {
     displayName = "TF.${var.deployment_env_name}.TenantAuthorizationPolicy"
@@ -90,16 +90,16 @@ resource "msgraph_resource_action" "authorization_policy" {
 
     # Additional security controls
     allowEmailVerifiedUsersToJoinOrganization = var.allow_email_verified_users_to_join
-    allowUserConsentForRiskyApps = var.allow_user_consent_for_risky_apps
-    allowedToSignUpEmailBasedSubscriptions = var.allowed_to_signup_email_subscriptions
+    allowUserConsentForRiskyApps              = var.allow_user_consent_for_risky_apps
+    allowedToSignUpEmailBasedSubscriptions    = var.allowed_to_signup_email_subscriptions
 
     defaultUserRolePermissions = {
-      allowedToCreateApps = var.allowed_to_create_apps
+      allowedToCreateApps           = var.allowed_to_create_apps
       allowedToCreateSecurityGroups = var.allowed_to_create_security_groups
-      allowedToReadOtherUsers = var.allowed_to_read_other_users
+      allowedToReadOtherUsers       = var.allowed_to_read_other_users
 
       # Additional security controls in defaultUserRolePermissions
-      allowedToCreateTenants = var.allowed_to_create_tenants
+      allowedToCreateTenants          = var.allowed_to_create_tenants
       permissionGrantPoliciesAssigned = var.disable_user_consent_to_apps ? [] : ["managePermissionGrantsForSelf.microsoft-user-default-low"]
     }
   }

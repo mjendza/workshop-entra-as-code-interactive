@@ -1,10 +1,10 @@
 terraform {
- required_providers {
-   azuread = {
-     source  = "hashicorp/azuread"
-     version = "= 3.3.0"
-   }
- }
+  required_providers {
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "= 3.3.0"
+    }
+  }
 }
 #########################################################################
 # Basic PLACEHOLDER
@@ -19,17 +19,17 @@ variable "deployment_unique_name" {
 # Stage 1: Create the SSO application for OidcDebugger PLACEHOLDER
 #########################################################################
 module "OidcDebugger_SSO" {
-  source = "./modules/sso_app"
+  source        = "./modules/sso_app"
   business_name = "${var.deployment_unique_name}-OidcDebuggerSSO"
-  web_uri = ["https://oidcdebugger.com/debug"]
+  web_uri       = ["https://oidcdebugger.com/debug"]
 }
 
 #########################################################################
 # Stage 2: Demo Service Principal PLACEHOLDER
 #########################################################################
 module "Demo_ServicePrincipal" {
-  source = "./modules/service_principal"
-  business_name = "${var.deployment_unique_name}-Demo"
+  source            = "./modules/service_principal"
+  business_name     = "${var.deployment_unique_name}-Demo"
   graph_permissions = ["9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30"]
 }
 
@@ -37,24 +37,24 @@ module "Demo_ServicePrincipal" {
 # Stage 3: Workload Identity PLACEHOLDER
 #########################################################################
 module "Demo_WorkloadIdentity_ServicePrincipal" {
-  source = "./modules/service_principal_workload_identity"
-  business_name = "${var.deployment_unique_name}-WorkloadIdentity"
+  source                   = "./modules/service_principal_workload_identity"
+  business_name            = "${var.deployment_unique_name}-WorkloadIdentity"
   enable_workload_identity = true
-  subject_identifier = "system:serviceaccount:default:play-with-workload-identity"
-  issuer_url = "PUT_TOKEN_ISSUER_URL_HERE"
+  subject_identifier       = "system:serviceaccount:default:play-with-workload-identity"
+  issuer_url               = "PUT_TOKEN_ISSUER_URL_HERE"
   graph_permissions = [
     #application.read.all
     "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30"
-    ]
+  ]
 }
 
 #########################################################################
 # Stage 4: Conditional Access PLACEHOLDER
 #########################################################################
 module "OidcDebugger_Policy" {
-  source = "./modules/conditional_access"
-  business_name = "${var.deployment_unique_name}-EnableWorkshopForDEAndIP"
-  included_applications = [module.OidcDebugger_SSO.client_id]
+  source                      = "./modules/conditional_access"
+  business_name               = "${var.deployment_unique_name}-EnableWorkshopForDEAndIP"
+  included_applications       = [module.OidcDebugger_SSO.client_id]
   trusted_locations_ip_ranges = ["80.80.202.202/32"]
 }
 
@@ -62,7 +62,7 @@ module "OidcDebugger_Policy" {
 # Stage 5: EntraDeveloper Access Package PLACEHOLDER
 #########################################################################
 module "EntraDeveloper_Package" {
-  source = "./modules/access_package"
+  source        = "./modules/access_package"
   business_name = "${var.deployment_unique_name}-EntraDeveloper"
 }
 
@@ -70,8 +70,8 @@ module "EntraDeveloper_Package" {
 # Stage 6: EntraDeveloper PIM PLACEHOLDER
 #########################################################################
 module "EntraDeveloper_PIM" {
-  source = "./modules/pim"
-  business_name = "${var.deployment_unique_name}-EntraDeveloper"
+  source               = "./modules/pim"
+  business_name        = "${var.deployment_unique_name}-EntraDeveloper"
   group_id_eligibility = module.EntraDeveloper_Package.group_id
 }
 
@@ -81,9 +81,9 @@ module "EntraDeveloper_PIM" {
 module "tenant_security" {
   source = "./modules/tenant_security"
 
-  deployment_env_name                = var.deployment_env_name
-  allow_invites_from                 = "adminsAndGuestInviters"
-  guest_user_role_id                 = "10dae51f-b6af-4016-8d66-8c2a99b929b3"
+  deployment_env_name = var.deployment_env_name
+  allow_invites_from  = "adminsAndGuestInviters"
+  guest_user_role_id  = "10dae51f-b6af-4016-8d66-8c2a99b929b3"
 }
 
 #########################################################################
@@ -92,22 +92,25 @@ module "tenant_security" {
 module "EntraAgent" {
   source = "./modules/entra_agent"
 
-  deployment_env_name   = var.deployment_env_name
-  business_name         = "${var.deployment_unique_name}-MyAgent"
-  sponsor_user_id       = "MY_USER_OBJECT_ID_HERE"
-  oauth2_scope_id       = "55e4ca81-5ef2-475e-9806-b84f0af78e32"
+
+  deployment_env_name = var.deployment_env_name
+  business_name       = "${var.deployment_unique_name}-MyAgent"
+  sponsor_user_id     = "MY_USER_OBJECT_ID_HERE"
+  oauth2_scope_id     = "55e4ca81-5ef2-475e-9806-b84f0af78e32"
   graph_permissions = [
     "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30"
   ]
   create_agent_user     = true
   agent_user_upn_domain = "my.entra.id.domain.here"
+
+  microsoft_graph_sp_id = "MY_MICROSOFT_GRAPH_SP_ID_HERE"
 }
 
 #########################################################################
 # Stage 9: Maester - Configuration Assessment PLACEHOLDER
 #########################################################################
 module "Maester_ServicePrincipal" {
-  source = "./modules/service_principal"
+  source        = "./modules/service_principal"
   business_name = "Maester"
   graph_permissions = [
     "dc377aa6-52d8-4e23-b271-2a7ae04cedf3",
@@ -138,7 +141,7 @@ module "Maester_ServicePrincipal" {
 #########################################################################
 
 module "MicrosoftEntraExporter_ServicePrincipal" {
-  source = "./modules/service_principal"
+  source        = "./modules/service_principal"
   business_name = "EntraExporter"
   graph_permissions = [
     "d07a8cc0-3d51-4b77-b3b0-32704d1f69fa",
@@ -163,7 +166,7 @@ module "MicrosoftEntraExporter_ServicePrincipal" {
     "ab5b445e-8f10-45f4-9c79-dd3f8062cc4e",
     "df021288-bdef-4463-88db-98f22de89214",
     "38d9df27-64da-44fd-b7c5-a6fbac20248f"
-]
+  ]
 }
 
 
@@ -172,7 +175,7 @@ module "MicrosoftEntraExporter_ServicePrincipal" {
 # Stage 11: Zero Trust Assessment PLACEHOLDER
 #########################################################################
 module "MicrosoftZTA_ServicePrincipal" {
-  source = "./modules/service_principal"
+  source        = "./modules/service_principal"
   business_name = "MicrosoftZTA"
   graph_permissions = [
     "b0afded3-3588-46d8-8b3d-9842eff778da",
@@ -205,11 +208,11 @@ module "MicrosoftZTA_ServicePrincipal" {
 #########################################################################
 
 module "Lokka_ServicePrincipal" {
-  source = "./modules/service_principal"
+  source        = "./modules/service_principal"
   business_name = "Lokka"
-  graph_permissions =[
-  "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30",
-  "df021288-bdef-4463-88db-98f22de89214"
+  graph_permissions = [
+    "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30",
+    "df021288-bdef-4463-88db-98f22de89214"
   ]
 }
 
@@ -217,23 +220,23 @@ module "Lokka_ServicePrincipal" {
 # Stage 14: SPA SSO for Application PLACEHOLDER
 #########################################################################
 module "SPA_OidcDebugger_SSO" {
-  source = "./modules/sso_app_rich"
-  business_name = "${var.deployment_unique_name}-SPA-OidcDebuggerSSO"
-  identifier_uris = ["api://workshop.factorlabs.pl"]
+  source                       = "./modules/sso_app_rich"
+  business_name                = "${var.deployment_unique_name}-SPA-OidcDebuggerSSO"
+  identifier_uris              = ["api://workshop.factorlabs.pl"]
   oauth2_permission_scope_name = "Helpdesk"
-  spa_uri = ["https://oidcdebugger.com/debug"]
+  spa_uri                      = ["https://oidcdebugger.com/debug"]
 }
 
 #########################################################################
 # Stage 15: Application Roles for SPA SSO PLACEHOLDER
 #########################################################################
 module "Demo_Roles_OidcDebugger_SSO" {
-   source = "./modules/sso_app_rich"
-    business_name = "${var.deployment_unique_name}-Roles-OidcDebuggerSSO"
-    identifier_uris = ["api://premium.factorlabs.pl"]
-    oauth2_permission_scope_name = "PremiumHelpdesk"
-    spa_uri = ["https://oidcdebugger.com/debug"]
-    app_role_values = ["vip", "basic", "premium"]
+  source                       = "./modules/sso_app_rich"
+  business_name                = "${var.deployment_unique_name}-Roles-OidcDebuggerSSO"
+  identifier_uris              = ["api://premium.factorlabs.pl"]
+  oauth2_permission_scope_name = "PremiumHelpdesk"
+  spa_uri                      = ["https://oidcdebugger.com/debug"]
+  app_role_values              = ["vip", "basic", "premium"]
 }
 
 #########################################################################

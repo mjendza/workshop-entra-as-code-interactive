@@ -1,15 +1,15 @@
 
 
 variable "graph_permissions" {
-    description = "List of Graph API permissions"
-    type        = list(string)
-    default     = []
+  description = "List of Graph API permissions"
+  type        = list(string)
+  default     = []
 }
 variable "business_name" {
-    description = "Business name"
-    type        = string
+  description = "Business name"
+  type        = string
 }
-variable deployment_env_name {
+variable "deployment_env_name" {
   description = "Unique name for the deployment"
   type        = string
   default     = "Workshop"

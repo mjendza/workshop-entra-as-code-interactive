@@ -70,7 +70,7 @@ variable "certificate_validity_months" {
   default     = 12
 }
 
-variable deployment_env_name {
+variable "deployment_env_name" {
   description = "Unique name for the deployment"
   type        = string
   default     = "Workshop"
