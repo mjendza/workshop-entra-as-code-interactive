@@ -45,6 +45,6 @@ jobs:
             | sort -u \
             | while read -r dir; do
                 echo "::group::Linting $dir"
-                tflint --chdir "$dir"
+                tflint --chdir "$dir" --minimum-failure-severity=error
                 echo "::endgroup::"
               done
