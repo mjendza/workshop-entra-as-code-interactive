@@ -40,4 +40,11 @@ jobs:
         run: tflint --init
 
       - name: TFLint
-        run: tflint --recursive
+        run: |
+          find . -name '*.tf' -not -path './doc/*' -printf '%h\n' \
+            | sort -u \
+            | while read -r dir; do
+                echo "::group::Linting $dir"
+                tflint --chdir "$dir"
+                echo "::endgroup::"
+              done
