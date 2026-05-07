@@ -256,11 +256,11 @@ module "Workload_CertSp" {
 #########################################################################
 
 module "GitHubMaester_ServicePrincipal" {
-  source        = "./modules/service_principal_workload_identity"
-  business_name = "GitHubActionsMaester"
+  source                   = "./modules/service_principal_workload_identity"
+  business_name            = "GitHubActionsMaester"
   enable_workload_identity = true
-  subject_identifier = "repo:mjendza/workshop-entra-as-code-interactive:environment:workshop-artefacts"
-  issuer_url = "https://token.actions.githubusercontent.com"
+  subject_identifier       = "repo:mjendza/workshop-entra-as-code-interactive:environment:workshop-artefacts"
+  issuer_url               = "https://token.actions.githubusercontent.com"
   graph_permissions = [
     "dc377aa6-52d8-4e23-b271-2a7ae04cedf3",
     "2f51be20-0bb4-4fed-bf7b-db946066c75e",
@@ -286,11 +286,11 @@ module "GitHubMaester_ServicePrincipal" {
 }
 
 module "GitHubMicrosoftEntraExporter_ServicePrincipal" {
-  source        = "./modules/service_principal_workload_identity"
-  business_name = "GitHubEntraExporter"
+  source                   = "./modules/service_principal_workload_identity"
+  business_name            = "GitHubEntraExporter"
   enable_workload_identity = true
-  subject_identifier = "repo:mjendza/workshop-entra-as-code-interactive:environment:workshop-artefacts"
-  issuer_url = "https://token.actions.githubusercontent.com"
+  subject_identifier       = "repo:mjendza/workshop-entra-as-code-interactive:environment:workshop-artefacts"
+  issuer_url               = "https://token.actions.githubusercontent.com"
   graph_permissions = [
     "d07a8cc0-3d51-4b77-b3b0-32704d1f69fa",
     "2f3e6f8c-093b-4c57-a58b-ba5ce494a169",
@@ -318,11 +318,11 @@ module "GitHubMicrosoftEntraExporter_ServicePrincipal" {
 }
 
 module "GitHubMicrosoftZTA_ServicePrincipal" {
-  source        = "./modules/service_principal_workload_identity"
-  business_name = "GitHubMicrosoftZTA"
+  source                   = "./modules/service_principal_workload_identity"
+  business_name            = "GitHubMicrosoftZTA"
   enable_workload_identity = true
-  subject_identifier = "repo:mjendza/workshop-entra-as-code-interactive:environment:workshop-artefacts"
-  issuer_url = "https://token.actions.githubusercontent.com"
+  subject_identifier       = "repo:mjendza/workshop-entra-as-code-interactive:environment:workshop-artefacts"
+  issuer_url               = "https://token.actions.githubusercontent.com"
   graph_permissions = [
     "b0afded3-3588-46d8-8b3d-9842eff778da",
     "cac88765-0581-4025-9725-5ebc13f729ee",
