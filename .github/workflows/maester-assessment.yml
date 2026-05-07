@@ -49,7 +49,7 @@ jobs:
           $result = Invoke-Maester `
             -SkipGraphConnect `
             -DisableTelemetry `
-            -Path "./Custom/Test-Smoke.Tests.ps1" `
+            -Path "./Custom/Sandbox" `
             -Verbosity Detailed `
             -PassThru `
             -OutputFolder "${{ github.workspace }}/test-results" `
