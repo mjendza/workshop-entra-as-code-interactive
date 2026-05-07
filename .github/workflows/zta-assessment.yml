@@ -1,0 +1,131 @@
+name: Run Microsoft Zero Trust Assessment 🛡️
+
+on:
+  # push:
+  #   branches:
+  #     - master
+
+  # schedule:
+  #   # Daily at 7:30 UTC, change accordingly
+  #   - cron: "30 7 * * *"
+
+  # Allows to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: windows-latest
+    environment: workshop-artefacts
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install Visual C++ Redistributable
+        shell: pwsh
+        run: |
+          Write-Host "Downloading Visual C++ Redistributable..."
+          $vcRedistUrl = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+          $vcRedistPath = "vc_redist.x64.exe"
+
+          Invoke-WebRequest -Uri $vcRedistUrl -OutFile $vcRedistPath -UseBasicParsing
+
+          Write-Host "Installing Visual C++ Redistributable..."
+          Start-Process -FilePath $vcRedistPath -ArgumentList '/install', '/quiet', '/norestart' -Wait -NoNewWindow
+
+          Write-Host "Visual C++ Redistributable installed successfully!"
+          Remove-Item -Path $vcRedistPath -Force -ErrorAction SilentlyContinue
+
+      - name: Install PowerShell Modules
+        shell: pwsh
+        run: |
+          Install-Module -Name ZeroTrustAssessment -Scope CurrentUser -Force -AllowClobber
+          Install-Module -Name Az -Scope CurrentUser -Force -AllowClobber
+
+      - name: Log in to Azure using OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+          enable-AzPSSession: true
+
+      - name: Run ZtAssessment 📦
+        shell: pwsh
+        run: |
+          $token = (Get-AzAccessToken -ResourceTypeName MSGraph -AsSecureString -ErrorAction Stop).token
+          $outputPath = "${{ github.workspace }}/entra-zta"
+
+          Connect-MgGraph -AccessToken $token -ErrorAction Stop
+
+          # Workaround: PSFramework's Disable-PSFConsoleInterrupt fails in non-interactive CI/CD
+          # environments (no real console handle).
+          $ErrorActionPreference = 'Continue'
+          Invoke-ZtAssessment -Path $outputPath -MaximumSignInLogQueryTime 7
+          $ErrorActionPreference = 'Stop'
+
+          $htmlFiles = Get-ChildItem -Path $outputPath -Recurse -Filter "*.html" -ErrorAction SilentlyContinue
+          if (-not $htmlFiles -or $htmlFiles.Count -eq 0) {
+            Write-Error "ZtAssessment failed - no HTML output files were generated"
+            exit 1
+          }
+
+          Write-Host "ZtAssessment completed successfully!"
+          Get-ChildItem -Path $outputPath -Recurse
+
+      - name: Upload ZtAssessment to Azure Blob Storage 📤
+        shell: pwsh
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+        run: |
+          $exportPath = "${{ github.workspace }}/entra-zta"
+          $reportDate = Get-Date -Format "yyyy-MM-dd"
+          $blobPrefix = "zta-reports/${{ github.run_number }}-${reportDate}"
+
+          az storage blob upload-batch `
+            --destination $env:AZURE_STORAGE_CONTAINER `
+            --source "$exportPath" `
+            --destination-path "$blobPrefix" `
+            --account-name $env:AZURE_STORAGE_ACCOUNT `
+            --account-key $env:AZURE_STORAGE_KEY `
+            --pattern "*" `
+            --exclude-pattern "zt-export/*" `
+            --overwrite `
+            --only-show-errors
+
+          Write-Host "Upload completed successfully."
+
+      - name: ZtAssessment Summary 📊
+        shell: pwsh
+        run: |
+          $exportPath = "${{ github.workspace }}/entra-zta"
+          $reportDate = Get-Date -Format "yyyy-MM-dd"
+          $folderName = "${{ github.run_number }}-${reportDate}"
+          $allFiles = Get-ChildItem -Path $exportPath -Recurse -File |
+            Where-Object { $_.FullName -notlike '*\zt-export\*' -and $_.FullName -notlike '*/zt-export/*' }
+          $fileCount = $allFiles.Count
+          $totalSize = ($allFiles | Measure-Object -Property Length -Sum).Sum
+          $sizeInMB = [math]::Round($totalSize / 1MB, 2)
+
+          Write-Host "ZtAssessment Summary:"
+          Write-Host "- Total files exported: $fileCount"
+          Write-Host "- Total size: $sizeInMB MB"
+
+          @"
+          ## ZtAssessment Summary 🚀
+
+          - **Total files exported:** $fileCount
+          - **Total size:** $sizeInMB MB
+          - **Run:** #${{ github.run_number }}
+          - **Report folder:** ``zta-reports/$folderName``
+          "@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append

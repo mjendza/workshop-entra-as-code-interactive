@@ -21,6 +21,7 @@ variable "enable_workload_identity" {
 variable "subject_identifier" {
   description = "Subject identifier for the federated credential"
   type        = string
+  default     = ""
 }
 variable "issuer_url" {
   description = "Issuer URL for the federated credential"

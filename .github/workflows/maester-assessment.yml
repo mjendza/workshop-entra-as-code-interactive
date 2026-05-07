@@ -1,0 +1,119 @@
+name: Run Secrets review via Maester 🔥
+
+on:
+  # push:
+  #   branches:
+  #     - master
+
+  # schedule:
+  #   # Daily at 7:30 UTC, change accordingly
+  #   - cron: "30 7 * * *"
+
+  # Allows to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment: workshop-artefacts
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure using OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+          enable-AzPSSession: true
+
+      - name: Run Maester 🔥
+        id: maester
+        shell: pwsh
+        run: |
+          Install-Module -Name Maester -AllowPrerelease -Force -Scope CurrentUser -AllowClobber -SkipPublisherCheck
+          Install-Module -Name Pester -Force -Scope CurrentUser -AllowClobber
+          Install-Module -Name Az -Scope CurrentUser -Force -AllowClobber
+
+          cd ${{ github.workspace }}/tests/maester/
+          $token = (Get-AzAccessToken -ResourceTypeName MSGraph -AsSecureString -ErrorAction Stop).token
+          Connect-MgGraph $token
+
+          # Run only the smoke test
+          $result = Invoke-Maester `
+            -SkipGraphConnect `
+            -DisableTelemetry `
+            -Path "./Custom/Test-Smoke.Tests.ps1" `
+            -Verbosity Detailed `
+            -PassThru `
+            -OutputFolder "${{ github.workspace }}/test-results" `
+            -ErrorAction Continue
+
+          # Generate summary for GitHub
+          Write-Host "::group::📊 Test Results Summary"
+          Write-Host "Total Tests: $($result.TotalCount)" -ForegroundColor Cyan
+          Write-Host "✅ Passed: $($result.PassedCount)" -ForegroundColor Green
+          Write-Host "❌ Failed: $($result.FailedCount)" -ForegroundColor Red
+          Write-Host "⚠️ Skipped: $($result.SkippedCount)" -ForegroundColor Yellow
+          Write-Host "::endgroup::"
+
+          # Create GitHub Step Summary
+          $summary = @"
+          ## 🔥 Maester Test Results
+
+          | Metric | Count |
+          |--------|-------|
+          | 📝 Total Tests | $($result.TotalCount) |
+          | ✅ Passed | $($result.PassedCount) |
+          | ❌ Failed | $($result.FailedCount) |
+          | ⚠️ Skipped | $($result.SkippedCount) |
+          | ⏱️ Duration | $($result.Duration) |
+
+          ### Test Status
+          $(if ($result.FailedCount -eq 0) { "✅ All tests passed!" } else { "❌ Some tests failed - review the artifacts for details" })
+          "@
+
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value $summary
+
+          echo "total_tests=$($result.TotalCount)" >> $env:GITHUB_OUTPUT
+          echo "passed_tests=$($result.PassedCount)" >> $env:GITHUB_OUTPUT
+          echo "failed_tests=$($result.FailedCount)" >> $env:GITHUB_OUTPUT
+          echo "skipped_tests=$($result.SkippedCount)" >> $env:GITHUB_OUTPUT
+
+          if ($result.FailedCount -gt 0) {
+            Write-Host "::error::$($result.FailedCount) test(s) failed"
+            exit 1
+          }
+
+      - name: Upload Maester Results to Azure Blob Storage 📤
+        if: always()
+        shell: pwsh
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+        run: |
+          $resultsPath = "${{ github.workspace }}/test-results"
+          $reportDate = Get-Date -Format "yyyy-MM-dd"
+          $blobPrefix = "maester-reports/${{ github.run_number }}-${reportDate}"
+
+          if (Test-Path $resultsPath) {
+            az storage blob upload-batch `
+              --destination $env:AZURE_STORAGE_CONTAINER `
+              --source "$resultsPath" `
+              --destination-path "$blobPrefix" `
+              --account-name $env:AZURE_STORAGE_ACCOUNT `
+              --account-key $env:AZURE_STORAGE_KEY `
+              --overwrite `
+              --only-show-errors
+
+            Write-Host "Upload completed successfully."
+          } else {
+            Write-Host "No test results to upload."
+          }
