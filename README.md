@@ -61,6 +61,7 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 | 14      | SPA SSO                              | Configure an Entra ID App Registration for Single Page Application (SPA) Single Sign-On. This includes defining SPA redirect URIs, custom API scopes, and identifier URIs. Validate the configuration and test authentication flows using the OIDC Debugger.                        |
 | 15      | Application Roles (App Roles)        | Define application roles for role-based access control (RBAC) in your Entra ID App Registration. This stage demonstrates how to create app roles, assign them to users, and verify role claims in ID tokens using the OIDC Debugger.                                                   |
 | 16      | Use Certificate instead of Client Secret for Service Principal        | Configure a Service Principal to use a certificate for authentication instead of a client secret. This enhances security by leveraging certificate-based authentication.                                                                                                           |
+| 17     | CI/CD Pipelines                      | Integrate your Terraform configurations and Maester tests into GitHub Actions pipelines. This stage demonstrates how to automate the deployment and security assessment of your Entra ID tenant on every code change, ensuring continuous compliance and security validation. |
 | Cleanup | Architecture Disassembly             | Execute a broad programmatic tracking destruction mapping using Terraform destroy. Formally complete the deployment workshop and zero the environment successfully. This safely removes all provisioned resources.                                                                 |
 
 ## Supported tenant type
@@ -81,6 +82,7 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 | 14   | ✅               | ✅ |
 | 15   | ✅               | ✅ |
 | 16   | ✅               | ✅ |
+| 17   | ✅               | ❓ Not tested |
 
 ## Changelog 
 | Version | Date       | Description                                                                                    |
@@ -100,6 +102,8 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 | v1.6.1  | 2026.03.13 | Updated Stage 13 Lokka MCP configurations for GitHub Copilot VS Code and NanoBot integrations  |
 | v1.7    | 2026.04.24 | Added Stage 14 (SPA SSO)                                                                       |
 | v1.7    | 2026.04.27 | Added Stage 15 (Application Roles)                                                             |
+| v1.7    | 2026.04.30 | Added Stage 16 (Use Certificate  for Service Principal)                                        |
+| v1.8    | 2026.05.06 | Added Stage 17 (CI/CD Pipelines for Maester and ZTA)                                           |
 
 
 ## Frequently Asked Questions (FAQ)
