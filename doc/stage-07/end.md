@@ -27,4 +27,4 @@
 > **Report Issues:** Found a bug or have a question? [Report it here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues)
 
 ---
-**Navigation:** [← Previous: Stage 6](../stage-6/pim.md) | [What's Next →](../stage-next/what-next.md) | [Final Solution](../stage-final/main.tf)
+**Navigation:** [← Previous: Stage 6](../stage-06/pim.md) | [What's Next →](../stage-next/what-next.md) | [Final Solution](../stage-final/main.tf)

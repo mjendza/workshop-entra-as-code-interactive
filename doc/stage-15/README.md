@@ -137,4 +137,4 @@ If you assigned multiple roles to the test user, they should all appear in the `
 
 ---
 
-**Navigation:** [← Previous: Stage 14](../stage-14/spa-sso.md) | [Next → Stage 16: Certificate-Based SP Authentication](../stage-16/certificate-auth.md)
+**Navigation:** [← Previous: Stage 14](../stage-14/README.md) | [Next → Stage 16: Certificate-Based SP Authentication](../stage-16/README.md)

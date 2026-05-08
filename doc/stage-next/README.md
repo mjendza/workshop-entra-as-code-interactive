@@ -21,4 +21,4 @@
 > **Report Issues:** Did parameters execute improperly or architecture fail executing? [Format issue context accurately reporting functionality boundaries here securely cleanly map properly exactly context check](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation Mapping Logs Checked Parameters Exact Secure Bounds:** [← Back to Workshop End Timeline Mapping](../stage-7/end.md) | [Review Active Final State Infrastructure Implementation Config Safely Validate Checks Parameters Successfully Seamlessly!](../stage-final/main.tf)
+**Navigation Mapping Logs Checked Parameters Exact Secure Bounds:** [← Back to Workshop End Timeline Mapping](../stage-07/README.md) | [Review Active Final State Infrastructure Implementation Config Safely Validate Checks Parameters Successfully Seamlessly!](../stage-final/main.tf)

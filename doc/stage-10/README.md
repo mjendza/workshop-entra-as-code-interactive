@@ -144,4 +144,4 @@ An example walkthrough script is also available in `scripts\entra-exporter\works
 
 ---
 
-**Navigation:** [← Previous: Stage 9: Maester](../stage-9/maester.md) | [Next → Stage 11: Zero Trust Assessment](../stage-11/zta.md)
+**Navigation:** [← Previous: Stage 9: Maester](../stage-09/README.md) | [Next → Stage 11: Zero Trust Assessment](../stage-11/README.md)

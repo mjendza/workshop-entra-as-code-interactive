@@ -159,4 +159,4 @@ Invoke-Maester -Tag 'DIFF'
 
 ---
 
-**Navigation:** [← Previous: Stage 11: ZTA](../stage-11/zta.md) | [Next → Stage 13: Lokka](../stage-13/lokka.md)
+**Navigation:** [← Previous: Stage 11: ZTA](../stage-11/README.md) | [Next → Stage 13: Lokka](../stage-13/README.md)

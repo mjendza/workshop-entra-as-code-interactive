@@ -1,4 +1,4 @@
-# Stage 9: Architecture Disassembly and Cleanup Operations
+# Stage Cleanup: Architecture Disassembly and Cleanup Operations
 
 ## Decommissioning Methodology
 - **New to Terraform Mechanics?** Thoroughly investigate the `terraform.tfstate` logic evaluating exactly how programmatic objects manifest natively mirroring the Azure Portal environment visually executing mapping.
@@ -47,4 +47,4 @@ Following the execution of programmatic structural disassembly metrics exactly m
 > **Report Infrastructure Errors:** Mapping logic failed or executing constraints failed explicitly? [Please open an issue cleanly mapping explicit error mappings accurately safely check successfully!](https://github.com/mjendza/workshop-entra-as-code-interactive/issues)
 
 ---
-**Architectural Navigation Check Value Configuration Setup Logic Verification:** [← Return Target Map Check](../stage-8/entra-agent.md) | [Continue Bounding Advanced Logic Valid Valid Validation Set](../stage-next/what-next.md) | [Examine Complete Infrastructure Output Solution Check Map Objective Target](../result/main.tf) Parameter Evaluation Set Checked Check Value Confirm Verification Determine Results Provide Evaluate
+**Architectural Navigation Check Value Configuration Setup Logic Verification:** [← Return Target Map Check](../stage-08/README.md) | [Continue Bounding Advanced Logic Valid Valid Validation Set](../stage-next/README.md) | [Examine Complete Infrastructure Output Solution Check Map Objective Target](../result/main.tf) Parameter Evaluation Set Checked Check Value Confirm Verification Determine Results Provide Evaluate

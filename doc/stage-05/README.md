@@ -55,4 +55,4 @@ module "EntraDeveloper_Package" {
 > **Report Issues:** Did you break Entitlement capabilities resolving Access workflows? [Establish formalized context here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← Previous: Stage 4](../stage-4/conditional-access.md) | [Next → Stage 6: PIM](../stage-6/pim.md)
+**Navigation:** [← Previous: Stage 4](../stage-04/README.md) | [Next → Stage 6: PIM](../stage-06/README.md)

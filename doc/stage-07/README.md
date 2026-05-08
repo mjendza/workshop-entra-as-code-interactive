@@ -110,4 +110,4 @@ Run all maester tests and implement a part of your tenant_security module and re
 > **Report Issues:** [Report it here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues)
 
 ---
-**Navigation:** [← Previous: Stage 6](../stage-6/pim.md) | [Next → Stage 8: Entra Agent Identity](../stage-8/entra-agent.md)
+**Navigation:** [← Previous: Stage 6](../stage-06/README.md) | [Next → Stage 8: Entra Agent Identity](../stage-08/README.md)

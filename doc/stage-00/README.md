@@ -124,4 +124,4 @@ provider "azuread" {
 > **Report Issues:** Did you encounter a bug or need clarification? [Report the issue here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [Next Stage → Stage 1: SSO Application](../stage-1/SSO-application.md)
+**Navigation:** [Next Stage → Stage 1: SSO Application](../stage-01/README.md)

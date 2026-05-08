@@ -131,4 +131,4 @@ I asked the question: `Is there any naming convension for App Registrations? use
 
 ---
 
-**Navigation:** [← Previous: Stage 12: Diff](../stage-12/diff.md) | [Next → Stage 14: SPA SSO](../stage-14/spa-sso.md)
+**Navigation:** [← Previous: Stage 12: Diff](../stage-12/README.md) | [Next → Stage 14: SPA SSO](../stage-14/README.md)

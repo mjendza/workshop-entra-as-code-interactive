@@ -138,4 +138,4 @@ After Terraform successfully provisions the Service Principal, complete the foll
 
 ---
 
-**Navigation:** [← Previous: Stage 10: EntraExporter](../stage-10/entra-exporter.md) | [Next → Stage 12: Diff](../stage-12/diff.md)
+**Navigation:** [← Previous: Stage 10: EntraExporter](../stage-10/README.md) | [Next → Stage 12: Diff](../stage-12/README.md)

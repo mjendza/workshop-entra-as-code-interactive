@@ -78,4 +78,4 @@ To verify the SPA functionality works correctly:
 > **Report Issues:** Did you encounter a bug or hold a question? [Report your issue here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← Previous: Stage 13](../stage-13/lokka.md) | [Next → Stage 15](../stage-15/application-roles.md)
+**Navigation:** [← Previous: Stage 13](../stage-13/README.md) | [Next → Stage 15](../stage-15/README.md)

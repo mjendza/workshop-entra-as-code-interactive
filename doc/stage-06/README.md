@@ -60,4 +60,4 @@ An activation should render structurally resembling the prompt below:
 > **Report Issues:** Missing documentation or struggling alongside a bug? [Please articulate an issue format here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← Previous: Stage 5](../stage-5/access-package.md) | [Next → Stage 7: Tenant Security](../stage-7/tenant-security.md)
+**Navigation:** [← Previous: Stage 5](../stage-05/README.md) | [Next → Stage 7: Tenant Security](../stage-07/README.md)

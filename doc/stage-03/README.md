@@ -68,4 +68,4 @@ You can effectively analyze any generated Token Claims using [jwt.ms](https://jw
 > **Report Issues:** Missing documentation or struggling alongside a bug? [Please articulate an issue format here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← Previous: Stage 2](../stage-2/service-principal.md) | [Next → Stage 4: Conditional Access](../stage-4/conditional-access.md)
+**Navigation:** [← Previous: Stage 2](../stage-02/README.md) | [Next → Stage 4: Conditional Access](../stage-04/README.md)

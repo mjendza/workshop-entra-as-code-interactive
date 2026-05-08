@@ -89,4 +89,4 @@ Make sure to always run `terraform init` to prepare the workspace when working f
 > **Report Issues:** Did you encounter a bug or hold a question? [Report your issue here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← Previous: Stage 0](../stage-0/prerequisits.md) | [Next → Stage 2: Service Principal](../stage-2/service-principal.md)
+**Navigation:** [← Previous: Stage 0](../stage-00/README.md) | [Next → Stage 2: Service Principal](../stage-02/README.md)

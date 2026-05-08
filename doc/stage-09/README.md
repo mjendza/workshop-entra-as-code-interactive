@@ -131,4 +131,4 @@ After Terraform successfully provisions the Service Principal, complete the foll
 
 ---
 
-**Navigation:** [← Previous: Stage 8: Cleanup](../stage-cleanup/end.md) | [Next → Stage 10: EntraExporter](../stage-10/entra-exporter.md)
+**Navigation:** [← Previous: Stage 8: Cleanup](../stage-cleanup/README.md) | [Next → Stage 10: EntraExporter](../stage-10/README.md)

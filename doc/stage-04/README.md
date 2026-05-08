@@ -61,4 +61,4 @@ module "OidcDebugger_Policy" {
 > **Report Issues:** Are pipeline resources operating unexpectedly? [Formulate issue context actively here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← Previous: Stage 3](../stage-3/workload-federation.md) | [Next → Stage 5: Access Packages](../stage-5/access-package.md)
+**Navigation:** [← Previous: Stage 3](../stage-03/README.md) | [Next → Stage 5: Access Packages](../stage-05/README.md)

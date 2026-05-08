@@ -102,4 +102,4 @@ Navigate to [Microsoft Entra Admin Center](https://entra.microsoft.com) -> Enter
 > **Report Issues:** [Report it here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues)
 
 ---
-**Navigation:** [← Previous: Stage 7](../stage-7/tenant-security.md) | [Next → Stage 9: Cleanup](../stage-cleanup/end.md)
+**Navigation:** [← Previous: Stage 7](../stage-07/README.md) | [Next → Stage 9: Cleanup](../stage-cleanup/README.md)

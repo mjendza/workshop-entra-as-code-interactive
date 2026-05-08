@@ -38,51 +38,51 @@ jobs:
 
             // Define stages in order
             const stages = [
-              { file: 'doc/stage-0/prerequisits.md', title: 'Stage 0: Prerequisites', labels: ['workshop', 'stage-0'] },
-              { file: 'doc/stage-1/SSO-application.md', title: 'Stage 1: SSO Application', labels: ['workshop', 'stage-1'] },
-              { file: 'doc/stage-2/service-principal.md', title: 'Stage 2: Service Principal', labels: ['workshop', 'stage-2'] },
-              { file: 'doc/stage-3/workload-federation.md', title: 'Stage 3: Workload Federation', labels: ['workshop', 'stage-3'] },
-              { file: 'doc/stage-4/conditional-access.md', title: 'Stage 4: Conditional Access', labels: ['workshop', 'stage-4'] },
-              { file: 'doc/stage-5/access-package.md', title: 'Stage 5: Access Package', labels: ['workshop', 'stage-5'] },
-              { file: 'doc/stage-6/pim.md', title: 'Stage 6: PIM (Privileged Identity Management)', labels: ['workshop', 'stage-6'] },
-              { file: 'doc/stage-7/tenant-security.md', title: 'Stage 7: Tenant Security', labels: ['workshop', 'stage-7'] },
-              { file: 'doc/stage-8/entra-agent.md', title: 'Stage 8: Entra ID Agent (Preview)', labels: ['workshop', 'stage-8'] },
-              { file: 'doc/stage-9/maester.md', title: 'Stage 9: Maester', labels: ['workshop', 'stage-9'] },
-              { file: 'doc/stage-10/entra-exporter.md', title: 'Stage 10: Entra Exporter', labels: ['workshop', 'stage-10'] },
-              { file: 'doc/stage-11/zta.md', title: 'Stage 11: Zero Trust Assessment', labels: ['workshop', 'stage-11'] },
-              { file: 'doc/stage-12/diff.md', title: 'Stage 12: Drift', labels: ['workshop', 'stage-12'] },
-              { file: 'doc/stage-13/lokka.md', title: 'Stage 13: Lokka MCP', labels: ['workshop', 'stage-13'] },
-              { file: 'doc/stage-14/spa-sso.md', title: 'Stage 14: SPA SSO', labels: ['workshop', 'stage-14'] },
-              { file: 'doc/stage-15/app-roles.md', title: 'Stage 15: Application Roles for SPA SSO', labels: ['workshop', 'stage-15'] },
-              { file: 'doc/stage-16/certificate-auth.md', title: 'Stage 16: Use Certificate instead of Client Secret for Service Principal', labels: ['workshop', 'stage-16'] },
-              { file: 'doc/stage-17/pipelines.md', title: 'Stage 17: CI/CD Pipelines', labels: ['workshop', 'stage-17'] },
+              { file: 'doc/stage-00/README.md', title: 'Stage 0: Prerequisites', labels: ['workshop', 'stage-0'] },
+              { file: 'doc/stage-01/README.md', title: 'Stage 1: SSO Application', labels: ['workshop', 'stage-1'] },
+              { file: 'doc/stage-02/README.md', title: 'Stage 2: Service Principal', labels: ['workshop', 'stage-2'] },
+              { file: 'doc/stage-03/README.md', title: 'Stage 3: Workload Federation', labels: ['workshop', 'stage-3'] },
+              { file: 'doc/stage-04/README.md', title: 'Stage 4: Conditional Access', labels: ['workshop', 'stage-4'] },
+              { file: 'doc/stage-05/README.md', title: 'Stage 5: Access Package', labels: ['workshop', 'stage-5'] },
+              { file: 'doc/stage-06/README.md', title: 'Stage 6: PIM (Privileged Identity Management)', labels: ['workshop', 'stage-6'] },
+              { file: 'doc/stage-07/README.md', title: 'Stage 7: Tenant Security', labels: ['workshop', 'stage-7'] },
+              { file: 'doc/stage-08/README.md', title: 'Stage 8: Entra ID Agent (Preview)', labels: ['workshop', 'stage-8'] },
+              { file: 'doc/stage-09/README.md', title: 'Stage 9: Maester', labels: ['workshop', 'stage-9'] },
+              { file: 'doc/stage-10/README.md', title: 'Stage 10: Entra Exporter', labels: ['workshop', 'stage-10'] },
+              { file: 'doc/stage-11/README.md', title: 'Stage 11: Zero Trust Assessment', labels: ['workshop', 'stage-11'] },
+              { file: 'doc/stage-12/README.md', title: 'Stage 12: Drift', labels: ['workshop', 'stage-12'] },
+              { file: 'doc/stage-13/README.md', title: 'Stage 13: Lokka MCP', labels: ['workshop', 'stage-13'] },
+              { file: 'doc/stage-14/README.md', title: 'Stage 14: SPA SSO', labels: ['workshop', 'stage-14'] },
+              { file: 'doc/stage-15/README.md', title: 'Stage 15: Application Roles for SPA SSO', labels: ['workshop', 'stage-15'] },
+              { file: 'doc/stage-16/README.md', title: 'Stage 16: Use Certificate instead of Client Secret for Service Principal', labels: ['workshop', 'stage-16'] },
+              { file: 'doc/stage-17/README.md', title: 'Stage 17: CI/CD Pipelines', labels: ['workshop', 'stage-17'] },
 
-              { file: 'doc/stage-cleanup/end.md', title: 'Stage End & Cleanup', labels: ['workshop', 'stage-cleanup'] },
-              { file: 'doc/stage-next/what-next.md', title: 'Bonus: What\'s Next?', labels: ['workshop', 'bonus'] }
+              { file: 'doc/stage-cleanup/README.md', title: 'Stage End & Cleanup', labels: ['workshop', 'stage-cleanup'] },
+              { file: 'doc/stage-next/README.md', title: 'Bonus: What\'s Next?', labels: ['workshop', 'bonus'] }
             ];
 
             // Navigation mapping: file path -> stage index
             const fileToStageIndex = {
-              '../stage-0/prerequisits.md': 0,
-              '../stage-1/SSO-application.md': 1,
-              '../stage-2/service-principal.md': 2,
-              '../stage-3/workload-federation.md': 3,
-              '../stage-4/conditional-access.md': 4,
-              '../stage-5/access-package.md': 5,
-              '../stage-6/pim.md': 6,
-              '../stage-7/tenant-security.md': 7,
-              '../stage-8/entra-agent.md': 8,
-              '../stage-9/maester.md': 9,
-              '../stage-10/entra-exporter.md': 10,
-              '../stage-11/zta.md': 11,
-              '../stage-12/diff.md': 12,
-              '../stage-13/lokka.md': 13,
-              '../stage-14/spa-sso.md': 14,
-              '../stage-15/app-roles.md': 15,
-              '../stage-16/certificate-auth.md': 16,
-              '../stage-17/pipelines.md': 17,
-              '../stage-cleanup/end.md': 18,
-              '../stage-next/what-next.md': 19
+              '../stage-00/README.md': 0,
+              '../stage-01/README.md': 1,
+              '../stage-02/README.md': 2,
+              '../stage-03/README.md': 3,
+              '../stage-04/README.md': 4,
+              '../stage-05/README.md': 5,
+              '../stage-06/README.md': 6,
+              '../stage-07/README.md': 7,
+              '../stage-08/README.md': 8,
+              '../stage-09/README.md': 9,
+              '../stage-10/README.md': 10,
+              '../stage-11/README.md': 11,
+              '../stage-12/README.md': 12,
+              '../stage-13/README.md': 13,
+              '../stage-14/README.md': 14,
+              '../stage-15/README.md': 15,
+              '../stage-16/README.md': 16,
+              '../stage-17/README.md': 17,
+              '../stage-cleanup/README.md': 18,
+              '../stage-next/README.md': 19
             };
 
             function convertImageUrls(content, docDir) {
@@ -97,7 +97,7 @@ jobs:
             }
 
             function replaceNavigationLinks(content, issueNumbers) {
-              return content.replace(/\[([^\]]+)\]\((\.\.\/stage-[^)]+\.md|\.\.\/stage-next\/[^)]+\.md)\)/g, (match, linkText, filePath) => {
+              return content.replace(/\[([^\]]+)\]\((\.\.\/stage-[^)]+\/README\.md)\)/g, (match, linkText, filePath) => {
                 const stageIndex = fileToStageIndex[filePath];
                 if (stageIndex !== undefined && issueNumbers[stageIndex]) {
                   const issueUrl = `https://github.com/${owner}/${repo}/issues/${issueNumbers[stageIndex]}`;
@@ -115,7 +115,7 @@ jobs:
                 if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
                   return match;
                 }
-                if (filePath.match(/\.\.\/stage-[^)]+\.md/) || filePath.match(/\.\.\/stage-next\/[^)]+\.md/)) {
+                if (filePath.match(/\.\.\/stage-[^)]+\/README\.md/)) {
                   return match;
                 }
                 const absolutePath = path.posix.normalize(path.posix.join(docDir, filePath));

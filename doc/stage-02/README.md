@@ -51,4 +51,4 @@ module "Demo_ServicePrincipal" {
 > **Report Issues:** Run into a bug? Have a suggestion? [Raise an issue structurally here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← Previous: Stage 1](../stage-1/SSO-application.md) | [Next → Stage 3: Workload Federation](../stage-3/workload-federation.md)
+**Navigation:** [← Previous: Stage 1](../stage-01/README.md) | [Next → Stage 3: Workload Federation](../stage-03/README.md)
