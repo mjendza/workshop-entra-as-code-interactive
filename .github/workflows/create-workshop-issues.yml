@@ -55,6 +55,7 @@ jobs:
               { file: 'doc/stage-14/spa-sso.md', title: 'Stage 14: SPA SSO', labels: ['workshop', 'stage-14'] },
               { file: 'doc/stage-15/app-roles.md', title: 'Stage 15: Application Roles for SPA SSO', labels: ['workshop', 'stage-15'] },
               { file: 'doc/stage-16/certificate-auth.md', title: 'Stage 16: Use Certificate instead of Client Secret for Service Principal', labels: ['workshop', 'stage-16'] },
+              { file: 'doc/stage-17/pipelines.md', title: 'Stage 17: CI/CD Pipelines', labels: ['workshop', 'stage-17'] },
 
               { file: 'doc/stage-cleanup/end.md', title: 'Stage End & Cleanup', labels: ['workshop', 'stage-cleanup'] },
               { file: 'doc/stage-next/what-next.md', title: 'Bonus: What\'s Next?', labels: ['workshop', 'bonus'] }
@@ -79,8 +80,9 @@ jobs:
               '../stage-14/spa-sso.md': 14,
               '../stage-15/app-roles.md': 15,
               '../stage-16/certificate-auth.md': 16,
-              '../stage-cleanup/end.md': 17,
-              '../stage-next/what-next.md': 18
+              '../stage-17/pipelines.md': 17,
+              '../stage-cleanup/end.md': 18,
+              '../stage-next/what-next.md': 19
             };
 
             function convertImageUrls(content, docDir) {

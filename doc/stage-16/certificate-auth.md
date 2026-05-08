@@ -123,4 +123,4 @@ Admin consent for `User.Read.All` is missing. Grant it from the API permissions 
 > **Report Issues:** Did you encounter a bug or hold a question? [Report your issue here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← Previous: Stage 15](../stage-15/app-roles.md) | [Next → Stage Cleanup](../stage-cleanup/end.md)
+**Navigation:** [← Previous: Stage 15](../stage-15/app-roles.md) | [Next → Stage 17: CI/CD Pipelines](../stage-17/pipelines.md)
