@@ -20,11 +20,11 @@ Add the following module configuration to your `main.tf`:
 # Stage 14: SPA SSO for Application PLACEHOLDER
 #########################################################################
 module "SPA_OidcDebugger_SSO" {
-  source = "./modules/sso_app_rich"
-  business_name = "${var.deployment_unique_name}-SPA-OidcDebuggerSSO"
-  identifier_uris = ["api://workshop.factorlabs.pl"]
+  source                       = "./modules/sso_app_rich"
+  business_name                = "${var.deployment_unique_name}-SPA-OidcDebuggerSSO"
+  identifier_uris              = ["api://workshop.factorlabs.pl/${var.deployment_unique_name}"]
   oauth2_permission_scope_name = "Helpdesk"
-  spa_uri = ["PUT_YOUR_WEB_URI_HERE"]
+  spa_uri                  = ["PUT_YOUR_WEB_URI_HERE"]
 }
 ```
 
@@ -46,7 +46,7 @@ terraform apply
 ## Verification Steps
 - An **App Registration** named `TF.Workshop.SPA-OidcDebuggerSSO.Application` should be provisioned in Entra ID.
 - Navigate to the Authentication blade of the app and verify that the SPA redirect URIs are correctly listed.
-- Navigate to the "Expose an API" blade and verify the Application ID URI is set to `api://workshop.factorlabs.pl`.
+- Navigate to the "Expose an API" blade and verify the Application ID URI is set to `api://workshop.factorlabs.pl/${var.deployment_unique_name}`.
 - Check that the scope `Helpdesk` is created and enabled under the "Expose an API" blade.
 ![app_registration](app.png)
 ## Testing with OIDC Debugger
@@ -56,7 +56,7 @@ To verify the SPA functionality works correctly:
 3. Set **Authorize URI** to `https://login.microsoftonline.com/TENANT_HERE/oauth2/v2.0/authorize` (or use your specific Tenant ID instead of `TENANT_HERE`).
 4. Set **Redirect URI** to `https://oidcdebugger.com/debug`.
 5. Set **Client ID** to your newly created App Registration's Application (client) ID.
-6. Set **Scope** to `api://factorlabs.pl/Helpdesk openid`.
+6. Set **Scope** to `api://workshop.factorlabs.pl/${var.deployment_unique_name}/Helpdesk openid`.
 7. Set **Response type** to `code` (with PKCE, which is required for SPAs).
 ![authorize](authorize.png)
 8. Scroll down and click **Send Request**. You should be prompted to authenticate and then redirected back with an authorization code and tokens in the OIDC Debugger interface.

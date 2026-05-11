@@ -30,13 +30,12 @@ Modify the existing `Demo_Roles_OidcDebugger_SSO` module from Stage 14 as a new 
 # Stage 15: Application Roles for SPA SSO PLACEHOLDER
 #########################################################################
 module "Demo_Roles_OidcDebugger_SSO" {
-  source = "./modules/sso_app_rich"
-  business_name = "Roles-OidcDebuggerSSO"
-  identifier_uris = ["api://premium.factorlabs.pl"]
+  source                       = "./modules/sso_app_rich"
+  business_name                = "${var.deployment_unique_name}-Roles-OidcDebuggerSSO"
+  identifier_uris              = ["api://premium.factorlabs.pl/${var.deployment_unique_name}"]
   oauth2_permission_scope_name = "PremiumHelpdesk"
-  spa_uri = ["PUT_YOUR_WEB_URI_HERE"]
-  
-  app_role_values = ["vip", "basic", "premium"]
+  spa_uri                      = ["PUT_YOUR_WEB_URI_HERE"]  
+  app_role_values              = ["vip", "basic", "premium"]
 }
 ```
 
