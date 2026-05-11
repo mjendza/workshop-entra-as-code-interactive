@@ -222,7 +222,7 @@ module "Lokka_ServicePrincipal" {
 module "SPA_OidcDebugger_SSO" {
   source                       = "./modules/sso_app_rich"
   business_name                = "${var.deployment_unique_name}-SPA-OidcDebuggerSSO"
-  identifier_uris              = ["api://workshop.factorlabs.pl"]
+  identifier_uris              = ["api://workshop.factorlabs.pl/${var.deployment_unique_name}"]
   oauth2_permission_scope_name = "Helpdesk"
   spa_uri                      = ["https://oidcdebugger.com/debug"]
 }
@@ -233,7 +233,7 @@ module "SPA_OidcDebugger_SSO" {
 module "Demo_Roles_OidcDebugger_SSO" {
   source                       = "./modules/sso_app_rich"
   business_name                = "${var.deployment_unique_name}-Roles-OidcDebuggerSSO"
-  identifier_uris              = ["api://premium.factorlabs.pl"]
+  identifier_uris              = ["api://premium.factorlabs.pl/${var.deployment_unique_name}"]
   oauth2_permission_scope_name = "PremiumHelpdesk"
   spa_uri                      = ["https://oidcdebugger.com/debug"]
   app_role_values              = ["vip", "basic", "premium"]
@@ -245,7 +245,7 @@ module "Demo_Roles_OidcDebugger_SSO" {
 module "Workload_CertSp" {
   source                      = "./modules/service_principal_rich"
   business_name               = "${var.deployment_unique_name}-SpWithCertificate"
-  graph_permissions           = ["df021288-bdef-4463-88db-98f22de89214"] # User.Read.All
+  graph_permissions           = ["df021288-bdef-4463-88db-98f22de89214"]
   use_certificate             = true
   certificate_file            = "cert.pem"
   certificate_validity_months = 12
@@ -257,7 +257,7 @@ module "Workload_CertSp" {
 
 module "GitHubMaester_ServicePrincipal" {
   source                   = "./modules/service_principal_workload_identity"
-  business_name            = "GitHubActionsMaester"
+  business_name            = "${var.deployment_unique_name}-GitHubActionsMaester"
   enable_workload_identity = true
   subject_identifier       = "repo:mjendza/workshop-entra-as-code-interactive:environment:workshop-artefacts"
   issuer_url               = "https://token.actions.githubusercontent.com"
@@ -287,7 +287,7 @@ module "GitHubMaester_ServicePrincipal" {
 
 module "GitHubMicrosoftEntraExporter_ServicePrincipal" {
   source                   = "./modules/service_principal_workload_identity"
-  business_name            = "GitHubEntraExporter"
+  business_name            = "${var.deployment_unique_name}-GitHubEntraExporter"
   enable_workload_identity = true
   subject_identifier       = "repo:mjendza/workshop-entra-as-code-interactive:environment:workshop-artefacts"
   issuer_url               = "https://token.actions.githubusercontent.com"
@@ -319,7 +319,7 @@ module "GitHubMicrosoftEntraExporter_ServicePrincipal" {
 
 module "GitHubMicrosoftZTA_ServicePrincipal" {
   source                   = "./modules/service_principal_workload_identity"
-  business_name            = "GitHubMicrosoftZTA"
+  business_name            = "${var.deployment_unique_name}-GitHubMicrosoftZTA"
   enable_workload_identity = true
   subject_identifier       = "repo:mjendza/workshop-entra-as-code-interactive:environment:workshop-artefacts"
   issuer_url               = "https://token.actions.githubusercontent.com"

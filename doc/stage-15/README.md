@@ -86,7 +86,7 @@ ng)
    - **Authorize URI**: `https://login.microsoftonline.com/common/oauth2/v2.0/authorize`
    - **Redirect URI**: `https://oidcdebugger.com/debug`
    - **Client ID**: Your App Registration's Application (client) ID
-   - **Scope**: `api://factorlabs.pl/Helpdesk openid profile`
+   - **Scope**: `api://premium.factorlabs.pl/${var.deployment_unique_name}/PremiumHelpdesk openid profile`
    - **Response type**: `code`
 
 3. Click **Send Request** and authenticate as the user you assigned a role to
