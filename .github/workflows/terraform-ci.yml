@@ -11,26 +11,41 @@ permissions:
 
 jobs:
   terraform:
-    name: Validate & Lint
+    name: Validate & Lint (${{ matrix.solution }})
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - solution: root
+            path: .
+            replace_main: true
+          - solution: external_tenant
+            path: external_tenant
+            replace_main: false
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Replace main.tf with result version
+        if: matrix.replace_main
         run: cp doc/result/main.tf main.tf
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
+        working-directory: ${{ matrix.path }}
         run: terraform init -backend=false
 
       - name: Terraform Format Check
+        working-directory: ${{ matrix.path }}
         run: terraform fmt -check -recursive
 
       - name: Terraform Validate
+        working-directory: ${{ matrix.path }}
         run: terraform validate
 
       - name: Setup TFLint
@@ -41,7 +56,11 @@ jobs:
 
       - name: TFLint
         run: |
-          find . -name '*.tf' -not -path './doc/*' -printf '%h\n' \
+          if [ "${{ matrix.solution }}" = "root" ]; then
+            find . -name '*.tf' -not -path './doc/*' -not -path './external_tenant/*' -printf '%h\n'
+          else
+            find ./external_tenant -name '*.tf' -printf '%h\n'
+          fi \
             | sort -u \
             | while read -r dir; do
                 echo "::group::Linting $dir"
