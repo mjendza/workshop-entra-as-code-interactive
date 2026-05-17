@@ -42,7 +42,7 @@ This writes:
 
 If you already ran `scripts/stage-16/init.ps1`, the same cert is reused — skip this step.
 
-### 2. Add the Verified ID Service Principal to `main.tf`
+### 2. Add the Verified ID Service Principal to `main.tf` in root folder (will be used with dedicated stack in folder `verified_id`)
 use https://permissions.factorlabs.pl and 'MS Other Apps Permissions' filter to find all expected permissions for the Verified ID Admin API:
 - `VerifiableCredential.Authority.ReadWrite`
 - `VerifiableCredential.Contract.ReadWrite`
@@ -55,26 +55,23 @@ use https://permissions.factorlabs.pl and 'MS Other Apps Permissions' filter to 
 #########################################################################
 # Stage 101: Verified ID Service Principal (cert-based)
 #########################################################################
-module "Workload_CertSpVc" {
+module "VerifiedId_SpVc" {
   source                      = "./modules/service_principal_rich"
-  business_name               = "${var.deployment_unique_name}-SpVcWithCertificate"
+  business_name               = "${var.deployment_unique_name}-SpVerifiedId"
   graph_permissions           = ["df021288-bdef-4463-88db-98f22de89214"] 
   permissions = [
     { resource_app_id = "6a8b4b39-c021-437c-b060-5a14a3fd65f3" # Verified ID Admin API
       permissions = [ PUT_HERE_ALL_REQUIRED_PERMISSIONS_LISTED_ABOVE ]
     }
   ]
-  use_certificate             = true
-  certificate_file            = "cert.pem"
-  certificate_validity_months = 12
 }
 
 output "cert_sp_vc_client_id" {
-  value = module.Workload_CertSpVc.client_id
+  value = module.VerifiedId_SpVc.client_id
 }
 ```
 
-### 3. First apply + grant admin consent
+### 3. First apply + grant admin consent and generate secret
 
 ```bash
 terraform plan
@@ -83,9 +80,9 @@ terraform apply
 
 This creates the App Registration, Service Principal, and uploads the certificate. App-only permissions cannot be consented interactively, so:
 
-Portal → **Entra ID → App registrations → `TF.Workshop.<prefix>-SpVcWithCertificate.ServicePrincipal` → API permissions** → **Grant admin consent fortenant**.
+Portal → **Entra ID → App registrations → `TF.Workshop.<prefix>-SpVerifiedId.ServicePrincipal` → API permissions** → **Grant admin consent fortenant**.
 
-### 4. Onboard the tenant to Verified ID (one-time per tenant)
+### 4. Onboard the tenant to Verified ID (one-time per tenant - manual step in the portal)
 
 If your tenant has never issued a Verified ID credential, you need to bootstrap an authority. Portal → **Microsoft Entra → Verified ID → Setup**, then follow the wizard (it provisions the Key Vault, creates the DID, and sets up the first authority).
 
@@ -102,7 +99,7 @@ Expected output: at least one authority with `id`, `name`, `did`, `didModel`, an
 
 Copy the authority `id` GUID from the output if you plan to use **Option B** below.
 
-### 6. Reference the authority and create the credential contract
+### 6. Reference the authority and create the credential contract via Terraform and dedicated stack in `verified_id` folder
 
 The `mjendza/verifiedid` provider exposes a generic `data "verifiedid_resource"` that performs a GET against any Admin API path. We use it to list authorities and pick the first one — pure IaC, no copy/paste.
 
@@ -115,7 +112,6 @@ terraform {
       source  = "mjendza/verifiedid"
       version = ">=  0.1.14-beta"
     }
-    # ... existing providers
   }
 }
 ```
@@ -152,18 +148,15 @@ Rename the module from "Demo_Credential_Contract" to "Demo_Credential_Contract_V
 
 
 ## Verification Steps
-
-- `terraform output vc_authority_id` returns a GUID matching the one printed by `auth.ps1`.
 - Portal → **Verified ID → Credentials**: a new contract `<prefix>-WorkshopCredential` appears under the authority.
 - Re-running `auth.ps1` shows the new contract under the authority's contracts list (uncomment the contracts loop near the bottom of `auth.ps1` if you want it printed).
 - The contract's `manifestUrl` returns valid JSON when fetched.
-- (Optional) use my https://github.com/mjendza/workshop-verified-id workshop to test the new credential.
+- (Optional) use my https://github.com/mjendza/workshop-verified-id workshop to test/use the new credential.
 
 
 ## Stage Completion Checklist
 - [ ] I have read and comprehended this stage.
-- [ ] I have run `./scripts/stage-101-vc/init.ps1` and verified `cert/cert.pem` was created.
-- [ ] I have inserted the `Workload_CertSpVc` module config into my `main.tf` file.
+- [ ] I have inserted the `VerifiedId_SpVc` module config into my `main.tf` file.
 - [ ] I have successfully run `terraform apply` and granted admin consent for the four Verified ID app roles.
 - [ ] I have onboarded my tenant to Verified ID in the portal.
 - [ ] I have run `./scripts/stage-101-vc/auth.ps1` and seen at least one authority + DID printed.

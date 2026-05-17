@@ -376,3 +376,29 @@ output "multitenant_client_id" {
 output "multitenant_sp_object_id" {
   value = module.SecretMonitor.service_principal_object_id
 }
+
+##########################################################################
+# Stage 101: Verified ID — Credential Contract (Service Principal for dedicated stack) PLACEHOLDER
+#########################################################################
+module "VerifiedId_SpVc" {
+  source            = "./modules/service_principal_rich"
+  business_name     = "${var.deployment_unique_name}-SpVerifiedId"
+  graph_permissions = ["df021288-bdef-4463-88db-98f22de89214"]
+  permissions = [
+    { resource_app_id = "6a8b4b39-c021-437c-b060-5a14a3fd65f3"
+      permissions = [
+        "4ceb7a90-1485-40b1-accf-83a647694c0f",
+        "077813bc-e516-4576-bafd-07bead19c0dc",
+        "933a4159-27ca-4486-b1be-dce09da38475",
+        "63f52f43-0b98-429c-b291-b2dba4a64504"
+      ]
+    }
+  ]
+
+  use_certificate             = true
+  certificate_file            = "cert.pem"
+  certificate_validity_months = 12
+}
+output "cert_sp_vc_client_id" {
+  value = module.VerifiedId_SpVc.client_id
+}
