@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    verifiedid = {
+      source  = "mjendza/verifiedid"
+      version = "= 0.1.14-beta"
+    }
+  }
+}
+
 #########################################################################
 # Stage 101: Verified ID — Credential Contract
 #########################################################################
@@ -8,7 +17,7 @@ data "verifiedid_resource" "authorities" {
   }
 }
 
-module "Demo_Credential_Contract2" {
+module "Demo_Credential_Contract" {
   source       = "./modules/verified_id"
   authority_id = data.verifiedid_resource.authorities.output.value[0].id
 
