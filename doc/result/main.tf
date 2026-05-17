@@ -364,7 +364,7 @@ module "SecretMonitor" {
       ##issuer        = "https://vc.factorlabs.pl",
       ##subject       = "system:serviceaccount:default:play-with-workload-identity"
 
-      audiences    = ["api://AzureADTokenExchange"]
+      audiences = ["api://AzureADTokenExchange"]
     }
   ]
 }
