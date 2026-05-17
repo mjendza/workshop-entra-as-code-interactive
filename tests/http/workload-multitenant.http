@@ -1,0 +1,58 @@
+@host = https://vc.factorlabs.pl
+
+### configuration
+GET {{host}}/.well-known/openid-configuration
+
+### keys
+GET {{host}}/.well-known/keys
+
+### Source (partner) token — used as the client_assertion for the multi-tenant app
+POST {{host}}/api/workload/token
+
+
+{
+  "id": "03de712e-67fc-4d48-8dce-14466f8e219f",
+  "aud": "api://AzureADTokenExchange",
+  "sub": "system:serviceaccount:default:play-with-workload-identity",
+  "subject": "system:serviceaccount:default:play-with-workload-identity"
+}
+
+### Target tenant — the multi-tenant SecretMonitor app must be provisioned here
+### (see external_tenant/ Terraform) with Application.Read.All admin-consented.
+@tenantId = YOUR_TARGET_TENANT_ID_HERE
+
+### Multi-tenant app client_id from `terraform output -raw multitenant_client_id`
+@clientId = YOUR_MULTITENANT_CLIENT_ID_HERE
+
+### Paste the JWT returned by the POST {{host}}/api/workload/token request above
+@subjectToken = YOUR_SUBJECT_TOKEN_HERE
+
+### Token exchange against the target tenant
+POST https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{clientId}}&
+client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer&
+client_assertion={{subjectToken}}&
+grant_type=client_credentials&
+scope=https://graph.microsoft.com/.default
+
+### Example Response:
+# {
+#   "token_type": "Bearer",
+#   "expires_in": 3599,
+#   "ext_expires_in": 3599,
+#   "access_token": "eyJ0eXAiOiJKV..."
+# }
+
+
+@access_token =
+### List all applications in tenant 52270bb2-ed98-4b79-9314-1af808682b4b
+### Mirrors what scripts/stage-18-secret-monitor/Get-TenantSecretInventory.ps1
+### enumerates in the Stage-18 pipeline.
+GET https://graph.microsoft.com/v1.0/applications
+Authorization: Bearer {{access_token}}
+
+### Same call, projected to the fields the secret-monitor cares about
+GET https://graph.microsoft.com/v1.0/applications?$select=id,appId,displayName,passwordCredentials,keyCredentials
+Authorization: Bearer {{access_token}}
