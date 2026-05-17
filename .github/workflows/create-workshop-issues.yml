@@ -56,6 +56,8 @@ jobs:
               { file: 'doc/stage-15/README.md', title: 'Stage 15: Application Roles for SPA SSO', labels: ['workshop', 'stage-15'] },
               { file: 'doc/stage-16/README.md', title: 'Stage 16: Use Certificate instead of Client Secret for Service Principal', labels: ['workshop', 'stage-16'] },
               { file: 'doc/stage-17/README.md', title: 'Stage 17: CI/CD Pipelines', labels: ['workshop', 'stage-17'] },
+              { file: 'doc/stage-18/README.md', title: 'Stage 18: Multitenant Secret Monitoring', labels: ['workshop', 'stage-18'] },
+              { file: 'doc/stage-101/README.md', title: 'Stage 101: Verified ID', labels: ['extra', 'workshop', 'stage-101'] },
 
               { file: 'doc/stage-cleanup/README.md', title: 'Stage End & Cleanup', labels: ['workshop', 'stage-cleanup'] },
               { file: 'doc/stage-next/README.md', title: 'Bonus: What\'s Next?', labels: ['workshop', 'bonus'] }
@@ -81,8 +83,10 @@ jobs:
               '../stage-15/README.md': 15,
               '../stage-16/README.md': 16,
               '../stage-17/README.md': 17,
-              '../stage-cleanup/README.md': 18,
-              '../stage-next/README.md': 19
+              '../stage-18/README.md': 18,
+              '../stage-101/README.md': 19,
+              '../stage-cleanup/README.md': 20,
+              '../stage-next/README.md': 21
             };
 
             function convertImageUrls(content, docDir) {

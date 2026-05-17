@@ -62,27 +62,40 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 | 15      | Application Roles (App Roles)        | Define application roles for role-based access control (RBAC) in your Entra ID App Registration. This stage demonstrates how to create app roles, assign them to users, and verify role claims in ID tokens using the OIDC Debugger.                                                   |
 | 16      | Use Certificate instead of Client Secret for Service Principal        | Configure a Service Principal to use a certificate for authentication instead of a client secret. This enhances security by leveraging certificate-based authentication.                                                                                                           |
 | 17     | CI/CD Pipelines                      | Integrate your Terraform configurations and Maester tests into GitHub Actions pipelines. This stage demonstrates how to automate the deployment and security assessment of your Entra ID tenant on every code change, ensuring continuous compliance and security validation. |
+| 18     | Multitenant Secret Monitoring                      | Monitor secrets across multiple tenants using a centralized approach. This stage demonstrates how to track and manage secrets in a multitenant environment, ensuring security and compliance via Multitenant App Registration and Federated Identity Credentials. |
 | Cleanup | Architecture Disassembly             | Execute a broad programmatic tracking destruction mapping using Terraform destroy. Formally complete the deployment workshop and zero the environment successfully. This safely removes all provisioned resources.                                                                 |
 
-## Supported tenant type
-| Step | Workforce tenant | Customer (External ID) tenant |
-|------|------------------|-------------------------------|
-| 1    | ✅               | ✅                           |
-| 2    | ✅               | ✅                           |
-| 3    | ✅               | ✅                           |
-| 4    | ✅               | ✅                           |
-| 5    | ✅               | ❓ Not tested | 
-| 7    | ✅               | ❓ Not tested |
-| 8    | ✅               | ❓ Not tested |
-| 9    | ✅               | ❓ Not tested |
-| 10   | ✅               | ❓ Not tested |
-| 11   | ✅               | ❓ Not tested |
-| 12   | ✅               | ❓ Not tested |
-| 13   | ✅               | ✅ |
-| 14   | ✅               | ✅ |
-| 15   | ✅               | ✅ |
-| 16   | ✅               | ✅ |
-| 17   | ✅               | ❓ Not tested |
+## Extra
+| Step    | Title                                | Description                                                                                                                                                                                                                                                                        |
+|---------|--------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 101     | Verified ID                         | Extend the certificate-bound Service Principal pattern to the Microsoft Entra Verified ID Admin API. Use the `mjendza/verifiedid` Terraform provider to create a Verifiable Credential contract under your tenant's authority.                                                                                                                                        |
+
+
+## Supported tenant type and required resources per stage
+| Step | Entra ID Workforce tenant | Entra ID External ID (Customer) tenant | Azure Subscription| GitHub Repository | Entra Verified ID | 
+|------|------------------|-------------------------------|---|---|---|
+| 1    | ✅               | ✅                           | not needed |not needed |not needed |
+| 2    | ✅               | ✅                           | not needed |not needed |not needed |
+| 3    | ✅               | ✅                           | not needed |not needed |not needed |
+| 4    | ✅               | ✅                           | not needed |not needed |not needed |
+| 5    | ✅               | ❓ Not tested                | not needed |not needed |not needed |
+| 7    | ✅               | ❓ Not tested                | not needed |not needed |not needed |
+| 8    | ✅               | ❓ Not tested                | not needed |not needed |not needed |
+| 9    | ✅               | ❓ Not tested                | not needed |not needed |not needed |
+| 10   | ✅               | ❓ Not tested                | not needed |not needed |not needed |
+| 11   | ✅               | ❓ Not tested                | not needed |not needed |not needed |
+| 12   | ✅               | ❓ Not tested                | not needed |not needed |not needed |
+| 13   | ✅               | ✅                           | not needed |not needed |not needed |
+| 14   | ✅               | ✅                           | not needed |not needed |not needed |
+| 15   | ✅               | ✅                           | not needed |not needed |not needed |
+| 16   | ✅               | ✅                           | not needed |not needed |not needed |
+| 16   | ✅               | ✅                           | not needed |not needed |not needed |
+| 17   | ✅               | ✅                           | not needed |not needed |not needed |
+| 18   | ✅               | ✅                           | not needed |required(*) | not needed |
+| 101   | not directly needed | not directly needed | | not needed |required |
+
+
+
 
 ## Changelog 
 | Version | Date       | Description                                                                                    |
@@ -104,7 +117,7 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 | v1.7    | 2026.04.27 | Added Stage 15 (Application Roles)                                                             |
 | v1.7    | 2026.04.30 | Added Stage 16 (Use Certificate  for Service Principal)                                        |
 | v1.8    | 2026.05.06 | Added Stage 17 (CI/CD Pipelines for Maester and ZTA)                                           |
-
+| v1.9    | 2026.05.17 | Added Stage 18 (Multitenant Secret Monitoring) and 101 Verified ID                             |
 
 ## Frequently Asked Questions (FAQ)
 

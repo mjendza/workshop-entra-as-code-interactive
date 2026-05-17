@@ -213,4 +213,4 @@ The default GitHub OIDC token is short-lived; long-running matrix jobs may need 
 > **Report Issues:** Did you encounter a bug or hold a question? [Report your issue here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← Previous: Stage 16](../stage-16/certificate-auth.md) | [Next → Stage 19](../stage-19/README.md)
+**Navigation:** [← Previous: Stage 17:](../stage-17/README.md) | [Next → Stage Cleanup](../stage-cleanup/README.md)

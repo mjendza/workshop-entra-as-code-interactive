@@ -116,6 +116,17 @@ terraform {
 }
 ```
 
+Update provider configuration in `main.tf` with the SP details and generated in the portal secret:
+
+```hcl
+provider "verifiedid" {
+
+  client_id     = "PUT_HERE_YOUR_CLIENT_ID_FROM_TERRAFORM_OUTPUT"
+  client_secret = "PUT_HERE_THE_SECRET_VALUE_YOU_GENERATED_IN_PORTAL"
+  tenant_id     = "PUT_HERE_YOUR_TENANT_ID"
+}
+```
+
 Append the Stage 101 block:
 
 ```hcl
@@ -144,12 +155,13 @@ output "vc_authority_id" {
 terraform apply
 ```
 
+
 Rename the module from "Demo_Credential_Contract" to "Demo_Credential_Contract_V2" run terraform init and terraform plan again. You should see that the old contract will be deleted and a new one with the same properties will be created. In the VerifiedID Terraform Provided I added the logic to prevent deletion of existing contract - there is no HTTP delete method, contract can be only deactivated. So when you run terraform apply after renaming the module, you should see that the existing contract will be deactivated and a new one will be created. You can verify that in the portal by checking the status of the contract - it should be "Inactive" for the old one and "Active" for the new one.
 
 
 ## Verification Steps
 - Portal → **Verified ID → Credentials**: a new contract `<prefix>-WorkshopCredential` appears under the authority.
-- Re-running `auth.ps1` shows the new contract under the authority's contracts list (uncomment the contracts loop near the bottom of `auth.ps1` if you want it printed).
+- Re-running `demo.ps1` shows the new contract in the 'Contracts' side.
 - The contract's `manifestUrl` returns valid JSON when fetched.
 - (Optional) use my https://github.com/mjendza/workshop-verified-id workshop to test/use the new credential.
 
@@ -159,7 +171,7 @@ Rename the module from "Demo_Credential_Contract" to "Demo_Credential_Contract_V
 - [ ] I have inserted the `VerifiedId_SpVc` module config into my `main.tf` file.
 - [ ] I have successfully run `terraform apply` and granted admin consent for the four Verified ID app roles.
 - [ ] I have onboarded my tenant to Verified ID in the portal.
-- [ ] I have run `./scripts/stage-101-vc/auth.ps1` and seen at least one authority + DID printed.
+- [ ] I have run `./scripts/stage-101-vc/demo.ps1` and seen at least one authority + DID printed.
 - [ ] I have added the Stage 101 block (data + module + output) and run `terraform apply` successfully.
 - [ ] I have verified the new credential contract appears in the Verified ID portal.
 - [ ] I renamed the module and re-ran `terraform apply` to verify that contract replacement logic works as expected.
