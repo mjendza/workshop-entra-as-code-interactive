@@ -346,3 +346,59 @@ module "GitHubMicrosoftZTA_ServicePrincipal" {
     "38d9df27-64da-44fd-b7c5-a6fbac20248f"
   ]
 }
+
+#########################################################################
+# Stage 18: Multi-Tenant App with GitHub Actions OIDC PLACEHOLDER
+#########################################################################
+module "SecretMonitor" {
+  source            = "./modules/multitenant_workload_identity"
+  business_name     = "${var.deployment_unique_name}-SecretMonitoring"
+  graph_permissions = ["9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30"]
+
+  federated_identity_credentials = var.github_repo == "" ? [] : [
+    {
+      display_name = "github-actions-main"
+      description  = "GitHub Actions OIDC from ${var.github_repo} on refs/heads/main"
+      issuer       = "https://token.actions.githubusercontent.com"
+      subject      = "repo:${var.github_repo}:ref:refs/heads/main"
+      ##issuer        = "https://vc.factorlabs.pl",
+      ##subject       = "system:serviceaccount:default:play-with-workload-identity"
+
+      audiences = ["api://AzureADTokenExchange"]
+    }
+  ]
+}
+
+output "multitenant_client_id" {
+  value = module.SecretMonitor.client_id
+}
+
+output "multitenant_sp_object_id" {
+  value = module.SecretMonitor.service_principal_object_id
+}
+
+##########################################################################
+# Stage 101: Verified ID — Credential Contract (Service Principal for dedicated stack) PLACEHOLDER
+#########################################################################
+module "VerifiedId_SpVc" {
+  source            = "./modules/service_principal_rich"
+  business_name     = "${var.deployment_unique_name}-SpVerifiedId"
+  graph_permissions = ["df021288-bdef-4463-88db-98f22de89214"]
+  permissions = [
+    { resource_app_id = "6a8b4b39-c021-437c-b060-5a14a3fd65f3"
+      permissions = [
+        "4ceb7a90-1485-40b1-accf-83a647694c0f",
+        "077813bc-e516-4576-bafd-07bead19c0dc",
+        "933a4159-27ca-4486-b1be-dce09da38475",
+        "63f52f43-0b98-429c-b291-b2dba4a64504"
+      ]
+    }
+  ]
+
+  use_certificate             = true
+  certificate_file            = "cert.pem"
+  certificate_validity_months = 12
+}
+output "cert_sp_vc_client_id" {
+  value = module.VerifiedId_SpVc.client_id
+}

@@ -1,5 +1,3 @@
-
-
 variable "graph_permissions" {
   description = "List of Graph API permissions"
   type        = list(string)
@@ -14,6 +12,8 @@ variable "deployment_env_name" {
   type        = string
   default     = "Workshop"
 }
+
+
 resource "azuread_application" "this" {
   display_name     = "TF.${var.deployment_env_name}.${var.business_name}.ServicePrincipal"
   sign_in_audience = "AzureADMyOrg"

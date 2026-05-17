@@ -279,4 +279,4 @@ az storage blob download-batch \
 
 ---
 
-**Navigation:** [← Previous: Stage 16: Certificate Auth](../stage-16/README.md) | [Next → Stage Cleanup](../stage-cleanup/README.md)
+**Navigation:** [← Previous: Stage 16: Certificate Auth](../stage-16/README.md) | [Next → Stage 18: Multitenant Secret Monitoring](../stage-18/README.md)

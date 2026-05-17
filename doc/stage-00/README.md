@@ -77,12 +77,9 @@ git --version
 
 ## Code Configuration
 
-Update the **Basic** section of the `main.tf` file. Define a unique prefix (such as your initials) as the value for `deployment_unique_name`.
+Update the **terraform.tfvars** file. Set a unique prefix (such as your initials) as the value for `deployment_unique_name`.
 ```hcl
-# Set deployment unique name
-variable "deployment_unique_name" {
-  default = "MJ"
-}
+deployment_unique_name = "MJ"
 ```
 
 Update the `provider.tf` file using the Service Principal credentials documented earlier:
