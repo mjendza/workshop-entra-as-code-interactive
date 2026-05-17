@@ -359,8 +359,8 @@ module "SecretMonitor" {
     {
       display_name = "github-actions-main"
       description  = "GitHub Actions OIDC from ${var.github_repo} on refs/heads/main"
-      #issuer       = "https://token.actions.githubusercontent.com"
-      #subject      = "repo:${var.github_repo}:ref:refs/heads/main"
+      issuer       = "https://token.actions.githubusercontent.com"
+      subject      = "repo:${var.github_repo}:ref:refs/heads/main"
       ##issuer        = "https://vc.factorlabs.pl",
       ##subject       = "system:serviceaccount:default:play-with-workload-identity"
 
