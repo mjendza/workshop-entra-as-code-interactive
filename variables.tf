@@ -8,3 +8,8 @@ variable "trusted_locations_ip_ranges" {
   type        = list(string)
   default     = null
 }
+variable "github_repo" {
+  description = "GitHub repository in OWNER/REPO format. Used by Stage 18 to bind the multi-tenant app's Federated Identity Credential to a GitHub Actions OIDC subject (repo:OWNER/REPO:ref:refs/heads/main). Leave empty to skip Stage 18 FIC creation."
+  type        = string
+  default     = ""
+}
