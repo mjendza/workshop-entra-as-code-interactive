@@ -34,7 +34,7 @@ jobs:
 
       - name: Replace main.tf with result version
         if: matrix.replace_main
-        run: cp doc/${{ matrix.solution }}/main.tf ${{ matrix.path }}/main.tf
+        run: cp doc/${{ matrix.path }}/main.tf ${{ matrix.path }}/main.tf
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
