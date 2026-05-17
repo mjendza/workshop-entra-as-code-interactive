@@ -24,6 +24,9 @@ jobs:
           - solution: external_tenant
             path: external_tenant
             replace_main: false
+          - solution: verified_id
+            path: verified_id
+            replace_main: true
 
     steps:
       - name: Checkout repository
@@ -31,7 +34,7 @@ jobs:
 
       - name: Replace main.tf with result version
         if: matrix.replace_main
-        run: cp doc/result/main.tf main.tf
+        run: cp doc/${{ matrix.solution }}/main.tf ${{ matrix.path }}/main.tf
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
