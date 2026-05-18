@@ -11,7 +11,6 @@ This is the "Observe" phase of the Musketeers cycle — read-only, scheduled, an
 ## Goals
 - Automate the deployment of a **multi-tenant App Registration** with a **GitHub Actions OIDC Federated Identity Credential** using Terraform.
 - Provision the same app's **Service Principal in each target tenant** with `Application.Read.All`.
-- Simple run and test via http file to check if all works.
 - Run a scheduled GitHub Actions workflow with one **matrix job per tenant** that builds an expired/expiring secrets table in the run summary.
 
 ## ⏱️ Estimated Time: 30 minutes
@@ -101,7 +100,7 @@ module "SecretMonitor" {
       display_name = "github-actions-main"
       description  = "GitHub Actions OIDC from ${var.github_repo} on refs/heads/main"
       issuer       = "https://token.actions.githubusercontent.com"
-      subject      = "repo:${var.github_repo}:ref:refs/heads/main"
+      subject      = "repo:${var.github_repo}:environment:monitoring"
       audiences    = ["api://AzureADTokenExchange"]
     }
   ]
@@ -118,11 +117,6 @@ Apply:
 terraform plan
 terraform apply
 terraform output -raw multitenant_client_id
-```
-#### 1. Optional, or phase one is to use demo token provider - use the issuer and subject values above as placeholders for the demo provider, which emits a token with the same claims but is not bound to GitHub's OIDC. This allows you to test the workflow and scripts before setting up the real GitHub OIDC trust.
-```hcl
- issuer        = "https://vc.factorlabs.pl",
- subject       = "system:serviceaccount:default:play-with-workload-identity"
 ```
 
 ### 2. Provision the SP into each target tenant
@@ -142,7 +136,16 @@ terraform apply
 
 The default `var.graph_permissions = ["9a5d68dd-52b0-4cc2-bbf0-d5f35e9def5b"]` (Application.Read.All) matches the home-tenant request. See [`../../external_tenant/README.md`](../../external_tenant/README.md) for the full guide.
 
-### 3. Configure GitHub repository secrets
+#### 2.1 Optional
+Use a link to register and grant admin consent to initialize the SP in the target tenant without Terraform:
+
+```
+https://login.microsoftonline.com/<target-tenant-id>/adminconsent?client_id=<multitenant-client-id>
+```
+
+### 3. Configure GitHub repository secrets monitoring
+
+Please add environment `monitoring` for the GitHub repository and define secrets:
 
 | Secret name | Value |
 |-------------|-------|
@@ -214,3 +217,4 @@ The default GitHub OIDC token is short-lived; long-running matrix jobs may need 
 
 ---
 **Navigation:** [← Previous: Stage 17:](../stage-17/README.md) | [Next → Stage Cleanup](../stage-cleanup/README.md)
+
