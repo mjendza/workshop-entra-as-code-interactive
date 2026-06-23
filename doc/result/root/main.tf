@@ -377,6 +377,20 @@ output "multitenant_sp_object_id" {
   value = module.SecretMonitor.service_principal_object_id
 }
 
+#########################################################################
+# Stage 19: TAP PLACEHOLDER
+#########################################################################
+module "Tenant_TapPolicy" {
+  source                      = "./modules/auth_methods_tap"
+  state                       = "enabled"
+  default_lifetime_in_minutes = 60
+  is_usable_once              = true
+
+  # Use "all_users" to target every user, or paste a specific group object ID:
+  include_target_group_id = "all_users"
+}
+
+
 ##########################################################################
 # Stage 101: Verified ID — Credential Contract (Service Principal for dedicated stack) PLACEHOLDER
 #########################################################################
