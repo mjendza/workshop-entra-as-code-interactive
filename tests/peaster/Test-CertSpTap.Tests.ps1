@@ -1,0 +1,136 @@
+<#
+.SYNOPSIS
+    Stage 16 - Prove the certificate-based Service Principal can issue a Temporary Access Pass.
+
+.DESCRIPTION
+    Uses the SAME certificate SP as Test-CertSp.Tests.ps1 (app-only Connect-MgGraph via the
+    cert, no secret) to generate a Temporary Access Pass (TAP) for a predefined user. This
+    exercises the UserAuthenticationMethod.ReadWrite.All permission added to the SP in Stage 16.
+
+    The target user and lifetime come from the central PeasterConfig.ps1 contract:
+        TAP_TARGET_USER      - UPN or object id to issue the TAP for. Empty = skip.
+        TAP_LIFETIME_MINUTES - requested lifetime in minutes (10-43200), default 60.
+
+    The whole context auto-skips unless the live inputs (ClientId, TenantId, target user) and
+    the Microsoft.Graph.Authentication module are available, so CI runs stay green.
+
+    Graph permission required (granted + admin-consented on the SP):
+        UserAuthenticationMethod.ReadWrite.All  (50483e42-d915-4231-9639-7fdb7fd190e5)
+
+    Run:  $env:ARM_TENANT_ID='<guid>'; $env:TAP_TARGET_USER='user@contoso.com'
+          Invoke-Pester ./tests/peaster/Test-CertSpTap.Tests.ps1
+#>
+
+BeforeDiscovery {
+    . "$PSScriptRoot/PeasterConfig.ps1"
+    Initialize-PeasterEnvironment
+
+    $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+
+    $liveTargetUser = $env:TAP_TARGET_USER
+    $liveTenantId   = $env:ARM_TENANT_ID
+    if ([string]::IsNullOrWhiteSpace($liveTenantId)) { $liveTenantId = $env:AZURE_TENANT_ID }
+
+    $hasGraph     = $null -ne (Get-Module -ListAvailable -Name Microsoft.Graph.Authentication)
+    $hasTerraform = $null -ne (Get-Command terraform -ErrorAction SilentlyContinue)
+
+    $liveClientId = $null
+    if ($hasTerraform) {
+        try {
+            Push-Location $repoRoot
+            $liveClientId = (& terraform output -raw sp_with_certificate_client_id 2>$null)
+            if ($LASTEXITCODE -ne 0) { $liveClientId = $null }
+        } catch {
+            $liveClientId = $null
+        } finally {
+            Pop-Location
+        }
+    }
+    if ([string]::IsNullOrWhiteSpace($liveClientId)) { $liveClientId = $null }
+
+    if ([string]::IsNullOrWhiteSpace($liveTenantId) -and $hasGraph) {
+        try { $liveTenantId = (Get-MgContext -ErrorAction SilentlyContinue).TenantId } catch { }
+    }
+
+    $skipTap = -not ($hasGraph -and $liveClientId -and $liveTenantId -and -not [string]::IsNullOrWhiteSpace($liveTargetUser))
+}
+
+Describe "Stage 16: Certificate SP issues a Temporary Access Pass" {
+
+    Context "TAP generation (live)" -Tag 'Live' -Skip:$skipTap {
+
+        BeforeAll {
+            . "$PSScriptRoot/PeasterConfig.ps1"
+            Initialize-PeasterEnvironment
+
+            $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+            $certDir  = Join-Path $repoRoot 'cert'
+
+            $script:clientId   = $liveClientId
+            $script:tenantId   = $liveTenantId
+            $script:targetUser = $env:TAP_TARGET_USER
+
+            $script:lifetime = 60
+            [int]::TryParse($env:TAP_LIFETIME_MINUTES, [ref]$script:lifetime) | Out-Null
+
+            $pfxPath        = Join-Path $certDir 'cert.pfx'
+            $thumbprintPath = Join-Path $certDir 'cert.thumbprint.txt'
+            $script:thumb   = (Get-Content -Path $thumbprintPath -Raw).Trim()
+
+            # Ensure the certificate is present in CurrentUser\My (same logic as auth.ps1).
+            $found = Get-ChildItem -Path 'Cert:\CurrentUser\My' | Where-Object { $_.Thumbprint -eq $script:thumb }
+            if (-not $found) {
+                $secure = ConvertTo-SecureString -String $env:CERT_PFX_PASSWORD -Force -AsPlainText
+                Import-PfxCertificate -FilePath $pfxPath -CertStoreLocation 'Cert:\CurrentUser\My' -Password $secure | Out-Null
+            }
+
+            Connect-MgGraph `
+                -ClientId              $script:clientId `
+                -CertificateThumbprint $script:thumb `
+                -TenantId              $script:tenantId `
+                -NoWelcome
+
+            $script:tapBaseUri = "https://graph.microsoft.com/v1.0/users/$($script:targetUser)/authentication/temporaryAccessPassMethods"
+
+            # A user can hold only one TAP at a time; clear any existing one so the test is idempotent.
+            try {
+                $existing = Invoke-MgGraphRequest -Method GET -Uri $script:tapBaseUri -ErrorAction Stop
+                foreach ($m in @($existing.value)) {
+                    Invoke-MgGraphRequest -Method DELETE -Uri "$($script:tapBaseUri)/$($m.id)" -ErrorAction Stop | Out-Null
+                }
+            } catch {
+                Write-Verbose "Could not pre-clear existing TAPs: $($_.Exception.Message)"
+            }
+
+            $script:createdTapId = $null
+        }
+
+        AfterAll {
+            if ($script:createdTapId) {
+                try { Invoke-MgGraphRequest -Method DELETE -Uri "$($script:tapBaseUri)/$($script:createdTapId)" -ErrorAction SilentlyContinue | Out-Null } catch { }
+            }
+            try { Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null } catch { }
+        }
+
+        It "is connected app-only as the certificate SP (no secret)" {
+            $ctx = Get-MgContext
+            $ctx.AuthType | Should -Be 'AppOnly'
+            $ctx.ClientId | Should -Be $script:clientId
+        }
+
+        It "generates a Temporary Access Pass for the predefined config user" {
+            $body = @{
+                isUsableOnce      = $true
+                lifetimeInMinutes = $script:lifetime
+            }
+            $tap = Invoke-MgGraphRequest -Method POST -Uri $script:tapBaseUri -Body $body
+            $script:createdTapId = $tap.id
+
+            $tap                     | Should -Not -BeNullOrEmpty -Because "the SP must be able to create a TAP for the user"
+            $tap.id                  | Should -Not -BeNullOrEmpty
+            $tap.temporaryAccessPass | Should -Not -BeNullOrEmpty -Because "a usable pass code must be returned"
+            $tap.lifetimeInMinutes   | Should -Be $script:lifetime
+            $tap.isUsableOnce        | Should -BeTrue
+        }
+    }
+}

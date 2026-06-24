@@ -243,9 +243,13 @@ module "Demo_Roles_OidcDebugger_SSO" {
 # Stage 16: Certificate-Based SP Authentication
 #########################################################################
 module "Workload_CertSp" {
-  source                      = "./modules/service_principal_rich"
-  business_name               = "${var.deployment_unique_name}-SpWithCertificate"
-  graph_permissions           = ["df021288-bdef-4463-88db-98f22de89214"]
+  source        = "./modules/service_principal_rich"
+  business_name = "${var.deployment_unique_name}-SpWithCertificate"
+  graph_permissions = [
+    "df021288-bdef-4463-88db-98f22de89214", # User.Read.All
+    "29c18626-4985-4dcd-85c0-193eef327366", # Policy.ReadWrite.AuthenticationMethod (manage TAP policy)
+    "50483e42-d915-4231-9639-7fdb7fd190e5", # UserAuthenticationMethod.ReadWrite.All (issue a TAP for a user)
+  ]
   use_certificate             = true
   certificate_file            = "cert.pem"
   certificate_validity_months = 12

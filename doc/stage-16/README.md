@@ -45,9 +45,13 @@ This writes:
 # Stage 16: Certificate-Based SP Authentication
 #########################################################################
 module "Workload_CertSp" {
-  source                      = "./modules/service_principal_rich"
-  business_name               = "${var.deployment_unique_name}-SpWithCertificate"
-  graph_permissions           = ["df021288-bdef-4463-88db-98f22de89214"]
+  source        = "./modules/service_principal_rich"
+  business_name = "${var.deployment_unique_name}-SpWithCertificate"
+  graph_permissions = [
+    "df021288-bdef-4463-88db-98f22de89214", # User.Read.All
+    "29c18626-4985-4dcd-85c0-193eef327366", # Policy.ReadWrite.AuthenticationMethod (manage TAP policy)
+    "50483e42-d915-4231-9639-7fdb7fd190e5", # UserAuthenticationMethod.ReadWrite.All (issue a TAP for a user)
+  ]
   use_certificate             = true
   certificate_file            = "cert.pem"
   certificate_validity_months = 12
@@ -69,7 +73,17 @@ You should see four new resources: `azuread_application`, `azuread_service_princ
 
 ### 4. Grant admin consent (manual)
 
-Navigate to **Entra ID → App registrations → `TF.Workshop.<your-prefix>-CertSp.ServicePrincipal` → API permissions** and click **Grant admin consent**. App-only permissions cannot be consented to interactively, so this step is manual — the same convention used in Stages 9–11.
+Navigate to **Entra ID → App registrations → `TF.Workshop.<your-prefix>-SpWithCertificate.ServicePrincipal` → API permissions** and click **Grant admin consent**. App-only permissions cannot be consented to interactively, so this step is manual — the same convention used in Stages 9–11.
+
+This SP requests three Graph application permissions, all of which need consent:
+
+| Permission | App role id | Why |
+|------------|-------------|-----|
+| `User.Read.All` | `df021288-bdef-4463-88db-98f22de89214` | Read users (the `auth.ps1` proof). |
+| `Policy.ReadWrite.AuthenticationMethod` | `29c18626-4985-4dcd-85c0-193eef327366` | Manage the tenant-wide Temporary Access Pass policy (Stage 19). |
+| `UserAuthenticationMethod.ReadWrite.All` | `50483e42-d915-4231-9639-7fdb7fd190e5` | Issue a Temporary Access Pass for a specific user. |
+
+The last two let the **same certificate SP** generate a Temporary Access Pass — exercised by the automated test `tests/peaster/Test-CertSpTap.Tests.ps1`.
 
 ### 5. Authenticate with the certificate
 
