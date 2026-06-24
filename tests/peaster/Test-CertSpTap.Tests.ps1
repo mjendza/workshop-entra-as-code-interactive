@@ -27,32 +27,11 @@ BeforeDiscovery {
 
     $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 
+    # These locals exist only in the discovery phase; BeforeAll re-resolves via Resolve-PeasterLiveSp.
+    $live = Resolve-PeasterLiveSp -RepoRoot $repoRoot
     $liveTargetUser = $env:TAP_TARGET_USER
-    $liveTenantId   = $env:ARM_TENANT_ID
-    if ([string]::IsNullOrWhiteSpace($liveTenantId)) { $liveTenantId = $env:AZURE_TENANT_ID }
 
-    $hasGraph     = $null -ne (Get-Module -ListAvailable -Name Microsoft.Graph.Authentication)
-    $hasTerraform = $null -ne (Get-Command terraform -ErrorAction SilentlyContinue)
-
-    $liveClientId = $null
-    if ($hasTerraform) {
-        try {
-            Push-Location $repoRoot
-            $liveClientId = (& terraform output -raw sp_with_certificate_client_id 2>$null)
-            if ($LASTEXITCODE -ne 0) { $liveClientId = $null }
-        } catch {
-            $liveClientId = $null
-        } finally {
-            Pop-Location
-        }
-    }
-    if ([string]::IsNullOrWhiteSpace($liveClientId)) { $liveClientId = $null }
-
-    if ([string]::IsNullOrWhiteSpace($liveTenantId) -and $hasGraph) {
-        try { $liveTenantId = (Get-MgContext -ErrorAction SilentlyContinue).TenantId } catch { }
-    }
-
-    $skipTap = -not ($hasGraph -and $liveClientId -and $liveTenantId -and -not [string]::IsNullOrWhiteSpace($liveTargetUser))
+    $skipTap = -not ($live.HasGraph -and $live.ClientId -and $live.TenantId -and -not [string]::IsNullOrWhiteSpace($liveTargetUser))
 }
 
 Describe "Stage 16: Certificate SP issues a Temporary Access Pass" {
@@ -66,8 +45,10 @@ Describe "Stage 16: Certificate SP issues a Temporary Access Pass" {
             $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
             $certDir  = Join-Path $repoRoot 'cert'
 
-            $script:clientId   = $liveClientId
-            $script:tenantId   = $liveTenantId
+            # Re-resolve at run time: discovery-phase locals are not visible inside BeforeAll.
+            $live = Resolve-PeasterLiveSp -RepoRoot $repoRoot
+            $script:clientId   = $live.ClientId
+            $script:tenantId   = $live.TenantId
             $script:targetUser = $env:TAP_TARGET_USER
 
             $script:lifetime = 60
@@ -76,6 +57,18 @@ Describe "Stage 16: Certificate SP issues a Temporary Access Pass" {
             $pfxPath        = Join-Path $certDir 'cert.pfx'
             $thumbprintPath = Join-Path $certDir 'cert.thumbprint.txt'
             $script:thumb   = (Get-Content -Path $thumbprintPath -Raw).Trim()
+
+            if ([string]::IsNullOrWhiteSpace($script:clientId) -or [string]::IsNullOrWhiteSpace($script:tenantId)) {
+                throw (@(
+                    "Live TAP context cannot authenticate - required inputs are missing:",
+                    "  ClientId  : '$($script:clientId)'  (terraform output -raw sp_with_certificate_client_id)",
+                    "  TenantId  : '$($script:tenantId)'  (`$env:ARM_TENANT_ID / AZURE_TENANT_ID / Get-MgContext)",
+                    "  TargetUser: '$($script:targetUser)'  (`$env:TAP_TARGET_USER)",
+                    "  Thumbprint: '$($script:thumb)'",
+                    "  HasGraph  : $($live.HasGraph)   HasTerraform: $($live.HasTerraform)",
+                    "  Terraform : $($live.TerraformError)"
+                ) -join [Environment]::NewLine)
+            }
 
             # Ensure the certificate is present in CurrentUser\My (same logic as auth.ps1).
             $found = Get-ChildItem -Path 'Cert:\CurrentUser\My' | Where-Object { $_.Thumbprint -eq $script:thumb }

@@ -34,33 +34,10 @@ BeforeDiscovery {
     $certDir  = Join-Path $repoRoot 'cert'
 
     # Resolve the ClientId/TenantId needed by the live context. Any failure leaves them $null,
-    # and the live It blocks are skipped rather than failed.
-    $liveClientId = $null
-    $liveTenantId = $env:ARM_TENANT_ID
-    if ([string]::IsNullOrWhiteSpace($liveTenantId)) { $liveTenantId = $env:AZURE_TENANT_ID }
-
-    $hasGraph     = $null -ne (Get-Module -ListAvailable -Name Microsoft.Graph.Authentication)
-    $hasTerraform = $null -ne (Get-Command terraform -ErrorAction SilentlyContinue)
-
-    if ($hasTerraform) {
-        try {
-            Push-Location $repoRoot
-            $liveClientId = (& terraform output -raw sp_with_certificate_client_id 2>$null)
-            if ($LASTEXITCODE -ne 0) { $liveClientId = $null }
-        } catch {
-            $liveClientId = $null
-        } finally {
-            Pop-Location
-        }
-    }
-    if ([string]::IsNullOrWhiteSpace($liveClientId)) { $liveClientId = $null }
-
-    # Fall back to an already-connected Graph context for the tenant id, if available.
-    if ([string]::IsNullOrWhiteSpace($liveTenantId) -and $hasGraph) {
-        try { $liveTenantId = (Get-MgContext -ErrorAction SilentlyContinue).TenantId } catch { }
-    }
-
-    $skipLive = -not ($hasGraph -and $liveClientId -and $liveTenantId)
+    # and the live It blocks are skipped rather than failed. NOTE: these locals exist only in the
+    # discovery phase; BeforeAll re-resolves them via Resolve-PeasterLiveSp for the run phase.
+    $live = Resolve-PeasterLiveSp -RepoRoot $repoRoot
+    $skipLive = -not ($live.HasGraph -and $live.ClientId -and $live.TenantId)
 }
 
 Describe "Stage 16: Certificate-Based SP Authentication" {
@@ -145,14 +122,28 @@ Describe "Stage 16: Certificate-Based SP Authentication" {
             $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
             $certDir  = Join-Path $repoRoot 'cert'
 
-            $script:clientId = $liveClientId
-            $script:tenantId = $liveTenantId
+            # Re-resolve at run time: discovery-phase locals are not visible inside BeforeAll.
+            $live = Resolve-PeasterLiveSp -RepoRoot $repoRoot
+            $script:clientId = $live.ClientId
+            $script:tenantId = $live.TenantId
 
             $pfxPath        = Join-Path $certDir 'cert.pfx'
             $thumbprintPath = Join-Path $certDir 'cert.thumbprint.txt'
             $script:thumb   = (Get-Content -Path $thumbprintPath -Raw).Trim()
 
             $pfxPassword = $env:CERT_PFX_PASSWORD
+
+            # Fail loudly with the resolved state instead of a cryptic Connect-MgGraph binding error.
+            if ([string]::IsNullOrWhiteSpace($script:clientId) -or [string]::IsNullOrWhiteSpace($script:tenantId)) {
+                throw (@(
+                    "Live context cannot authenticate - required inputs are missing:",
+                    "  ClientId  : '$($script:clientId)'  (terraform output -raw sp_with_certificate_client_id)",
+                    "  TenantId  : '$($script:tenantId)'  (`$env:ARM_TENANT_ID / AZURE_TENANT_ID / Get-MgContext)",
+                    "  Thumbprint: '$($script:thumb)'",
+                    "  HasGraph  : $($live.HasGraph)   HasTerraform: $($live.HasTerraform)",
+                    "  Terraform : $($live.TerraformError)"
+                ) -join [Environment]::NewLine)
+            }
 
             # Ensure the certificate is present in CurrentUser\My (same logic as auth.ps1).
             $found = Get-ChildItem -Path 'Cert:\CurrentUser\My' | Where-Object { $_.Thumbprint -eq $script:thumb }
