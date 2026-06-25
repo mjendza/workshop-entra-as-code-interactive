@@ -255,6 +255,13 @@ module "Workload_CertSp" {
   certificate_validity_months = 12
 }
 
+output "sp_with_certificate_client_id" {
+  value = module.Workload_CertSp.client_id
+}
+
+output "sp_with_certificate_cert_end_date" {
+  value = module.Workload_CertSp.cert_end_date
+}
 #########################################################################
 # Stage 17: Maester & ZTA & EntraExporter in GitHub Actions (Workload Federated Identity) PLACEHOLDER
 #########################################################################

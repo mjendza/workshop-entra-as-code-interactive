@@ -8,14 +8,14 @@ See [`doc/stage-16/README.md`](../../doc/stage-16/README.md) for the stage these
 
 ## What is verified
 
-**`Test-CertSp.Tests.ps1`** — two layers:
+**`Stage-16.SP-Cert.Tests.ps1`** — two layers:
 
 | Tag       | Network? | Proves                                                                                 |
 |-----------|----------|----------------------------------------------------------------------------------------|
 | `Offline` | No       | The local artifacts from `scripts/stage-16/init.ps1` are valid: `cert/cert.pem` parses, `cert/cert.thumbprint.txt` matches it, RSA-2048 / SHA256, not expired, and `cert/cert.pfx` opens with the password and carries the private key. |
 | `Live`    | Yes      | App-only `Connect-MgGraph` as the SP **using the certificate** (`AuthType = AppOnly`, no secret), and the certificate uploaded to the app registration matches the local thumbprint and is unexpired. |
 
-**`Test-CertSpTap.Tests.ps1`** — uses the **same certificate SP** to issue a Temporary Access
+**`Stage-19.TAP.Tests.ps1`** — uses the **same certificate SP** to issue a Temporary Access
 Pass:
 
 | Tag    | Network? | Proves                                                                                    |

@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    Stage 16 - Prove the certificate-based Service Principal can issue a Temporary Access Pass.
+    Stage 19 - Prove the certificate-based Service Principal can issue a Temporary Access Pass.
 
 .DESCRIPTION
-    Uses the SAME certificate SP as Test-CertSp.Tests.ps1 (app-only Connect-MgGraph via the
+    Uses the SAME certificate SP as Stage-16.SP-Cert.Tests.ps1 (app-only Connect-MgGraph via the
     cert, no secret) to generate a Temporary Access Pass (TAP) for a predefined user. This
     exercises the UserAuthenticationMethod.ReadWrite.All permission added to the SP in Stage 16.
 
@@ -18,7 +18,7 @@
         UserAuthenticationMethod.ReadWrite.All  (50483e42-d915-4231-9639-7fdb7fd190e5)
 
     Run:  $env:ARM_TENANT_ID='<guid>'; $env:TAP_TARGET_USER='user@contoso.com'
-          Invoke-Pester ./tests/peaster/Test-CertSpTap.Tests.ps1
+          Invoke-Pester ./tests/peaster/Stage-19.TAP.Tests.ps1
 #>
 
 BeforeDiscovery {
@@ -37,7 +37,7 @@ BeforeDiscovery {
     }
 }
 
-Describe "Stage 16: Certificate SP issues a Temporary Access Pass" {
+Describe "Stage 19: Temporary Access Pass (TAP)" {
 
     Context "TAP generation (live)" -Tag 'Live' -Skip:$skipTap {
 

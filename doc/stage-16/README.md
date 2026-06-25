@@ -60,7 +60,13 @@ module "Workload_CertSp" {
 output "sp_with_certificate_client_id" {
   value = module.Workload_CertSp.client_id
 }
+
+output "sp_with_certificate_cert_end_date" {
+  value = module.Workload_CertSp.cert_end_date
+}
 ```
+
+> The `sp_with_certificate_cert_end_date` output exposes the uploaded certificate's expiry from Terraform state. The optional automated tests use it to confirm the cert is uploaded and unexpired without needing the `Application.Read.All` Graph permission.
 
 ### 3. Apply
 
@@ -83,7 +89,7 @@ This SP requests three Graph application permissions, all of which need consent:
 | `Policy.ReadWrite.AuthenticationMethod` | `29c18626-4985-4dcd-85c0-193eef327366` | Manage the tenant-wide Temporary Access Pass policy (Stage 19). |
 | `UserAuthenticationMethod.ReadWrite.All` | `50483e42-d915-4231-9639-7fdb7fd190e5` | Issue a Temporary Access Pass for a specific user. |
 
-The last two let the **same certificate SP** generate a Temporary Access Pass — exercised by the automated test `tests/peaster/Test-CertSpTap.Tests.ps1`.
+The last two let the **same certificate SP** generate a Temporary Access Pass — exercised by the automated test `tests/peaster/Stage-19.TAP.Tests.ps1`.
 
 ### 5. Authenticate with the certificate
 
@@ -109,6 +115,23 @@ Connected.
 - `auth.ps1` prints `AuthType: AppOnly` and `Get-MgOrganization` returns your tenant's display name.
 - No client secret was created or used at any point in this stage.
 
+### Verify with automated tests (optional)
+
+Instead of (or in addition to) the manual checks above, you can prove this stage with the Pester tests in `tests/peaster`:
+
+```powershell
+# Offline only — validates the local cert artifacts (cert.pem / cert.pfx / thumbprint).
+# No network or tenant required.
+Invoke-Pester ./tests/peaster/Stage-16.SP-Cert.Tests.ps1 -ExcludeTagFilter Live
+
+# Full run — also authenticates app-only with the certificate (no secret) and confirms,
+# via `terraform output`, that the uploaded certificate is recorded and unexpired.
+$env:ARM_TENANT_ID = '<tenant-guid>'
+Invoke-Pester ./tests/peaster/Stage-16.SP-Cert.Tests.ps1
+```
+
+The live tests resolve the SP from `terraform output -raw sp_with_certificate_client_id` and read the expiry from `terraform output -raw sp_with_certificate_cert_end_date`, so they require the `output` blocks above and a successful `terraform apply`. See `tests/peaster/README.md` for the full input contract.
+
 ## Troubleshooting
 
 **`file: cert/cert.pem not found` during `terraform apply`**
@@ -130,6 +153,7 @@ Admin consent for `User.Read.All` is missing. Grant it from the API permissions 
 - [ ] I have verified the certificate appears in the App Registration's Certificates blade with the matching thumbprint.
 - [ ] I have granted admin consent for the SP's Graph permissions.
 - [ ] I have run `./scripts/stage-16/auth.ps1` and seen `AuthType: AppOnly` plus a successful `Get-MgUser` Count response (like `Total users in tenant: 20`).
+- [ ] (Optional) I have run `Invoke-Pester ./tests/peaster/Stage-16.SP-Cert.Tests.ps1` and the tests pass.
 - [ ] I am ready to proceed to the next stage.
 
 > **Tip:** Please mark all boxes above prior to closing out the issue!
