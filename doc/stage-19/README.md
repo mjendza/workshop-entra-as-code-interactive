@@ -65,6 +65,23 @@ The `terraform plan` should show a single `msgraph_resource_action.temporary_acc
 - Optionally confirm via Microsoft Graph by running `GET https://graph.microsoft.com/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/temporaryAccessPass` and checking that `state`, `defaultLifetimeInMinutes`, `isUsableOnce`, and `includeTargets` reflect your Terraform values.
 - (Optional) Issue a real TAP to a targeted test user from Entra ID → Users → `select a user` → Authentication methods → Add authentication method → Temporary Access Pass, and confirm the pass is generated within the configured lifetime.
 
+### Verify with automated tests (optional)
+
+You can prove end-to-end TAP issuance with the Pester test in `tests/peaster` — it reuses the **Stage 16 certificate Service Principal** to generate a real TAP for a target user, exercising this enabled policy:
+
+```powershell
+$env:ARM_TENANT_ID   = '<tenant-guid>'
+$env:TAP_TARGET_USER = 'user@contoso.com'   # UPN or object id to issue a TAP for
+Invoke-Pester ./tests/peaster/Stage-19.TAP.Tests.ps1
+```
+
+This requires:
+- **Stage 16 applied** — the test resolves the cert SP from `terraform output -raw sp_with_certificate_client_id`.
+- **Admin consent** for `UserAuthenticationMethod.ReadWrite.All` on that SP.
+- **This TAP policy enabled** (the module above) with the target user inside `includeTargets`.
+
+A `403 Authorization_RequestDenied` makes the test **fail red** with guidance to grant consent — it is never skipped. See `tests/peaster/README.md` for the full input contract.
+
 ## Troubleshooting
 
 `Authorization_RequestDenied` / insufficient privileges during `terraform apply`
@@ -85,6 +102,7 @@ Only users inside the policy's `includeTargets` (and not in `excludeTargets`) ca
 - [ ] I have successfully run `terraform plan` without errors.
 - [ ] I have successfully run `terraform apply`.
 - [ ] I have verified in the Entra admin center that Temporary Access Pass is **Enabled** with the expected lifetime and one-time-use settings.
+- [ ] (Optional) I have run `Invoke-Pester ./tests/peaster/Stage-19.TAP.Tests.ps1` (with `TAP_TARGET_USER` set) and the test passes.
 - [ ] I am ready to proceed to the next stage.
 
 > **Tip:** Please mark all boxes above prior to closing out the issue!
