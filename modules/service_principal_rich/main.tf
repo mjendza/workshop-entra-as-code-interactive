@@ -96,3 +96,8 @@ output "client_id" {
 output "object_id" {
   value = azuread_application.this.object_id
 }
+
+output "cert_end_date" {
+  description = "Expiry (RFC3339) of the X.509 certificate uploaded to the app registration, or null when no certificate is used."
+  value       = var.use_certificate ? azuread_application_certificate.this_cert[0].end_date : null
+}
