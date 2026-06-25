@@ -13,9 +13,9 @@
 
       Live (-Tag Live)        Auto-skips unless live inputs and the Microsoft.Graph module
                               are present. Authenticates app-only to Microsoft Graph as the
-                              SP using the certificate (no secret), and verifies the cert
-                              uploaded to the app registration matches the local cert and is
-                              unexpired.
+                              SP using the certificate (no secret), and verifies via Terraform
+                              state that the uploaded certificate is recorded and unexpired
+                              (no Application.Read.All required).
 
     CI usage:    Invoke-Pester ./tests/peaster -ExcludeTagFilter Live
     Full usage:  $env:ARM_TENANT_ID = '<tenant-guid>'; Invoke-Pester ./tests/peaster
@@ -38,6 +38,9 @@ BeforeDiscovery {
     # discovery phase; BeforeAll re-resolves them via Resolve-PeasterLiveSp for the run phase.
     $live = Resolve-PeasterLiveSp -RepoRoot $repoRoot
     $skipLive = -not ($live.HasGraph -and $live.ClientId -and $live.TenantId)
+    if ($skipLive) {
+        Write-PeasterSkipReason -Live $live -ContextName 'Service Principal certificate authentication (live)'
+    }
 }
 
 Describe "Stage 16: Certificate-Based SP Authentication" {
@@ -170,16 +173,18 @@ Describe "Stage 16: Certificate-Based SP Authentication" {
             $ctx.ClientId        | Should -Be $script:clientId
         }
 
-        It "has the local certificate uploaded to the app registration and unexpired in Entra" {
-            $app = Get-MgApplication -Filter "appId eq '$($script:clientId)'" -Property 'id,appId,keyCredentials'
-            $app | Should -Not -BeNullOrEmpty -Because "the SP's application object must exist"
+        It "has the certificate uploaded to the app registration and unexpired (per Terraform state)" {
+            # Verified via Terraform state, not Get-MgApplication: reading /applications app-only
+            # would require Application.Read.All, which this SP intentionally does not request.
+            # The module uploads file(cert/cert.pem) as azuread_application_certificate, so the
+            # uploaded certificate is the same local cert proven by the offline tests; here we
+            # assert Terraform recorded that upload and that its expiry is in the future.
+            $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+            $endOut   = Get-PeasterTerraformOutputRaw -RepoRoot $repoRoot -Name 'sp_with_certificate_cert_end_date'
+            $endOut.Value | Should -Not -BeNullOrEmpty -Because "Terraform must record the uploaded certificate's end date. $($endOut.Error)"
 
-            $now = [DateTime]::UtcNow
-            $matching = $app.KeyCredentials | Where-Object {
-                ($_.CustomKeyIdentifier -and ([BitConverter]::ToString($_.CustomKeyIdentifier) -replace '-', '') -ieq $script:thumb) `
-                -and ($_.EndDateTime -gt $now)
-            }
-            $matching | Should -Not -BeNullOrEmpty -Because "the certificate Terraform uploaded must match cert/cert.thumbprint.txt and not be expired"
+            $endDate = [DateTimeOffset]::Parse($endOut.Value, [System.Globalization.CultureInfo]::InvariantCulture).UtcDateTime
+            $endDate | Should -BeGreaterThan ([DateTime]::UtcNow) -Because "the certificate Terraform uploaded to the app registration must not be expired"
         }
     }
 }

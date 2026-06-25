@@ -35,6 +35,48 @@ function Initialize-PeasterEnvironment {
 
 <#
 .SYNOPSIS
+    Read a single raw Terraform output, separating a real value from terraform's noise.
+
+.DESCRIPTION
+    `terraform output -raw <name>` prints a warning box (e.g. "No outputs found") to the success
+    stream when the output is absent, so a naive capture pollutes the value. This returns a
+    hashtable @{ Value; Error }: Value is the clean output (or $null), Error carries the
+    terraform diagnostic for a clear test failure message.
+#>
+function Get-PeasterTerraformOutputRaw {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string] $RepoRoot,
+        [Parameter(Mandatory)][string] $Name
+    )
+
+    if ($null -eq (Get-Command terraform -ErrorAction SilentlyContinue)) {
+        return @{ Value = $null; Error = 'terraform executable not found on PATH' }
+    }
+
+    try {
+        Push-Location $RepoRoot
+        $raw  = (& terraform output -no-color -raw $Name 2>&1)
+        $exit = $LASTEXITCODE
+        $text = ((@($raw) | ForEach-Object { "$_" }) -join "`n") -replace "`e\[[0-9;]*m", ''
+        $flat = ($text -replace '\s+', ' ').Trim()
+        if ($exit -ne 0) {
+            return @{ Value = $null; Error = "terraform output -raw $Name failed (exit $exit): $flat" }
+        }
+        $val = $text.Trim()
+        if ([string]::IsNullOrWhiteSpace($val) -or $val -match 'No outputs found' -or $val -match '^\s*(Warning|Error):') {
+            return @{ Value = $null; Error = "terraform output -raw $Name returned no value: $flat" }
+        }
+        return @{ Value = $val; Error = $null }
+    } catch {
+        return @{ Value = $null; Error = "terraform output -raw $Name threw: $($_.Exception.Message)" }
+    } finally {
+        Pop-Location
+    }
+}
+
+<#
+.SYNOPSIS
     Resolve the live ClientId / TenantId / Graph availability for the certificate-SP tests.
 
 .DESCRIPTION
@@ -62,34 +104,18 @@ function Resolve-PeasterLiveSp {
     $hasGraph     = $null -ne (Get-Module -ListAvailable -Name Microsoft.Graph.Authentication)
     $hasTerraform = $null -ne (Get-Command terraform -ErrorAction SilentlyContinue)
 
-    $clientId       = $null
-    $terraformError = $null
-    if ($hasTerraform) {
-        try {
-            Push-Location $RepoRoot
-            # Merge stderr into the capture, then validate: terraform may print a warning box
-            # (e.g. "No outputs found") to the success stream when an output is absent, so a
-            # client id is only accepted when it is a single, clean GUID. Anything else is
-            # preserved as a diagnostic and ClientId stays $null (-> the live context skips).
-            $raw  = (& terraform output -no-color -raw $OutputName 2>&1)
-            $exit = $LASTEXITCODE
-            # Flatten to text and strip any residual ANSI escape sequences for a clean diagnostic.
-            $text = ((@($raw) | ForEach-Object { "$_" }) -join "`n") -replace "`e\[[0-9;]*m", ''
-            $guid = '^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$'
-            if ($exit -eq 0 -and $text.Trim() -match $guid) {
-                $clientId = $text.Trim()
-            } else {
-                $clientId = $null
-                $terraformError = "terraform output -raw $OutputName did not return a client id (exit $exit): " + (($text -replace '\s+', ' ').Trim())
-            }
-        } catch {
-            $terraformError = "terraform output -raw $OutputName threw: $($_.Exception.Message)"
-            $clientId = $null
-        } finally {
-            Pop-Location
-        }
+    # A client id is only accepted when terraform returns a single clean GUID; anything else
+    # (warning box, empty, error) leaves ClientId $null and the live context skips.
+    $tf             = Get-PeasterTerraformOutputRaw -RepoRoot $RepoRoot -Name $OutputName
+    $terraformError = $tf.Error
+    $guid           = '^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$'
+    if ($tf.Value -and $tf.Value -match $guid) {
+        $clientId = $tf.Value
     } else {
-        $terraformError = 'terraform executable not found on PATH'
+        $clientId = $null
+        if (-not $terraformError -and $tf.Value) {
+            $terraformError = "terraform output -raw $OutputName did not return a client id: $($tf.Value)"
+        }
     }
     if ([string]::IsNullOrWhiteSpace($clientId)) { $clientId = $null }
 
@@ -105,5 +131,43 @@ function Resolve-PeasterLiveSp {
         HasGraph       = $hasGraph
         HasTerraform   = $hasTerraform
         TerraformError = $terraformError
+    }
+}
+
+<#
+.SYNOPSIS
+    Emit a Write-Warning explaining why a live Pester context is being skipped.
+
+.DESCRIPTION
+    Pester's -Skip gives no reason in the output, so when live tests show as [!] you cannot tell
+    which input was missing. Call this from BeforeDiscovery when the skip flag is true; it lists
+    each unmet requirement (and the terraform diagnostic) so the cause is visible in the run log.
+
+    $Extra is an optional ordered list of additional "label = value" requirements (e.g. the TAP
+    target user) whose value being null/empty also forces a skip.
+#>
+function Write-PeasterSkipReason {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][hashtable] $Live,
+        [Parameter(Mandatory)][string]    $ContextName,
+        [hashtable] $Extra
+    )
+
+    $reasons = [System.Collections.Generic.List[string]]::new()
+    if (-not $Live.HasGraph) { $reasons.Add('Microsoft.Graph.Authentication module is not installed') }
+    if (-not $Live.ClientId) {
+        $why = if ($Live.TerraformError) { $Live.TerraformError } else { 'terraform output -raw sp_with_certificate_client_id returned nothing' }
+        $reasons.Add("ClientId is missing -> $why")
+    }
+    if (-not $Live.TenantId) { $reasons.Add('TenantId is missing (set $env:ARM_TENANT_ID / AZURE_TENANT_ID, or connect Graph first)') }
+    if ($Extra) {
+        foreach ($key in $Extra.Keys) {
+            if ([string]::IsNullOrWhiteSpace([string]$Extra[$key])) { $reasons.Add("$key is missing") }
+        }
+    }
+
+    if ($reasons.Count -gt 0) {
+        Write-Warning ("[peaster] Skipping live context '$ContextName' because:`n  - " + ($reasons -join "`n  - "))
     }
 }

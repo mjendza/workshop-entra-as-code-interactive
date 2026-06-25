@@ -32,6 +32,9 @@ BeforeDiscovery {
     $liveTargetUser = $env:TAP_TARGET_USER
 
     $skipTap = -not ($live.HasGraph -and $live.ClientId -and $live.TenantId -and -not [string]::IsNullOrWhiteSpace($liveTargetUser))
+    if ($skipTap) {
+        Write-PeasterSkipReason -Live $live -ContextName 'TAP generation (live)' -Extra @{ 'TargetUser ($env:TAP_TARGET_USER)' = $liveTargetUser }
+    }
 }
 
 Describe "Stage 16: Certificate SP issues a Temporary Access Pass" {
@@ -116,7 +119,24 @@ Describe "Stage 16: Certificate SP issues a Temporary Access Pass" {
                 isUsableOnce      = $true
                 lifetimeInMinutes = $script:lifetime
             }
-            $tap = Invoke-MgGraphRequest -Method POST -Uri $script:tapBaseUri -Body $body
+
+            # A missing/unconsented permission (403 Forbidden / Authorization_RequestDenied) is a
+            # real defect of the deployment, not a reason to skip: surface it as a clear RED failure.
+            try {
+                $tap = Invoke-MgGraphRequest -Method POST -Uri $script:tapBaseUri -Body $body -ErrorAction Stop
+            } catch {
+                $status = $null
+                try { $status = [int]$_.Exception.Response.StatusCode } catch { }
+                if ($status -eq 403 -or $_.Exception.Message -match 'Authorization_RequestDenied|Forbidden') {
+                    throw "TAP creation was denied (HTTP 403 Authorization_RequestDenied). The certificate SP is " +
+                          "authenticated but lacks effective permission. Grant admin consent for " +
+                          "'UserAuthenticationMethod.ReadWrite.All' on the SP (Entra ID -> App registrations -> " +
+                          "the SpWithCertificate app -> API permissions -> Grant admin consent), then re-run. " +
+                          "Underlying error: $($_.Exception.Message)"
+                }
+                throw "TAP creation failed (HTTP $status): $($_.Exception.Message)"
+            }
+
             $script:createdTapId = $tap.id
 
             $tap                     | Should -Not -BeNullOrEmpty -Because "the SP must be able to create a TAP for the user"
