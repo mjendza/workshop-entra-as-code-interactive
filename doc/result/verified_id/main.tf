@@ -2,7 +2,7 @@ terraform {
   required_providers {
     verifiedid = {
       source  = "mjendza/verifiedid"
-      version = "= 0.1.14-beta"
+      version = ">= 0.1.14-beta"
     }
   }
 }
