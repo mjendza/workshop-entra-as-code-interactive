@@ -40,7 +40,13 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 
 > **Tip:** Use the issue comments to jot down any problems encountered or lessons learned during each stage!
 
-## Steps
+## Workshop Paths
+
+This workshop is organized into **three independent paths**. Each is self-contained - pick
+whichever apply to you. They intentionally don't cross-link into each other's stage numbering
+(separate label sets, separate issue sequences when generated via the interactive mode).
+
+### Path 1: Workforce Tenant (Stages 0-19)
 
 | Step               | Title                                                          | Description                                                                                                                                                                                                                                                                        |
 |--------------------|----------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -66,13 +72,36 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 | [19](doc/stage-19) | Temporary Access Pass (TAP)                                    | This stage demonstrates how to create and manage TAP policies for secure temporary access to your Entra ID tenant.                                                                                                                                                                 |
 | Cleanup            | Architecture Disassembly                                       | Execute a broad programmatic tracking destruction mapping using Terraform destroy. Formally complete the deployment workshop and zero the environment successfully. This safely removes all provisioned resources.                                                                 |
 
-## Extra
-| Step    | Title                                | Description                                                                                                                                                                                                                                                                        |
-|---------|--------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [101](doc/stage-101-vc)     | Verified ID                         | Extend the certificate-bound Service Principal pattern to the Microsoft Entra Verified ID Admin API. Use the `mjendza/verifiedid` Terraform provider to create a Verifiable Credential contract under your tenant's authority.                                                                                                                                        |
+### Path 2: External ID (CIAM) Tenant
 
+Native Authentication for a customer-facing Entra External ID tenant - a self-contained pair of
+stages using their own dedicated Service Principal and Terraform root ([`external_tenant/`](external_tenant)).
+
+| Step                           | Title                              | Description                                                                                                                                                                                                                           |
+|--------------------------------|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [external-00](doc/external-00) | Prerequisites (External ID tenant) | Create a second Service Principal, this time in your External ID (CIAM) tenant, with every Microsoft Graph permission the `external_tenant/` Terraform root needs (native auth, user flows, conditional access, groups, local users). |
+| [external-01](doc/external-01) | Native Authentication              | Enable Entra External ID's Native Authentication API (email + password) on a native app registration, and prove the sign-in flows end-to-end with Pester via registered user also in terraform .                                      |
+
+### Path 3: Verified ID
+
+Issue a W3C Verifiable Credential from your tenant's own authority - a self-contained pair of
+stages layered on top of the certificate-bound Service Principal pattern from Stage 16.
+
+| Step               | Title                                         | Description                                                                                                                                                                                                                    |
+|--------------------|-----------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [vc-00](doc/vc-00) | Prerequisites (Onboard Tenant to Verified ID) | One-time, tenant-level onboarding: custom domain & Quick Setup.                                                                                                                                                                |
+| [vc-01](doc/vc-01) | Verified ID - register first contract         | Extend the certificate-bound Service Principal pattern to the Microsoft Entra Verified ID Admin API. Use the `mjendza/verifiedid` Terraform provider to create a Verifiable Credential contract under your tenant's authority. |
+
+> 🚀 **Next steps after this path:** use the dedicated
+> [workshop-verified-id](https://github.com/mjendza/workshop-verified-id) developer workshop to
+> actually issue, present, and verify the credential you created here from a real app.
 
 ## Supported tenant type and required resources per stage
+
+### Path 1: Workforce Tenant
+
+This describes which tenant type each Workforce-path stage's *own* Terraform can also run against External ID Tenants, but we have a dedicated External ID path below.
+
 | Step | Entra ID Workforce tenant | Entra ID External ID (Customer) tenant | Azure Subscription | GitHub Repository | Entra Verified ID | 
 |------|---------------------------|----------------------------------------|--------------------|-------------------|-------------------|
 | 1    | ✅                         | ✅                                      | not needed         | not needed        | not needed        |
@@ -90,12 +119,23 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 | 14   | ✅                         | ✅                                      | not needed         | not needed        | not needed        |
 | 15   | ✅                         | ✅                                      | not needed         | not needed        | not needed        |
 | 16   | ✅                         | ✅                                      | not needed         | not needed        | not needed        |
-| 16   | ✅                         | ✅                                      | not needed         | not needed        | not needed        |
 | 17   | ✅                         | ✅                                      | not needed         | not needed        | not needed        |
 | 18   | ✅                         | ✅                                      | not needed         | required(*)       | not needed        |
 | 19   | ✅                         | not supported feature                  | not needed         | required(*)       | not needed        |
-| 101  | not directly needed       | not directly needed                    |                    | not needed        | required          |
 
+### Path 2: External ID (CIAM) Tenant
+
+| Step        | Entra ID Workforce tenant | Entra ID External ID (Customer) tenant | Azure Subscription | GitHub Repository | Entra Verified ID |
+|-------------|---------------------------|----------------------------------------|--------------------|-------------------|-------------------|
+| external-00 | not directly needed       | required                               | not needed         | not needed        | not needed        |
+| external-01 | not directly needed       | required                               | not needed         | not needed        | not needed        |
+
+### Path 3: Verified ID
+
+| Step  | Entra ID Workforce tenant | Entra ID External ID (Customer) tenant  | Azure Subscription | GitHub Repository | Entra Verified ID                |
+|-------|---------------------------|-----------------------------------------|--------------------|-------------------|----------------------------------|
+| vc-00 | required                  | if not workforce can be external tenant | not needed         | not needed        | required - this stage enables it |
+| vc-01 | required                  |                                         | not needed         | not needed        | required                         |
 
 
 
@@ -121,14 +161,15 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 | v1.8    | 2026.05.06 | Added Stage 17 (CI/CD Pipelines for Maester and ZTA)                                           |
 | v1.9    | 2026.05.17 | Added Stage 18 (Multitenant Secret Monitoring) and 101 Verified ID                             |
 | v1.10   | 2026.06.23 | Added Stage 19 (Temporary Access Pass)                                                         |
- 
+| v1.11   | 2026.07.04 | Added Stage Extra External ID - Native Authentication |
+| v2.0-alpha   | 2026.07.05 | 🎆 Reorganized into 3 independent paths (Workforce, External, Verified ID)  |
 
 ## Frequently Asked Questions (FAQ)
 
 | Question                                                | Answer                                                                                                                                                                                                                                                                                  |
 |---------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Do I need an Entra ID Tenant?                           | Yes, if you are running the workshop on your own. No, if you are participating in a guided online or onsite session (one will be provided).                                                                                                                                             |
-| Do I need an Azure Subscription?                        | No, this workshop focuses exclusively on Entra ID.                                                                                                                                                                                                                                      |
+| Do I need an Azure Subscription?                        | No for the Workforce and External ID paths - this workshop focuses exclusively on Entra ID there. The Verified ID path (VC-00) is the one exception: it needs an Azure Key Vault to store DID signing keys.                                                                            |
 | Do I need to have a Workforce or an External ID tenant? | The entire workshop is designed for a Workforce tenant. Stages 1-4 are also compatible with an External ID tenant.                                                                                                                                                                      |
 | Do I need the Global Admin role?                        | Yes, Global Administrator privileges are required.                                                                                                                                                                                                                                      |
 | Is the workshop designed to teach me Terraform?         | No, the primary focus is learning how to manage Entra ID using Infrastructure as Code (Terraform), rather than teaching Terraform from scratch.                                                                                                                                         |

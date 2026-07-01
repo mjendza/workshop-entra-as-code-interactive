@@ -1,4 +1,8 @@
-# Stage 101: Verified ID — Issue a Verifiable Credential Contract
+# VC-01: Verified ID — Issue a Verifiable Credential Contract
+
+<!-- Banner: generate via doc/assets/image-prompts.md, save as banner.png in this folder, then uncomment:
+![VC-01 banner](banner.png)
+-->
 
 ## Rationale
 
@@ -27,7 +31,7 @@ This stage extends the certificate-bound Service Principal pattern from Stage 16
 
 We will reuse `./modules/service_principal_rich` (Stage 16) to provision a cert-bound SP, then wire `./modules/verified_id` to create the contract. The provider is `mjendza/verifiedid` — a thin wrapper over the Verified ID Admin API.
 
-> **Note:** The cert files live at the repo root (`<repo-root>/cert/`) so both Stage 16 and Stage 101 can share them. Pick a unique `deployment_unique_name` in `main.tf` to keep contract names tenant-unique.
+> **Note:** The cert files live at the repo root (`<repo-root>/cert/`) so both Stage 16 and VC-01 can share them. Pick a unique `deployment_unique_name` in `main.tf` to keep contract names tenant-unique.
 
 ### 1. Generate the certificate
 
@@ -37,8 +41,8 @@ pwsh ./scripts/stage-16/init.ps1
 
 This writes:
 - `cert/cert.pem` — public key (Terraform uploads this to the SP)
-- `cert/cert.pfx` — public + private key, password `Workshop123!` (used by `auth.ps1` and the `verifiedid` provider)
-- `cert/cert.thumbprint.txt` — thumbprint, read by `auth.ps1`
+- `cert/cert.pfx` — public + private key, password `Workshop123!` (used by `demo.ps1` and the `verifiedid` provider)
+- `cert/cert.thumbprint.txt` — thumbprint, read by `demo.ps1`
 
 If you already ran `scripts/stage-16/init.ps1`, the same cert is reused — skip this step.
 
@@ -53,7 +57,7 @@ use https://permissions.factorlabs.pl and 'MS Other Apps Permissions' filter to 
 
 ```hcl
 #########################################################################
-# Stage 101: Verified ID Service Principal (cert-based)
+# VC-01: Verified ID Service Principal (cert-based)
 #########################################################################
 module "VerifiedId_SpVc" {
   source                      = "./modules/service_principal_rich"
@@ -84,15 +88,18 @@ Portal → **Entra ID → App registrations → `TF.Workshop.<prefix>-SpVerified
 
 ### 4. Onboard the tenant to Verified ID (one-time per tenant - manual step in the portal)
 
-If your tenant has never issued a Verified ID credential, you need to bootstrap an authority. Portal → **Microsoft Entra → Verified ID → Setup**, then follow the wizard (it provisions the Key Vault, creates the DID, and sets up the first authority).
+If your tenant has never issued a Verified ID credential, you need to bootstrap an authority first.
+This is covered as its own prerequisite stage — see [VC-00: Prerequisites](../vc-00/README.md) for
+the full Key Vault + DID + domain-verification walkthrough. If you already completed VC-00 (or did
+this for another project), there's nothing more to do here.
 
-> Without this step, the `data` block in step 6 returns an empty `value` array and `terraform apply` fails on `value[0].id`.
+> Skipping VC-00 means the `data` block in step 6 returns an empty `value` array and `terraform apply` fails on `value[0].id`.
 
-### 5. Verify with `auth.ps1`
+### 5. Verify with `demo.ps1`
 
 ```powershell
 $clientId = terraform output -raw cert_sp_vc_client_id
-pwsh ./scripts/stage-101-vc/auth.ps1 -ClientId $clientId -TenantId YOUR_TENANT_ID
+pwsh ./scripts/vc-01/demo.ps1 -ClientId $clientId -TenantId YOUR_TENANT_ID
 ```
 
 Expected output: at least one authority with `id`, `name`, `did`, `didModel`, and `keyVaultMetadata` printed. This proves cert auth + Admin API access work.
@@ -127,7 +134,7 @@ provider "verifiedid" {
 }
 ```
 
-Append the Stage 101 block:
+Append the VC-01 block:
 
 ```hcl
 data "verifiedid_resource" "authorities" {
@@ -163,23 +170,30 @@ Rename the module from "Demo_Credential_Contract" to "Demo_Credential_Contract_V
 - Portal → **Verified ID → Credentials**: a new contract `<prefix>-WorkshopCredential` appears under the authority.
 - Re-running `demo.ps1` shows the new contract in the 'Contracts' side.
 - The contract's `manifestUrl` returns valid JSON when fetched.
-- (Optional) use my https://github.com/mjendza/workshop-verified-id workshop to test/use the new credential.
 
+## Next Steps
+
+This is the last stage of the Verified ID path — there's no follow-on stage in this repo. To
+actually **use** the credential contract you just created (issue it, present it from a wallet,
+verify a presentation), head over to the dedicated
+[workshop-verified-id](https://github.com/mjendza/workshop-verified-id) developer workshop. It
+picks up exactly where this one leaves off, against the authority and contract you provisioned
+here.
 
 ## Stage Completion Checklist
 - [ ] I have read and comprehended this stage.
 - [ ] I have inserted the `VerifiedId_SpVc` module config into my `main.tf` file.
 - [ ] I have successfully run `terraform apply` and granted admin consent for the four Verified ID app roles.
-- [ ] I have onboarded my tenant to Verified ID in the portal.
-- [ ] I have run `./scripts/stage-101-vc/demo.ps1` and seen at least one authority + DID printed.
-- [ ] I have added the Stage 101 block (data + module + output) and run `terraform apply` successfully.
+- [ ] I have onboarded my tenant to Verified ID (see [VC-00](../vc-00/README.md)).
+- [ ] I have run `./scripts/vc-01/demo.ps1` and seen at least one authority + DID printed.
+- [ ] I have added the VC-01 block (data + module + output) and run `terraform apply` successfully.
 - [ ] I have verified the new credential contract appears in the Verified ID portal.
 - [ ] I renamed the module and re-ran `terraform apply` to verify that contract replacement logic works as expected.
-- [ ] I am ready to proceed to the next stage.
+- [ ] I am ready to try the [workshop-verified-id](https://github.com/mjendza/workshop-verified-id) developer workshop to use the credential I created.
 
 > **Tip:** Please mark all boxes above prior to closing out the issue!
 
 > **Report Issues:** Did you encounter a bug or hold a question? [Report your issue here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← Previous: Stage 18](../stage-18/README.md) | [Next → Stage Cleanup](../stage-cleanup/README.md)
+**Navigation:** [← Previous: VC-00: Prerequisites](../vc-00/README.md)

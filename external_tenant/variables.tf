@@ -8,3 +8,25 @@ variable "graph_permissions" {
   type        = list(string)
   default     = ["9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30"] # Application.Read.All
 }
+
+variable "native_signin_user_email" {
+  description = "E-mail for the External-01 native-auth sign-in test user (emailAddress identity). Its mailbox must be reachable via the fakemail RSS feed the peaster test polls. Left blank so nothing tenant-specific is committed and unrelated applies are unaffected; when blank no user is created and the sign-in test skips."
+  type        = string
+  default     = ""
+}
+
+variable "deployment_env_name" {
+  description = "Unique name for the deployment"
+  type        = string
+  default     = "Workshop"
+}
+
+variable "deployment_unique_name" {
+  description = "Unique prefix applied to resource business names so each attendee's deployment is distinct."
+  type        = string
+}
+
+variable "tenant_default_domain" {
+  description = "Default domain of the target tenant (e.g. yourtenant.onmicrosoft.com)."
+  type        = string
+}
