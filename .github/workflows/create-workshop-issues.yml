@@ -32,64 +32,58 @@ jobs:
             const repo =  context.repo.repo;
             const branch = context.ref.replace('refs/heads/', '');
             const rawBaseUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}`;
+            const blobBaseUrl = `https://github.com/${owner}/${repo}/blob/${branch}`;
 
             console.log(`Target repository: ${owner}/${repo}`);
             console.log(`Source branch: ${branch}`);
 
-            // Define stages in order
-            const stages = [
-              { file: 'doc/stage-00/README.md', title: 'Stage 0: Prerequisites', labels: ['workshop', 'stage-0'] },
-              { file: 'doc/stage-01/README.md', title: 'Stage 1: SSO Application', labels: ['workshop', 'stage-1'] },
-              { file: 'doc/stage-02/README.md', title: 'Stage 2: Service Principal', labels: ['workshop', 'stage-2'] },
-              { file: 'doc/stage-03/README.md', title: 'Stage 3: Workload Federation', labels: ['workshop', 'stage-3'] },
-              { file: 'doc/stage-04/README.md', title: 'Stage 4: Conditional Access', labels: ['workshop', 'stage-4'] },
-              { file: 'doc/stage-05/README.md', title: 'Stage 5: Access Package', labels: ['workshop', 'stage-5'] },
-              { file: 'doc/stage-06/README.md', title: 'Stage 6: PIM (Privileged Identity Management)', labels: ['workshop', 'stage-6'] },
-              { file: 'doc/stage-07/README.md', title: 'Stage 7: Tenant Security', labels: ['workshop', 'stage-7'] },
-              { file: 'doc/stage-08/README.md', title: 'Stage 8: Entra ID Agent (Preview)', labels: ['workshop', 'stage-8'] },
-              { file: 'doc/stage-09/README.md', title: 'Stage 9: Maester', labels: ['workshop', 'stage-9'] },
-              { file: 'doc/stage-10/README.md', title: 'Stage 10: Entra Exporter', labels: ['workshop', 'stage-10'] },
-              { file: 'doc/stage-11/README.md', title: 'Stage 11: Zero Trust Assessment', labels: ['workshop', 'stage-11'] },
-              { file: 'doc/stage-12/README.md', title: 'Stage 12: Drift', labels: ['workshop', 'stage-12'] },
-              { file: 'doc/stage-13/README.md', title: 'Stage 13: Lokka MCP', labels: ['workshop', 'stage-13'] },
-              { file: 'doc/stage-14/README.md', title: 'Stage 14: SPA SSO', labels: ['workshop', 'stage-14'] },
-              { file: 'doc/stage-15/README.md', title: 'Stage 15: Application Roles for SPA SSO', labels: ['workshop', 'stage-15'] },
-              { file: 'doc/stage-16/README.md', title: 'Stage 16: Use Certificate instead of Client Secret for Service Principal', labels: ['workshop', 'stage-16'] },
-              { file: 'doc/stage-17/README.md', title: 'Stage 17: CI/CD Pipelines', labels: ['workshop', 'stage-17'] },
-              { file: 'doc/stage-18/README.md', title: 'Stage 18: Multitenant Secret Monitoring', labels: ['workshop', 'stage-18'] },
-              { file: 'doc/stage-19/README.md', title: 'Stage 19: Temporary Access Pass (TAP)', labels: ['workshop', 'stage-19'] },
-              { file: 'doc/stage-101/README.md', title: 'Stage 101: Verified ID', labels: ['extra', 'workshop', 'stage-101'] },
-
-              { file: 'doc/stage-cleanup/README.md', title: 'Stage End & Cleanup', labels: ['workshop', 'stage-cleanup'] },
-              { file: 'doc/stage-next/README.md', title: 'Bonus: What\'s Next?', labels: ['workshop', 'bonus'] }
+            // Workshop bulks, created fully in order. Each bulk gets its own labels and its
+            // own navigation-link numbering - stages never link (as issues) across bulks.
+            // Add a new workshop by appending an object here; no other logic changes needed.
+            const workshops = [
+              {
+                name: 'Workforce',
+                labels: ['workshop', 'EntraId', 'Workforce'],
+                stages: [
+                  { file: 'doc/stage-00/README.md', title: 'Stage 0: Prerequisites', label: 'stage-0' },
+                  { file: 'doc/stage-01/README.md', title: 'Stage 1: SSO Application', label: 'stage-1' },
+                  { file: 'doc/stage-02/README.md', title: 'Stage 2: Service Principal', label: 'stage-2' },
+                  { file: 'doc/stage-03/README.md', title: 'Stage 3: Workload Federation', label: 'stage-3' },
+                  { file: 'doc/stage-04/README.md', title: 'Stage 4: Conditional Access', label: 'stage-4' },
+                  { file: 'doc/stage-05/README.md', title: 'Stage 5: Access Package', label: 'stage-5' },
+                  { file: 'doc/stage-06/README.md', title: 'Stage 6: PIM (Privileged Identity Management)', label: 'stage-6' },
+                  { file: 'doc/stage-07/README.md', title: 'Stage 7: Tenant Security', label: 'stage-7' },
+                  { file: 'doc/stage-08/README.md', title: 'Stage 8: Entra ID Agent (Preview)', label: 'stage-8' },
+                  { file: 'doc/stage-09/README.md', title: 'Stage 9: Maester', label: 'stage-9' },
+                  { file: 'doc/stage-10/README.md', title: 'Stage 10: Entra Exporter', label: 'stage-10' },
+                  { file: 'doc/stage-11/README.md', title: 'Stage 11: Zero Trust Assessment', label: 'stage-11' },
+                  { file: 'doc/stage-12/README.md', title: 'Stage 12: Drift', label: 'stage-12' },
+                  { file: 'doc/stage-13/README.md', title: 'Stage 13: Lokka MCP', label: 'stage-13' },
+                  { file: 'doc/stage-14/README.md', title: 'Stage 14: SPA SSO', label: 'stage-14' },
+                  { file: 'doc/stage-15/README.md', title: 'Stage 15: Application Roles for SPA SSO', label: 'stage-15' },
+                  { file: 'doc/stage-16/README.md', title: 'Stage 16: Use Certificate instead of Client Secret for Service Principal', label: 'stage-16' },
+                  { file: 'doc/stage-17/README.md', title: 'Stage 17: CI/CD Pipelines', label: 'stage-17' },
+                  { file: 'doc/stage-18/README.md', title: 'Stage 18: Multitenant Secret Monitoring', label: 'stage-18' },
+                  { file: 'doc/stage-19/README.md', title: 'Stage 19: Temporary Access Pass (TAP)', label: 'stage-19' }
+                ]
+              },
+              {
+                name: 'External',
+                labels: ['workshop', 'EntraId', 'External'],
+                stages: [
+                  { file: 'doc/external-00/README.md', title: 'External-00: Prerequisites (External ID / CIAM Tenant)', label: 'external-00' },
+                  { file: 'doc/external-01/README.MD', title: 'External-01: Entra External ID Native Authentication Flow', label: 'external-01' }
+                ]
+              },
+              {
+                name: 'VerifiedId',
+                labels: ['workshop', 'EntraId', 'VerifiedId'],
+                stages: [
+                  { file: 'doc/vc-00/README.md', title: 'VC-00: Prerequisites - Onboard Your Tenant to Verified ID', label: 'vc-00' },
+                  { file: 'doc/vc-01/README.md', title: 'VC-01: Verified ID - Issue a Verifiable Credential Contract', label: 'vc-01' }
+                ]
+              }
             ];
-
-            // Navigation mapping: file path -> stage index
-            const fileToStageIndex = {
-              '../stage-00/README.md': 0,
-              '../stage-01/README.md': 1,
-              '../stage-02/README.md': 2,
-              '../stage-03/README.md': 3,
-              '../stage-04/README.md': 4,
-              '../stage-05/README.md': 5,
-              '../stage-06/README.md': 6,
-              '../stage-07/README.md': 7,
-              '../stage-08/README.md': 8,
-              '../stage-09/README.md': 9,
-              '../stage-10/README.md': 10,
-              '../stage-11/README.md': 11,
-              '../stage-12/README.md': 12,
-              '../stage-13/README.md': 13,
-              '../stage-14/README.md': 14,
-              '../stage-15/README.md': 15,
-              '../stage-16/README.md': 16,
-              '../stage-17/README.md': 17,
-              '../stage-18/README.md': 18,
-              '../stage-19/README.md': 19,
-              '../stage-101/README.md': 20,
-              '../stage-cleanup/README.md': 21,
-              '../stage-next/README.md': 22
-            };
 
             function convertImageUrls(content, docDir) {
               return content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, imgPath) => {
@@ -102,26 +96,14 @@ jobs:
               });
             }
 
-            function replaceNavigationLinks(content, issueNumbers) {
-              return content.replace(/\[([^\]]+)\]\((\.\.\/stage-[^)]+\/README\.md)\)/g, (match, linkText, filePath) => {
-                const stageIndex = fileToStageIndex[filePath];
-                if (stageIndex !== undefined && issueNumbers[stageIndex]) {
-                  const issueUrl = `https://github.com/${owner}/${repo}/issues/${issueNumbers[stageIndex]}`;
-                  return `[${linkText}](${issueUrl})`;
-                }
-                return match;
-              });
-            }
-
+            // Handles non-README relative links (.tf, .http, other repo files). README-to-README
+            // links are handled separately by resolveReadmeLinks below.
             function convertRepoFileLinks(content, docDir) {
-              const blobBaseUrl = `https://github.com/${owner}/${repo}/blob/${branch}`;
-              // Match markdown links to relative files (not images, not URLs, not stage navigation)
               return content.replace(/\[([^\]]+)\]\((\.\.[^)]+|[^)]+\.tf|[^)]+\.http)\)/g, (match, linkText, filePath) => {
-                // Skip if already absolute URL
                 if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
                   return match;
                 }
-                if (filePath.match(/\.\.\/stage-[^)]+\/README\.md/)) {
+                if (/README\.md$/i.test(filePath)) {
                   return match;
                 }
                 const absolutePath = path.posix.normalize(path.posix.join(docDir, filePath));
@@ -129,44 +111,65 @@ jobs:
                 return `[${linkText}](${blobUrl})`;
               });
             }
-            const issueNumbers = [];
-            for (let i = 0; i < stages.length; i++) {
-              const stage = stages[i];
-              let body = fs.readFileSync(stage.file, 'utf8');
-              const docDir = path.dirname(stage.file);
-              body = convertImageUrls(body, docDir);
-              body = convertRepoFileLinks(body, docDir);
-              body = replaceNavigationLinks(body, issueNumbers);
-              const issue = await github.rest.issues.create({
-                owner: owner,
-                repo: repo,
-                title: `${prefix}${stage.title}`,
-                body: body,
-                labels: stage.labels
+
+            // Resolves ../.../README.md links. If the target is a stage within the current
+            // bulk, point at that stage's issue; otherwise fall back to a blob URL so the link
+            // stays functional without creating a cross-workshop issue reference.
+            function resolveReadmeLinks(content, docDir, fileToIndex, issueNumbers) {
+              return content.replace(/\[([^\]]+)\]\((\.\.\/[^)]+\/README\.md)\)/gi, (match, linkText, filePath) => {
+                const absolutePath = path.posix.normalize(path.posix.join(docDir, filePath));
+                const idx = fileToIndex[absolutePath.toLowerCase()];
+                if (idx !== undefined && issueNumbers[idx]) {
+                  return `[${linkText}](https://github.com/${owner}/${repo}/issues/${issueNumbers[idx]})`;
+                }
+                return `[${linkText}](${blobBaseUrl}/${absolutePath})`;
               });
-              issueNumbers.push(issue.data.number);
-              console.log(`Created issue #${issue.data.number}: ${stage.title}`);
-              // Small delay to ensure proper ordering
-              await new Promise(resolve => setTimeout(resolve, 500));
             }
 
-            console.log('\nUpdating navigation links...');
-            for (let i = 0; i < stages.length; i++) {
-              const stage = stages[i];
-              let body = fs.readFileSync(stage.file, 'utf8');
-              const docDir = path.dirname(stage.file);
-              body = convertImageUrls(body, docDir);
-              body = convertRepoFileLinks(body, docDir);
-              body = replaceNavigationLinks(body, issueNumbers);
-              await github.rest.issues.update({
-                owner: owner,
-                repo: repo,
-                issue_number: issueNumbers[i],
-                body: body
-              });
-              console.log(`Updated issue #${issueNumbers[i]} with correct navigation`);
+            for (const workshop of workshops) {
+              const fileToIndex = {};
+              workshop.stages.forEach((s, i) => { fileToIndex[s.file.toLowerCase()] = i; });
+
+              console.log(`\n=== Creating ${workshop.name} issues ===`);
+              const issueNumbers = [];
+              for (let i = 0; i < workshop.stages.length; i++) {
+                const stage = workshop.stages[i];
+                const docDir = path.dirname(stage.file);
+                let body = fs.readFileSync(stage.file, 'utf8');
+                body = convertImageUrls(body, docDir);
+                body = convertRepoFileLinks(body, docDir);
+                body = resolveReadmeLinks(body, docDir, fileToIndex, issueNumbers);
+                const issue = await github.rest.issues.create({
+                  owner: owner,
+                  repo: repo,
+                  title: `${prefix}${stage.title}`,
+                  body: body,
+                  labels: [...workshop.labels, stage.label]
+                });
+                issueNumbers.push(issue.data.number);
+                console.log(`Created issue #${issue.data.number}: ${stage.title}`);
+                // Small delay to ensure proper ordering
+                await new Promise(resolve => setTimeout(resolve, 500));
+              }
+
+              console.log(`Updating navigation links for ${workshop.name}...`);
+              for (let i = 0; i < workshop.stages.length; i++) {
+                const stage = workshop.stages[i];
+                const docDir = path.dirname(stage.file);
+                let body = fs.readFileSync(stage.file, 'utf8');
+                body = convertImageUrls(body, docDir);
+                body = convertRepoFileLinks(body, docDir);
+                body = resolveReadmeLinks(body, docDir, fileToIndex, issueNumbers);
+                await github.rest.issues.update({
+                  owner: owner,
+                  repo: repo,
+                  issue_number: issueNumbers[i],
+                  body: body
+                });
+                console.log(`Updated issue #${issueNumbers[i]} with correct navigation`);
+              }
+              console.log(`${workshop.name} issue numbers:`, issueNumbers.join(', '));
             }
-            console.log('Issue numbers:', issueNumbers.join(', '));
 
       - name: Summary
         run: |

@@ -8,7 +8,7 @@ terraform {
 }
 
 #########################################################################
-# Stage 101: Verified ID — Credential Contract
+# VC-01: Verified ID — Credential Contract
 #########################################################################
 data "verifiedid_resource" "authorities" {
   url = "verifiableCredentials/authorities"

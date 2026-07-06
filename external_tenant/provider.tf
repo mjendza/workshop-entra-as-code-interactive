@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/azuread"
       version = "= 3.7.0"
     }
+    msgraph = {
+      source  = "microsoft/msgraph"
+      version = ">= 0.3.0"
+    }
   }
 }
 
@@ -24,6 +28,12 @@ terraform {
 # https://registry.terraform.io/providers/hashicorp/azuread/latest/docs#authentication
 # =============================================================================
 provider "azuread" {
+  client_id     = ""
+  client_secret = ""
+  tenant_id     = ""
+}
+
+provider "msgraph" {
   client_id     = ""
   client_secret = ""
   tenant_id     = ""

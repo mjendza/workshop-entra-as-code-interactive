@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Stage 101 (Verified ID) - Acquire a Verified ID Admin API access token via certificate auth
+    VC-01 (Verified ID) - Acquire a Verified ID Admin API access token via certificate auth
     and print full authority + contract details for the tenant.
 
 .DESCRIPTION
@@ -11,7 +11,7 @@
     authority's full detail, and list each authority's contracts.
 
     Prerequisites:
-      1. ./scripts/stage-101-vc/init.ps1 has been run.
+      1. ./scripts/vc-01/init.ps1 has been run.
       2. terraform apply has uploaded the cert to the Verified ID SP (module.Workload_CertSpVc).
       3. Admin consent has been granted for the SP's Verified ID application roles.
       4. The tenant has been onboarded to Verified ID at least once (otherwise the
@@ -28,7 +28,7 @@
     Password used by init.ps1 when exporting cert.pfx. Defaults to 'Workshop123!'.
 
 .EXAMPLE
-    pwsh ./scripts/stage-101-vc/auth.ps1 -ClientId 00000000-0000-0000-0000-000000000000 -TenantId 12345678-0000-0000-0000-000000000000
+    pwsh ./scripts/vc-01/demo.ps1 -ClientId 00000000-0000-0000-0000-000000000000 -TenantId 12345678-0000-0000-0000-000000000000
 #>
 [CmdletBinding()]
 param(
@@ -45,7 +45,7 @@ $pfxPath        = Join-Path $certDir  'cert.pfx'
 $thumbprintPath = Join-Path $certDir  'cert.thumbprint.txt'
 
 if (-not (Test-Path $thumbprintPath)) {
-    throw "cert/cert.thumbprint.txt not found. Run scripts/stage-101-vc/init.ps1 first."
+    throw "cert/cert.thumbprint.txt not found. Run scripts/vc-01/init.ps1 first."
 }
 $thumb = (Get-Content -Path $thumbprintPath -Raw).Trim()
 

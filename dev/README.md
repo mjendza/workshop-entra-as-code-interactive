@@ -13,25 +13,29 @@
 terraform init -backend=false
 ```
 
-### 2. Check formatting
+### 2. Format Terraform files
 
-```bash
-terraform fmt -check -recursive
-```
-
-To auto-fix formatting issues:
+Recursively format all `.tf` files in the repository:
 
 ```bash
 terraform fmt -recursive
 ```
 
-### 3. Validate configuration
+### 3. Check formatting
+
+Verify that all files are properly formatted (useful in CI):
+
+```bash
+terraform fmt -check -recursive
+```
+
+### 4. Validate configuration
 
 ```bash
 terraform validate
 ```
 
-### 4. Run TFLint
+### 5. Run TFLint
 
 Install the TFLint plugin defined in `.tflint.hcl`, then run the linter:
 

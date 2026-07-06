@@ -72,3 +72,13 @@ $env:ARM_TENANT_ID   = '<your-tenant-guid>'
 $env:TAP_TARGET_USER = 'user@contoso.com'
 Invoke-Pester ./tests/peaster -Output Detailed
 ```
+
+# Invoke only per Stage
+
+```powershell 
+# Stage 16 - SP cert validation
+Invoke-Pester ./tests/peaster/Stage-16.SP-Cert.Tests.ps1
+
+Invoke-Pester ./tests/peaster/External-01.NativeAuth-SignIn.E2E.Tests.ps1
+
+```
