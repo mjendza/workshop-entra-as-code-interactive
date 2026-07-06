@@ -119,7 +119,7 @@ stages layered on top of the certificate-bound Service Principal pattern from St
 | v1.9    | 2026.05.17 | Added Stage 18 (Multitenant Secret Monitoring) and 101 Verified ID                             |
 | v1.10   | 2026.06.23 | Added Stage 19 (Temporary Access Pass)                                                         |
 | v1.11   | 2026.07.04 | Added Stage Extra External ID - Native Authentication |
-| v2.0-alpha   | 2026.07.05 | 🎆 Reorganized into 3 independent paths (Workforce, External, Verified ID)  |
+| v2.0   | 2026.07.06 | 🎆 Reorganized into 3 independent paths (Workforce, External, Verified ID)  |
 
 ## Frequently Asked Questions (FAQ)
 

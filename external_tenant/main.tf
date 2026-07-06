@@ -52,3 +52,18 @@ output "external_sp_app_id" {
   description = "Application (client) ID of the SP — equals var.multitenant_client_id."
   value       = azuread_service_principal.multitenant_app.client_id
 }
+
+# ---------------------------------------------------------------------------
+# External-01 Password User Flow for application
+# ---------------------------------------------------------------------------
+
+
+# ---------------------------------------------------------------------------
+# External-01 native-auth SIGN-IN test user (created only when an email is set)
+# ---------------------------------------------------------------------------
+
+
+# ---------------------------------------------------------------------------
+# External-01 native auth application
+# ---------------------------------------------------------------------------
+
