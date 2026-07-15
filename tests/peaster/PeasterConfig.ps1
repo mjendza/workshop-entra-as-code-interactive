@@ -35,6 +35,11 @@ $PeasterEnvDefaults = @{
     EXTERNAL_GRAPH_TENANT_ID     = ''                                        # external tenant id for post-test user cleanup (empty = leave user)
     EXTERNAL_GRAPH_CLIENT_ID     = ''                                        # app-only client id for cleanup (needs User.ReadWrite.All)
     EXTERNAL_GRAPH_CLIENT_SECRET = ''                                        # app-only client secret for cleanup
+
+    # External-02 - Federation with Entra Workforce ID (External-02.FederationWithEntra.Simple.Tests.ps1)
+    FEDERATION_EXTERNAL_TENANT_ID    = '' # external CIAM tenant id (GUID)
+    FEDERATION_WORKFORCE_CLIENT_ID   = ''                                     # client_id of the workforce federation SSO app (OidcDebugger_SSO module); empty = skip
+    WORKFORCE_FEDERATION_DOMAIN_NAME = ''                                     # workforce tenant verified domain for domain_hint (e.g. 'contoso.onmicrosoft.com'); empty = skip domain_hint test
 }
 
 function Initialize-PeasterEnvironment {

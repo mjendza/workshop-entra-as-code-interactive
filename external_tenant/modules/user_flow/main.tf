@@ -15,6 +15,13 @@ variable "business_name" {
   description = "Business name"
   type        = string
 }
+variable "federations" {
+  description = "List of federations to include in the user flow"
+  type        = list(object({
+    name = string
+    id   = string
+  }))
+}
 
 resource "msgraph_resource" "this" {
   url         = "identity/AuthenticationEventsFlows"
@@ -106,6 +113,20 @@ resource "msgraph_resource" "this" {
       accessPackages   = []
     }
   }
+}
+
+#for now action
+resource "msgraph_resource_action" "this_user_flow_assignment" {
+  resource_url = "identity/AuthenticationEventsFlows/${msgraph_resource.this.id}"
+  action       = "microsoft.graph.externalUsersSelfServiceSignUpEventsFlow/onAuthenticationMethodLoadStart/microsoft.graph.onAuthenticationMethodLoadStartExternalUsersSelfServiceSignUp/identityProviders/$ref"
+  method       = "POST"
+  api_version  = "v1.0"
+
+  body = {
+    "@odata.id" = "https://graph.microsoft.com/v1.0/identityProviders/${var.federations[0].id}"
+  }
+
+  depends_on = [msgraph_resource.this]
 }
 
 output "user_flow_id" {

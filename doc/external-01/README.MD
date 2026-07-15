@@ -1,17 +1,13 @@
 # External-01: Entra External ID Native Authentication Flow
 
-<!-- Banner: generate via doc/assets/image-prompts.md, save as banner.png in this folder, then uncomment:
-![External-01 banner](banner.png)
--->
-
-Similar to Stage 01 we enable a new SSO application, but this time using the `Native` application
-type. Native apps (mobile / desktop clients) authenticate directly against the tenant with
+Similar to Stage 01 we enable a new SSO application for Workforce Tenant, but this time using the `Native` application
+type as starter point for External ID Tenant. Native apps (mobile / desktop clients) authenticate directly against the tenant with
 Microsoft's [Native Authentication API](https://learn.microsoft.com/en-us/entra/identity-platform/reference-native-authentication-api?tabs=emailOtp)
 instead of a browser redirect, so the flows differ from the web apps in earlier stages.
 
 This stage lives in the dedicated [`external_tenant/`](../../external_tenant/) Terraform root (the
 same one used by Stage 18), because Native Authentication is an **External ID (CIAM) tenant**
-feature and must be applied against that tenant (Tenant B), not the workshop's home tenant.
+feature and must be applied against that tenant (Tenant B), not the workshop's Workforce home tenant.
 
 ## What gets created
 
@@ -54,41 +50,9 @@ module "native_signin_user" {
 Outputs: `external_native_federation_client_id`, `external_native_signin_user_email`,
 `external_native_signin_user_object_id`.
 
-## Native authentication flows
+## Native authentication flow & workshop assumption
 
-Both tests exercise the **email + password** method (matching the External-01 password user flow). The
-authority base URL is:
-
-```
-https://<subdomain>.ciamlogin.com/<subdomain>.onmicrosoft.com
-```
-
-`<subdomain>` is the label before `.onmicrosoft.com` in `var.tenant_default_domain` (e.g.
-`b2ctenantmj.onmicrosoft.com` → subdomain `b2ctenantmj`). You can pass either form to the peaster
-tests (see below) - `Get-PeasterNativeAuthAuthority` in `PeasterConfig.ps1` strips a trailing
-`.onmicrosoft.com` before building the authority, so a pasted full domain doesn't double up into a
-broken URL like `b2ctenantmj.onmicrosoft.com.ciamlogin.com`.
-
-**Sign-up** (new user) — `POST signup/v1.0/{start,challenge,continue}` then `POST oauth/v2.0/token`.
-E-mail is verified with an OTP *and* a password is set:
-
-1. `start`    — `client_id`, `username`, `password`, `challenge_type=oob password redirect` → `continuation_token`.
-2. `challenge`— sends the OTP by email → `challenge_type=oob`, `code_length`.
-3. `continue` — `grant_type=oob`, `oob=<code>`; then, on `credential_required`, `challenge` again and
-   `continue` with `grant_type=password` (and `grant_type=attributes` if `attributes_required`).
-4. `token`    — `grant_type=continuation_token`, `scope=openid offline_access` → `id_token`.
-
-**Sign-in** (existing user) — `POST oauth2/v2.0/{initiate,challenge,token}`. Password only, **no OTP**:
-
-1. `initiate` — `client_id`, `username`, `challenge_type=password redirect` → `continuation_token`.
-2. `challenge`— `challenge_type=password redirect` → `challenge_type=password` (nothing e-mailed).
-3. `token`    — `grant_type=password`, `password=<pwd>`, `scope=openid offline_access` → `id_token`.
-
-> **Known gap:** the `native_auth_app` registration doesn't currently request the `email` optional
-> claim, so the `id_token` returned by `oauth2/v2.0/token` only carries the standard claims
-> (`aud`, `iss`, `sub`, `tid`, …) - no `email` / `preferred_username`. The sign-in test therefore
-> asserts identity via `sub`, not by matching the e-mail. Add the `email` optional claim to
-> `sso_app_native` (token configuration) if you need the claim back.
+Both tests exercise the **email + password** method (matching the External-01 password user flow). Via Self-Service Sign-up, a new user can create an account with email and password; via Sign-in, an existing user can authenticate with their password, but like in the current workshop flow, creating a user via Terraform we can skip the email verification and create a user with a known password for the sign-in test. To make it even easier, I created peaster tests that read the password from the module default, so you don't have to remember it, and you can verify the entire stage via tests.
 
 ## Workshop steps
 
@@ -160,8 +124,8 @@ the fakemail **RSS** feed (`<NATIVE_AUTH_RSS_BASE>/<email>`); sign-in uses the p
 
 | Test | What it proves |
 | --- | --- |
-| `tests/peaster/External-01.NativeAuth-SignUp.E2E.Tests.ps1` | A brand-new user can self-service sign up (email verified via OTP, password set); random mailbox per run; the created user is deleted afterwards. |
 | `tests/peaster/External-01.NativeAuth-SignIn.E2E.Tests.ps1` | The Terraform-created user can sign in with email + password (no OTP); the password must match the module's. |
+| `tests/peaster/External-01.NativeAuth-SignUp.E2E.Tests.ps1` | OPTIONA: A brand-new user can self-service sign up (email verified via OTP, password set); random mailbox per run; the created user is deleted afterwards. |
 
 Both follow the existing peaster convention (`tests/peaster/PeasterConfig.ps1`): every live input is
 an environment variable with a default (some blank so the whole context auto-skips and CI stays
