@@ -18,11 +18,12 @@
         Same as Test 1 but adds domain_hint={WORKFORCE_FEDERATION_DOMAIN_NAME} to trigger
         automatic federation to the workforce tenant without the user picking a home realm.
 
-    Inputs from PeasterConfig.ps1 / environment:
+    Inputs from PeasterConfig.ps1 / environment (see Resolve-PeasterFederationInputs):
         NATIVE_AUTH_TENANT_SUBDOMAIN          - external CIAM subdomain (e.g. 'b2ctenantmj')
-        FEDERATION_EXTERNAL_TENANT_ID         - tenant id GUID of the external CIAM tenant
-        FEDERATION_WORKFORCE_CLIENT_ID        - client_id of the workforce federation SSO app
-                                                (the OidcDebugger_SSO module in the root main.tf)
+        EXTERNAL_TENANT_ID                    - tenant id GUID of the external CIAM tenant;
+                                                else terraform output external_tenant_id
+        FEDERATION_WORKFORCE_CLIENT_ID        - client_id for the authorize request;
+                                                else terraform output external_native_federation_client_id
         WORKFORCE_FEDERATION_DOMAIN_NAME      - verified domain of the workforce tenant used as
                                                 domain_hint (e.g. 'contoso.onmicrosoft.com')
 
@@ -33,9 +34,12 @@ BeforeDiscovery {
     . "$PSScriptRoot/PeasterConfig.ps1"
     Initialize-PeasterEnvironment
 
+    $repoRoot = (Resolve-Path "$PSScriptRoot/../..").Path
+    $fed      = Resolve-PeasterFederationInputs -RepoRoot $repoRoot
+
     $subdomain  = $env:NATIVE_AUTH_TENANT_SUBDOMAIN
-    $tenantId   = $env:FEDERATION_EXTERNAL_TENANT_ID
-    $clientId   = $env:FEDERATION_WORKFORCE_CLIENT_ID
+    $tenantId   = $fed.TenantId
+    $clientId   = $fed.ClientId
     $domainHint = $env:WORKFORCE_FEDERATION_DOMAIN_NAME
 
     $skipSimple = -not (
@@ -52,10 +56,12 @@ BeforeDiscovery {
             $reasons.Add('NATIVE_AUTH_TENANT_SUBDOMAIN is missing')
         }
         if ([string]::IsNullOrWhiteSpace($tenantId)) {
-            $reasons.Add('FEDERATION_EXTERNAL_TENANT_ID is missing')
+            $why = if ($fed.TenantError) { $fed.TenantError } else { 'set $env:EXTERNAL_TENANT_ID (e.g. in tests/peaster/.env)' }
+            $reasons.Add("EXTERNAL_TENANT_ID is missing -> $why")
         }
         if ([string]::IsNullOrWhiteSpace($clientId)) {
-            $reasons.Add('FEDERATION_WORKFORCE_CLIENT_ID is missing')
+            $why = if ($fed.ClientError) { $fed.ClientError } else { 'set $env:FEDERATION_WORKFORCE_CLIENT_ID (e.g. in tests/peaster/.env)' }
+            $reasons.Add("FEDERATION_WORKFORCE_CLIENT_ID is missing -> $why")
         }
         Write-Warning ("[peaster] Skipping 'OpenID Connect authorize (simple)' because:`n  - " + ($reasons -join "`n  - "))
     }
@@ -72,9 +78,12 @@ Describe "External-02: Federation with Entra - OpenID Connect authorize endpoint
             . "$PSScriptRoot/PeasterConfig.ps1"
             Initialize-PeasterEnvironment
 
+            $repoRoot = (Resolve-Path "$PSScriptRoot/../..").Path
+            $fed      = Resolve-PeasterFederationInputs -RepoRoot $repoRoot
+
             $script:subdomain = $env:NATIVE_AUTH_TENANT_SUBDOMAIN.Trim() -replace '(?i)\.onmicrosoft\.com$', ''
-            $script:tenantId  = $env:FEDERATION_EXTERNAL_TENANT_ID
-            $script:clientId  = $env:FEDERATION_WORKFORCE_CLIENT_ID
+            $script:tenantId  = $fed.TenantId
+            $script:clientId  = $fed.ClientId
 
             # Generate PKCE code_verifier and code_challenge (S256)
             $verifierBytes = [byte[]]::new(32)
@@ -100,7 +109,12 @@ Describe "External-02: Federation with Entra - OpenID Connect authorize endpoint
             $query['code_challenge']        = $script:codeChallenge
 
             $script:authorizeUrl = "$baseUrl`?$($query.ToString())"
-            Write-Verbose "Authorize URL (simple): $($script:authorizeUrl)"
+
+            # Print the URL so it shows up in the test output as a clickable link for manual testing.
+            Write-Host ''
+            Write-Host '[peaster] External-02 authorize URL (simple) - open in a browser to test manually:' -ForegroundColor Cyan
+            Write-Host $script:authorizeUrl -ForegroundColor Cyan
+            Write-Host "[peaster] PKCE code_verifier (needed to redeem the returned code): $($script:codeVerifier)" -ForegroundColor DarkGray
         }
 
         It "constructs a valid OpenID Connect authorize URL" {
@@ -126,9 +140,12 @@ Describe "External-02: Federation with Entra - OpenID Connect authorize endpoint
             . "$PSScriptRoot/PeasterConfig.ps1"
             Initialize-PeasterEnvironment
 
+            $repoRoot = (Resolve-Path "$PSScriptRoot/../..").Path
+            $fed      = Resolve-PeasterFederationInputs -RepoRoot $repoRoot
+
             $script:subdomain  = $env:NATIVE_AUTH_TENANT_SUBDOMAIN.Trim() -replace '(?i)\.onmicrosoft\.com$', ''
-            $script:tenantId   = $env:FEDERATION_EXTERNAL_TENANT_ID
-            $script:clientId   = $env:FEDERATION_WORKFORCE_CLIENT_ID
+            $script:tenantId   = $fed.TenantId
+            $script:clientId   = $fed.ClientId
             $script:domainHint = $env:WORKFORCE_FEDERATION_DOMAIN_NAME
 
             # Generate PKCE code_verifier and code_challenge (S256)
@@ -156,7 +173,12 @@ Describe "External-02: Federation with Entra - OpenID Connect authorize endpoint
             $query['domain_hint']           = $script:domainHint
 
             $script:authorizeUrl = "$baseUrl`?$($query.ToString())"
-            Write-Verbose "Authorize URL (domain_hint): $($script:authorizeUrl)"
+
+            # Print the URL so it shows up in the test output as a clickable link for manual testing.
+            Write-Host ''
+            Write-Host '[peaster] External-02 authorize URL (domain_hint) - open in a browser to test manually:' -ForegroundColor Cyan
+            Write-Host $script:authorizeUrl -ForegroundColor Cyan
+            Write-Host "[peaster] PKCE code_verifier (needed to redeem the returned code): $($script:codeVerifier)" -ForegroundColor DarkGray
         }
 
         It "constructs a valid OpenID Connect authorize URL with domain_hint" {
