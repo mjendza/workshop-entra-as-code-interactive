@@ -24,7 +24,7 @@ variable "tenant_id" {
 variable "client_secret" {
   description = "Client Secret"
   type        = string
-  sensitive = true
+  sensitive   = true
 }
 
 resource "msgraph_resource" "identity_providers_workforce_federation" {

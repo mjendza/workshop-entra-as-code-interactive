@@ -402,7 +402,7 @@ module "Tenant_TapPolicy" {
 # External-02 Federation with Workforce Entra ID
 # ---------------------------------------------------------------------------
 module "ExternalId_Federation_SSO" {
-  source                       = "./modules/sso_app_rich"
-  business_name                = "${var.deployment_unique_name}-ExternalId-Federation-SSO"
-  web_uri                      = ["https://${var.external_id_default_domain_name}.ciamlogin.com/${var.external_id_default_domain_name}.onmicrosoft.com/federation/oauth2"]
+  source        = "./modules/sso_app_rich"
+  business_name = "${var.deployment_unique_name}-ExternalId-Federation-SSO"
+  web_uri       = ["https://${var.external_id_default_domain_name}.ciamlogin.com/${var.external_id_default_domain_name}.onmicrosoft.com/federation/oauth2"]
 }

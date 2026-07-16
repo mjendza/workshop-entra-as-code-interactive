@@ -17,7 +17,7 @@ variable "business_name" {
 }
 variable "federations" {
   description = "List of federations to include in the user flow"
-  type        = list(object({
+  type = list(object({
     name = string
     id   = string
   }))
