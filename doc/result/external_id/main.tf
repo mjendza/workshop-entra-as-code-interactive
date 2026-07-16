@@ -111,7 +111,7 @@ output "external_native_federation_client_id" {
 
 module "federation_with_workforce" {
   source        = "./modules/federation"
-  business_name = "${var.deployment_unique_name}"
+  business_name = var.deployment_unique_name
   client_id     = "YOUR_WORKFORCE_APP_REGISTRATION_CLIENT_ID"
   tenant_id     = "YOUR_WORKFORCE_TENANT_ID"
   client_secret = "YOUR_WORKFORCE_APP_REGISTRATION_CLIENT_SECRET"
