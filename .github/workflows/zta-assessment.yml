@@ -64,7 +64,7 @@ jobs:
           $token = (Get-AzAccessToken -ResourceTypeName MSGraph -AsSecureString -ErrorAction Stop).token
           $outputPath = "${{ github.workspace }}/entra-zta"
 
-          Connect-ZtAssessment -Service Graph -ErrorAction Stop
+          Connect-MgGraph -AccessToken $token -ErrorAction Stop
 
           # Workaround: PSFramework's Disable-PSFConsoleInterrupt fails in non-interactive CI/CD
           # environments (no real console handle).
