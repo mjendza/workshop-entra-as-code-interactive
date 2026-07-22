@@ -47,7 +47,7 @@ jobs:
       - name: Install PowerShell Modules
         shell: pwsh
         run: |
-          Install-Module -Name ZeroTrustAssessment -Scope CurrentUser -Force -AllowClobber
+          Install-Module -Name ZeroTrustAssessment -RequiredVersion 2.5.0 -Scope CurrentUser -Force -AllowClobber
           Install-Module -Name Az -Scope CurrentUser -Force -AllowClobber
 
       - name: Log in to Azure using OIDC
@@ -64,7 +64,7 @@ jobs:
           $token = (Get-AzAccessToken -ResourceTypeName MSGraph -AsSecureString -ErrorAction Stop).token
           $outputPath = "${{ github.workspace }}/entra-zta"
 
-          Connect-MgGraph -AccessToken $token -ErrorAction Stop
+          Connect-ZtAssessment -Service Graph -ErrorAction Stop
 
           # Workaround: PSFramework's Disable-PSFConsoleInterrupt fails in non-interactive CI/CD
           # environments (no real console handle).
