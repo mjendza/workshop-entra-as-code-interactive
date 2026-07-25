@@ -66,6 +66,14 @@ jobs:
 
           Connect-MgGraph -AccessToken $token -ErrorAction Stop
 
+          # Preflight: fail loudly here rather than letting the module fall back to a browser
+          $ctx     = Get-MgContext
+          $missing = Get-ZtGraphScope | Where-Object { $ctx.Scopes -notcontains $_ }
+          if ($missing) { throw "Missing application permissions: $($missing -join ', ')" }
+
+          # Adopts the existing Graph + Az contexts, marks ConnectedService, no interactive fallback
+          Connect-ZtAssessment -Service Graph,Azure -ErrorAction Stop
+          
           # Workaround: PSFramework's Disable-PSFConsoleInterrupt fails in non-interactive CI/CD
           # environments (no real console handle).
           $ErrorActionPreference = 'Continue'
