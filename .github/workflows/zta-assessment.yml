@@ -77,7 +77,7 @@ jobs:
           # Workaround: PSFramework's Disable-PSFConsoleInterrupt fails in non-interactive CI/CD
           # environments (no real console handle).
           $ErrorActionPreference = 'Continue'
-          Invoke-ZtAssessment -Path $outputPath -MaximumSignInLogQueryTime 7
+          Invoke-ZtAssessment -Path $outputPath -Pillar Identity -Days 1 -MaximumSignInLogQueryTime 5 -NoBrowser
           $ErrorActionPreference = 'Stop'
 
           $htmlFiles = Get-ChildItem -Path $outputPath -Recurse -Filter "*.html" -ErrorAction SilentlyContinue
