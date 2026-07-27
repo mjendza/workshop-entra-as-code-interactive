@@ -100,6 +100,11 @@ jobs:
           $reportDate = Get-Date -Format "yyyy-MM-dd"
           $blobPrefix = "zta-reports/${{ github.run_number }}-${reportDate}"
 
+          # 'az storage blob upload-batch' has no --exclude-pattern, so remove the raw
+          # export data first and upload only the report with --pattern.
+          $rawExport = Join-Path $exportPath "zt-export"
+          if (Test-Path $rawExport) { Remove-Item -Path $rawExport -Recurse -Force }
+
           az storage blob upload-batch `
             --destination $env:AZURE_STORAGE_CONTAINER `
             --source "$exportPath" `
@@ -107,7 +112,6 @@ jobs:
             --account-name $env:AZURE_STORAGE_ACCOUNT `
             --account-key $env:AZURE_STORAGE_KEY `
             --pattern "*" `
-            --exclude-pattern "zt-export/*" `
             --overwrite `
             --only-show-errors
 
