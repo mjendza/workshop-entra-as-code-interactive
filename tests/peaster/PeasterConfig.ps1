@@ -4,42 +4,97 @@
 
 .DESCRIPTION
     Declares every environment variable the peaster tests rely on, in one discoverable place.
-    Tests dot-source this file and call Initialize-PeasterEnvironment. Defaults are applied
-    only when a variable is unset/empty, so real environment values and CI overrides always
-    take precedence.
+    Tests dot-source this file and call Initialize-PeasterEnvironment.
 
-    Add new env vars by adding one line to $PeasterEnvDefaults.
+    Values are resolved in precedence order:
+      1. Real environment variables (CI overrides always win).
+      2. tests/peaster/.env - gitignored, holds all tenant-specific values and secrets.
+         Copy tests/peaster/.env.example to .env and fill it in.
+      3. $PeasterEnvDefaults - neutral fallbacks only (timeouts, lifetimes); never secrets.
+
+    Add new env vars by adding a line to .env.example (and $PeasterEnvDefaults if a safe
+    neutral default exists).
 
 .EXAMPLE
     . "$PSScriptRoot/PeasterConfig.ps1"
     Initialize-PeasterEnvironment
 #>
 
+$PeasterConfigRoot = $PSScriptRoot
+
+# Neutral fallbacks only. Tenant-specific values and secrets belong in .env (gitignored);
+# see .env.example for the full variable contract with documentation.
 $PeasterEnvDefaults = @{
-    ARM_TENANT_ID       = 'c5863934-4575-4e54-bc4a-92ad95817e9d'             # live tenant id (GUID); empty = skip live tests
+    ARM_TENANT_ID       = ''             # live tenant id (GUID); empty = skip live tests
     AZURE_TENANT_ID     = ''             # alternative tenant id source
-    CERT_PFX_PASSWORD   = 'Workshop123!' # init.ps1 default pfx password
-    TAP_TARGET_USER     = '4439a43d-296e-41fe-8709-1f59a8c17bb6'             # UPN or object id to issue a TAP for; empty = skip TAP test
+    CERT_PFX_PASSWORD   = ''             # pfx password (init.ps1 default is set in .env)
+    TAP_TARGET_USER     = ''             # UPN or object id to issue a TAP for; empty = skip TAP test
     TAP_LIFETIME_MINUTES = '60'          # requested TAP lifetime (10-43200)
 
     # External-01 - Native Authentication email-OTP sign-up (External-01.NativeAuth-SignUp.E2E.Tests.ps1)
-    # NATIVE_AUTH_RSS_BASE / NATIVE_AUTH_EMAIL_DOMAIN are intentionally left blank so the fakemail
-    # host and mailbox domain are supplied at runtime rather than committed here; empty = skip.
-    NATIVE_AUTH_TENANT_SUBDOMAIN = 'b2ctenantmj'                                        # external CIAM subdomain; empty = skip the live signup test
-    NATIVE_AUTH_EMAIL_DOMAIN     = ''                                        # OTP mailbox domain; empty = skip
-    NATIVE_AUTH_RSS_BASE         = ''                                        # fakemail RSS base URL; feed = <base>/<email>; empty = skip
-    NATIVE_AUTH_CLIENT_ID        = ''                                        # optional override; else terraform output external_native_federation_client_id
-    NATIVE_AUTH_SIGNIN_USERNAME  = ''                                        # sign-IN username; optional override, else terraform output external_native_signin_user_email
-    NATIVE_AUTH_SIGNIN_PASSWORD  = 'Aa1!Workshop-Native-External-01'         # sign-IN password; MUST match the native_auth_test_user module password
-    NATIVE_AUTH_OTP_TIMEOUT_SEC  = '90'                                      # seconds to poll the RSS feed for the OTP mail (sign-up email verification)
-    EXTERNAL_GRAPH_TENANT_ID     = ''                                        # external tenant id for post-test user cleanup (empty = leave user)
-    EXTERNAL_GRAPH_CLIENT_ID     = ''                                        # app-only client id for cleanup (needs User.ReadWrite.All)
-    EXTERNAL_GRAPH_CLIENT_SECRET = ''                                        # app-only client secret for cleanup
+    NATIVE_AUTH_TENANT_SUBDOMAIN = ''    # external CIAM subdomain; empty = skip the live signup/federation tests
+    NATIVE_AUTH_EMAIL_DOMAIN     = ''    # OTP mailbox domain; empty = skip
+    NATIVE_AUTH_RSS_BASE         = ''    # fakemail RSS base URL; feed = <base>/<email>; empty = skip
+    NATIVE_AUTH_CLIENT_ID        = ''    # optional override; else terraform output external_native_federation_client_id
+    NATIVE_AUTH_SIGNIN_USERNAME  = ''    # sign-IN username; optional override, else terraform output external_native_signin_user_email
+    NATIVE_AUTH_SIGNIN_PASSWORD  = ''    # sign-IN password; MUST match the native_auth_test_user module password
+    NATIVE_AUTH_OTP_TIMEOUT_SEC  = '90'  # seconds to poll the RSS feed for the OTP mail (sign-up email verification)
+    EXTERNAL_GRAPH_TENANT_ID     = ''    # external tenant id for post-test user cleanup (empty = leave user)
+    EXTERNAL_GRAPH_CLIENT_ID     = ''    # app-only client id for cleanup (needs User.ReadWrite.All)
+    EXTERNAL_GRAPH_CLIENT_SECRET = ''    # app-only client secret for cleanup
+
+    # External-02 - Federation with Entra Workforce ID (External-02.FederationWithEntra.Simple.Tests.ps1)
+    EXTERNAL_TENANT_ID               = '' # external CIAM tenant id (GUID); optional override, else terraform output external_tenant_id
+    FEDERATION_WORKFORCE_CLIENT_ID   = '' # client_id for the authorize request; optional override, else terraform output external_native_federation_client_id
+    WORKFORCE_FEDERATION_DOMAIN_NAME = '' # workforce tenant verified domain for domain_hint (e.g. 'contoso.onmicrosoft.com'); empty = skip domain_hint test
+}
+
+<#
+.SYNOPSIS
+    Load KEY=VALUE pairs from tests/peaster/.env into the process environment.
+
+.DESCRIPTION
+    Parses a dotenv-style file: one KEY=VALUE per line, blank lines and #-comments ignored,
+    optional single/double quotes around the value are stripped. A variable already set in the
+    real environment is never overwritten, so CI/session overrides keep precedence over .env.
+    Missing file is fine - everything then comes from the environment and $PeasterEnvDefaults.
+#>
+function Import-PeasterDotEnv {
+    [CmdletBinding()]
+    param(
+        [string] $Path = (Join-Path $PeasterConfigRoot '.env')
+    )
+
+    if (-not (Test-Path -LiteralPath $Path)) { return }
+
+    foreach ($line in Get-Content -LiteralPath $Path) {
+        $trimmed = $line.Trim()
+        if ([string]::IsNullOrEmpty($trimmed) -or $trimmed.StartsWith('#')) { continue }
+
+        $eq = $trimmed.IndexOf('=')
+        if ($eq -lt 1) { continue }
+
+        $name  = $trimmed.Substring(0, $eq).Trim()
+        $value = $trimmed.Substring($eq + 1).Trim()
+        if ($value.Length -ge 2 -and
+            (($value.StartsWith('"') -and $value.EndsWith('"')) -or
+             ($value.StartsWith("'") -and $value.EndsWith("'")))) {
+            $value = $value.Substring(1, $value.Length - 2)
+        }
+
+        if ([string]::IsNullOrEmpty($value)) { continue }
+        if ([string]::IsNullOrEmpty([Environment]::GetEnvironmentVariable($name))) {
+            Set-Item -Path "env:$name" -Value $value
+        }
+    }
 }
 
 function Initialize-PeasterEnvironment {
     [CmdletBinding()]
     param()
+
+    Import-PeasterDotEnv
+
     foreach ($name in $PeasterEnvDefaults.Keys) {
         if ([string]::IsNullOrEmpty([Environment]::GetEnvironmentVariable($name))) {
             Set-Item -Path "env:$name" -Value $PeasterEnvDefaults[$name]
@@ -290,4 +345,80 @@ function Resolve-PeasterNativeSignInUser {
         $err = 'set $env:NATIVE_AUTH_SIGNIN_USERNAME or apply external_tenant with -var native_signin_user_email=<email> (output external_native_signin_user_email)'
     }
     return @{ Username = $null; Error = $err }
+}
+
+<#
+.SYNOPSIS
+    Resolve the External-02 federation test inputs (external tenant id + client id).
+
+.DESCRIPTION
+    Single source of truth so the External-02 inputs can be resolved in BOTH Pester phases
+    (BeforeDiscovery for the -Skip decision, BeforeAll for the run).
+
+    Resolution order (env values come from the session, CI, or tests/peaster/.env):
+      TenantId : 1. $env:EXTERNAL_TENANT_ID
+                 2. terraform output -raw external_tenant_id, run in the external_tenant dir
+      ClientId : 1. $env:FEDERATION_WORKFORCE_CLIENT_ID
+                 2. terraform output -raw external_native_federation_client_id, run in the
+                    external_tenant dir (the app registered in the external tenant with the
+                    oidcdebugger.com redirect URI - the client the authorize request must use)
+
+    Only a single clean GUID is accepted; anything else leaves the value $null so the live
+    context skips. Returns @{ TenantId; ClientId; TenantError; ClientError }.
+#>
+function Resolve-PeasterFederationInputs {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string] $RepoRoot
+    )
+
+    $guid        = '^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$'
+    $externalDir = Join-Path $RepoRoot 'external_tenant'
+
+    $tenantId    = $env:EXTERNAL_TENANT_ID
+    $tenantError = $null
+    if (-not [string]::IsNullOrWhiteSpace($tenantId)) {
+        if ($tenantId -notmatch $guid) {
+            $tenantError = "`$env:EXTERNAL_TENANT_ID is set but is not a GUID: '$tenantId'"
+            $tenantId    = $null
+        }
+    } else {
+        $tf = Get-PeasterTerraformOutputRaw -RepoRoot $externalDir -Name 'external_tenant_id'
+        if ($tf.Value -and $tf.Value -match $guid) {
+            $tenantId = $tf.Value
+        } else {
+            $tenantId    = $null
+            $tenantError = $tf.Error
+            if (-not $tenantError) {
+                $tenantError = "terraform output -raw external_tenant_id did not return a tenant id: $($tf.Value)"
+            }
+        }
+    }
+
+    $clientId    = $env:FEDERATION_WORKFORCE_CLIENT_ID
+    $clientError = $null
+    if (-not [string]::IsNullOrWhiteSpace($clientId)) {
+        if ($clientId -notmatch $guid) {
+            $clientError = "`$env:FEDERATION_WORKFORCE_CLIENT_ID is set but is not a GUID: '$clientId'"
+            $clientId    = $null
+        }
+    } else {
+        $tf = Get-PeasterTerraformOutputRaw -RepoRoot $externalDir -Name 'external_native_federation_client_id'
+        if ($tf.Value -and $tf.Value -match $guid) {
+            $clientId = $tf.Value
+        } else {
+            $clientId    = $null
+            $clientError = $tf.Error
+            if (-not $clientError) {
+                $clientError = "terraform output -raw external_native_federation_client_id did not return a client id: $($tf.Value)"
+            }
+        }
+    }
+
+    return @{
+        TenantId    = $tenantId
+        ClientId    = $clientId
+        TenantError = $tenantError
+        ClientError = $clientError
+    }
 }
