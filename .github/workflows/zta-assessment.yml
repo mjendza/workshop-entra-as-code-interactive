@@ -47,13 +47,13 @@ jobs:
       - name: Install PowerShell Modules
         shell: pwsh
         run: |
-          Install-Module -Name ZeroTrustAssessment -Scope CurrentUser -Force -AllowClobber
+          Install-Module -Name ZeroTrustAssessment -RequiredVersion 2.5.0 -Scope CurrentUser -Force -AllowClobber
           Install-Module -Name Az -Scope CurrentUser -Force -AllowClobber
 
       - name: Log in to Azure using OIDC
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          client-id: ${{ secrets.ZTA_AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           allow-no-subscriptions: true
           enable-AzPSSession: true
@@ -66,10 +66,18 @@ jobs:
 
           Connect-MgGraph -AccessToken $token -ErrorAction Stop
 
+          # Preflight: fail loudly here rather than letting the module fall back to a browser
+          $ctx     = Get-MgContext
+          $missing = Get-ZtGraphScope | Where-Object { $ctx.Scopes -notcontains $_ }
+          if ($missing) { throw "Missing application permissions: $($missing -join ', ')" }
+
+          # Adopts the existing Graph + Az contexts, marks ConnectedService, no interactive fallback
+          Connect-ZtAssessment -Service Graph,Azure -ErrorAction Stop
+          
           # Workaround: PSFramework's Disable-PSFConsoleInterrupt fails in non-interactive CI/CD
           # environments (no real console handle).
           $ErrorActionPreference = 'Continue'
-          Invoke-ZtAssessment -Path $outputPath -MaximumSignInLogQueryTime 7
+          Invoke-ZtAssessment -Path $outputPath -Pillar Identity -Days 1 -MaximumSignInLogQueryTime 5 -NoBrowser
           $ErrorActionPreference = 'Stop'
 
           $htmlFiles = Get-ChildItem -Path $outputPath -Recurse -Filter "*.html" -ErrorAction SilentlyContinue
@@ -92,6 +100,11 @@ jobs:
           $reportDate = Get-Date -Format "yyyy-MM-dd"
           $blobPrefix = "zta-reports/${{ github.run_number }}-${reportDate}"
 
+          # 'az storage blob upload-batch' has no --exclude-pattern, so remove the raw
+          # export data first and upload only the report with --pattern.
+          $rawExport = Join-Path $exportPath "zt-export"
+          if (Test-Path $rawExport) { Remove-Item -Path $rawExport -Recurse -Force }
+
           az storage blob upload-batch `
             --destination $env:AZURE_STORAGE_CONTAINER `
             --source "$exportPath" `
@@ -99,7 +112,6 @@ jobs:
             --account-name $env:AZURE_STORAGE_ACCOUNT `
             --account-key $env:AZURE_STORAGE_KEY `
             --pattern "*" `
-            --exclude-pattern "zt-export/*" `
             --overwrite `
             --only-show-errors
 
