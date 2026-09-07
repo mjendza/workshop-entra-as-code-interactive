@@ -1,0 +1,12 @@
+{
+  "GlobalSettings": {    
+    "RiskyMaliciousServicePrincipals": {
+      "FeedBaseUri": "https://oauthsentry.github.io/feeds",
+      "Service": "entra",
+      "IncludeCategories": ["malicious", "risky"],
+      "IncludeSeverities": ["critical", "high", "medium"],
+      "ExcludeAppIds": [],
+      "ExcludeMicrosoftFirstParty": true
+    }
+  }
+}
