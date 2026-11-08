@@ -9,64 +9,39 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: terraform-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   terraform:
-    name: Validate & Lint (${{ matrix.solution }})
+    name: Validate & Lint (${{ matrix.solution }}, ${{ matrix.variant }})
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - solution: root
-            path: .
-            replace_main: true
-          - solution: external_tenant
-            path: external_tenant
-            replace_main: false
-          - solution: verified_id
-            path: verified_id
-            replace_main: true
+        solution: [root, external_tenant, verified_id]
+        # starter = files participants begin with, final = doc/result/** overlay
+        variant: [starter, final]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Replace main.tf with result version
-        if: matrix.replace_main
-        run: cp doc/result/${{ matrix.solution }}/main.tf ${{ matrix.path }}/main.tf
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform Init
-        working-directory: ${{ matrix.path }}
-        run: terraform init -backend=false
-
-      - name: Terraform Format Check
-        working-directory: ${{ matrix.path }}
-        run: terraform fmt -check -recursive
-
-      - name: Terraform Validate
-        working-directory: ${{ matrix.path }}
-        run: terraform validate
+        with:
+          terraform_wrapper: false
 
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4
 
-      - name: TFLint Init
-        run: tflint --init
-
-      - name: TFLint
-        run: |
-          if [ "${{ matrix.solution }}" = "root" ]; then
-            find . -name '*.tf' -not -path './doc/*' -not -path './external_tenant/*' -printf '%h\n'
-          else
-            find ./external_tenant -name '*.tf' -printf '%h\n'
-          fi \
-            | sort -u \
-            | while read -r dir; do
-                echo "::group::Linting $dir"
-                tflint --chdir "$dir" --minimum-failure-severity=error
-                echo "::endgroup::"
-              done
+      # init -> fmt -check -> validate -> test (offline plan, mocked providers) -> tflint
+      # Same script runs locally:  wsl -e bash scripts/ci/validate.sh
+      - name: Validate, Test & Lint
+        env:
+          IN_PLACE: "1"
+          NO_FINAL: ${{ matrix.variant == 'starter' && '1' || '' }}
+        run: bash scripts/ci/validate.sh ${{ matrix.solution }}
