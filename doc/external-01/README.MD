@@ -1,9 +1,5 @@
 # External-01: Entra External ID Native Authentication Flow
 
-<!-- Banner: generate via doc/assets/image-prompts.md, save as banner.png in this folder, then uncomment:
-![External-01 banner](banner.png)
--->
-
 Similar to Stage 01 we enable a new SSO application, but this time using the `Native` application
 type. Native apps (mobile / desktop clients) authenticate directly against the tenant with
 Microsoft's [Native Authentication API](https://learn.microsoft.com/en-us/entra/identity-platform/reference-native-authentication-api?tabs=emailOtp)
@@ -228,4 +224,4 @@ See the "Known gap" note above - the id_token doesn't carry an email claim today
 `sub` instead.
 
 ---
-**Navigation:** [← External-00: Prerequisites](../external-00/README.md)
+**Navigation:** [← External-00: Prerequisites](../external-00/README.md) | [External-02: SSO for your PoC App →](../external-02/README.md)

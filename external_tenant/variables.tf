@@ -30,3 +30,21 @@ variable "tenant_default_domain" {
   description = "Default domain of the target tenant (e.g. yourtenant.onmicrosoft.com)."
   type        = string
 }
+
+variable "poc_spa_redirect_uris" {
+  description = "External-02: SPA redirect URIs of the PoC app. Entra matches these exactly -- a trailing slash difference is a mismatch (AADSTS50011)."
+  type        = list(string)
+  default     = ["http://localhost:5173/", "https://oidcdebugger.com/debug"]
+}
+
+variable "poc_sign_up_allowed" {
+  description = "External-02: allow self-service sign-up in the PoC app's user flow. false = sign-in only."
+  type        = bool
+  default     = true
+}
+
+variable "poc_require_mfa" {
+  description = "External-02 (OPTIONAL): create a Conditional Access policy requiring MFA (Email OTP) on the PoC SPA and API. Security defaults MUST be disabled in the External ID tenant first."
+  type        = bool
+  default     = false
+}
