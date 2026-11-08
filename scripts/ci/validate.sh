@@ -3,20 +3,23 @@
 # Terraform "Validate & Lint" — single source of truth for CI and local runs.
 #
 # Copies the repo to a temp dir, overlays the FINAL workshop solution files
-# from doc/result/**, then runs: init -> fmt -check -> validate -> tflint.
+# from doc/result/**, then runs:
+#   init -> fmt -check -> validate -> test (offline plan, mocked providers) -> tflint
+# Plan tests live in <solution>/tests/plan.tftest.hcl.
 # Your working tree (state, .terraform, tfvars) is never touched.
 #
 # Usage:
 #   scripts/ci/validate.sh                       # all solutions
 #   scripts/ci/validate.sh root external_tenant  # selected solutions
 #   NO_FINAL=1 scripts/ci/validate.sh            # check starter files as-is
+#                                                # (CI runs both: matrix.variant)
 #   IN_PLACE=1 scripts/ci/validate.sh root       # CI: run in checkout, no copy
 #
 # Local (Windows): run via WSL from the repo dir (verified path):
 #   wsl -e bash scripts/ci/install-tools.sh   # once
 #   wsl -e bash scripts/ci/validate.sh
 # Git Bash may work (needs tflint on PATH) but is untested.
-# Requires: terraform, tflint (scripts/ci/install-tools.sh installs both).
+# Requires: terraform, tflint (scripts/ci/install-tools.sh installs both), openssl.
 # =============================================================================
 set -uo pipefail
 export PATH="$HOME/.local/bin:$PATH"   # where install-tools.sh puts binaries
@@ -52,6 +55,14 @@ else
   # Tracked files only — skips state, .terraform, secrets, IDE junk.
   (cd "$REPO_ROOT" && git ls-files -z --cached --others --exclude-standard \
     | tar --null -T - -cf -) | tar -xf - -C "$WORK"
+fi
+
+# Stage 16 reads cert/cert.pem via file() and it is not in git. Plan tests need
+# *a* cert: generate a throwaway self-signed one (private key is discarded).
+if [ ! -f "$WORK/cert/cert.pem" ]; then
+  mkdir -p "$WORK/cert"
+  openssl req -x509 -newkey rsa:2048 -nodes -keyout /dev/null -out "$WORK/cert/cert.pem" \
+    -days 1 -subj "/CN=ci-throwaway" 2>/dev/null || { err "openssl failed to create cert/cert.pem"; exit 2; }
 fi
 
 # --- Overlay final solution --------------------------------------------------
@@ -106,6 +117,12 @@ for s in "${SOLUTIONS[@]}"; do
     group "[$s] terraform validate"
     (cd "$WORK/$p" && terraform validate -no-color) || { err "[$s] validate"; fail=1; }
     endgroup
+
+    if ls "$WORK/$p"/tests/*.tftest.hcl >/dev/null 2>&1; then
+      group "[$s] terraform test (offline plan, mocked providers)"
+      (cd "$WORK/$p" && terraform test -no-color) || { err "[$s] test"; fail=1; }
+      endgroup
+    fi
   fi
 
   while read -r dir; do
