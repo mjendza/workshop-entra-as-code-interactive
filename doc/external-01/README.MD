@@ -15,7 +15,7 @@ feature and must be applied against that tenant (Tenant B), not the workshop's h
 
 ## What gets created
 
-Three resources, wired together in [`external_tenant/main.tf`](../../external_tenant/main.tf):
+Three resources, wired together in [`external_tenant/external-01.tf`](../../external_tenant/external-01.tf):
 
 ```hcl
 # 1. A self-service sign-up user flow with the "Email with password" identity provider
@@ -151,7 +151,7 @@ beta API (`msgraph_resource`), so the user can sign in with their e-mail. The in
 (`onmicrosoft.com`) domain is used as the identity `issuer`, and the module's default password
 (`Aa1!Workshop-Native-External-01`) matches `PeasterConfig.ps1`'s `NATIVE_AUTH_SIGNIN_PASSWORD` default -
 don't change one without the other (the password isn't currently exposed as a variable on the
-`native_signin_user` module call in `main.tf`).
+`native_signin_user` module call in `external-01.tf`).
 
 ## End-to-end tests (peaster / Pester)
 
