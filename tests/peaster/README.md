@@ -40,18 +40,18 @@ run cleanly in CI.
 ## Configuration
 
 `PeasterConfig.ps1` is the single root file that declares every environment variable the tests
-use. Each test dot-sources it and calls `Initialize-PeasterEnvironment`, which fills a default
-**only when the variable is unset/empty** — so exporting a real value (e.g.
-`$env:ARM_TENANT_ID = '<guid>'`) always overrides the default. Add new env vars by adding one
-line to `$PeasterEnvDefaults`.
+use. Each test dot-sources it and calls `Initialize-PeasterEnvironment`, which resolves values
+in this precedence order:
 
-| Variable               | Default        | Purpose                                          |
-|------------------------|----------------|--------------------------------------------------|
-| `ARM_TENANT_ID`        | `''` (empty)   | Live tenant id (GUID); empty = skip live         |
-| `AZURE_TENANT_ID`      | `''` (empty)   | Alternative tenant id source                     |
-| `CERT_PFX_PASSWORD`    | `Workshop123!` | Pfx password (the `init.ps1` default)            |
-| `TAP_TARGET_USER`      | `''` (empty)   | UPN/object id to issue a TAP for; empty = skip   |
-| `TAP_LIFETIME_MINUTES` | `60`           | Requested TAP lifetime in minutes (10–43200)     |
+1. **Real environment variables** — a value exported in the session/CI (e.g.
+   `$env:ARM_TENANT_ID = '<guid>'`) always wins.
+2. **`tests/peaster/.env`** — gitignored; holds all tenant-specific values and secrets.
+3. **`$PeasterEnvDefaults`** — neutral fallbacks only (timeouts, lifetimes); never secrets.
+
+To set up: copy [`.env.example`](.env.example) to `tests/peaster/.env` and fill in your
+tenant's values. `.env.example` documents every variable; an empty value means the
+corresponding live test auto-skips. Never commit real ids, passwords, or secrets — `.env`
+is covered by the repo `.gitignore`.
 
 ## Live inputs
 

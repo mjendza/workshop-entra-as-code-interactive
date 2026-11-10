@@ -17,3 +17,15 @@ variable "github_repo" {
   type        = string
   default     = ""
 }
+variable "external_id_tenant_id" {
+  description = "(Optional) External ID tenant ID. Used by External-02 to configure the external ID federation."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+variable "external_id_default_domain_name" {
+  description = "(Optional) External ID tenant default domain name. Used by External-02 to configure the external ID federation. For ext01.ciamlogin.com value should be ext01"
+  type        = string
+  default     = ""
+  sensitive   = true
+}

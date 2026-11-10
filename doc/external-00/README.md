@@ -66,12 +66,6 @@ returning to this screen:
 | `Application.ReadWrite.All` | Application | Read and write all applications | Yes | Creating/updating app registrations (`modules/sso_app_native`, `modules/federation`, `modules/service_principal_rich`) |
 | `AppRoleAssignment.ReadWrite.All` | Application | Manage app permission grants and app role assignments | Yes | Granting admin consent / app role assignments for target-tenant Service Principals (Stage 18) |
 | `CustomAuthenticationExtension.ReadWrite.All` | Application | Read and write all custom authentication extensions | Yes | Managing the sign-up event flow and its attribute-collection hooks (`modules/user_flow`) |
-| `Group.ReadWrite.All` | Application | Read and write all groups | Yes | Group-scoped policies/assignments in the external tenant |
-| `Policy.Read.All` | Application | Read your organization's policies | Yes | Reading existing policies before updates (pairs with the `ReadWrite` policy permissions below) |
-| `Policy.ReadWrite.ApplicationConfiguration` | Application | Read and write your organization's application configuration policies | Yes | Enabling `nativeAuthenticationApisEnabled` on the native-auth app (`modules/sso_app_native`) |
-| `Policy.ReadWrite.ConditionalAccess` | Application | Read and write your organization's conditional access policies | Yes | Conditional Access policies in the external tenant |
-| `Policy.ReadWrite.ExternalIdentities` | Application | Read and write your organization's external identities policy | Yes | Creating the sign-up user flow and linking apps to it (`modules/user_flow`, `this_user_flow_assignment` in `modules/sso_app_native`) |
-| `User.Read` | Delegated | Sign in and read user profile | No | Default delegated permission added to every app registration |
 | `User.ReadWrite.All` | Application | Read and write all users' full profiles | Yes | Creating the native-auth sign-in test user (`modules/user`, the `native_auth_test_user` module) |
 
 5. **Document the Following Identifiers**

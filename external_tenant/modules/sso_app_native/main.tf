@@ -223,29 +223,21 @@ resource "msgraph_update_resource" "this_native_auth" {
 # Link the application to the External ID user flow (authenticationEventsFlow) so the
 # sign-up/sign-in experience it defines applies to this app. An application can only be
 # linked to one user flow, and it must already have a service principal in the tenant.
-# The dedicated POST .../conditions/applications/includeApplications action (see
+# Uses the dedicated POST .../conditions/applications/includeApplications action (see
 # https://learn.microsoft.com/graph/api/authenticationconditionsapplications-post-includeapplications)
-# only returns {appId}, with no top-level "id" - msgraph_resource requires one in the create
-# response to track the resource (per its schema docs), so it cannot manage this endpoint.
-# PATCH the parent flow's conditions.applications.includeApplications list instead; the flow's
-# own create body (modules/user_flow/main.tf) deliberately omits that field so there's no
-# conflicting owner of it.
-resource "msgraph_update_resource" "this_user_flow_assignment" {
-  url         = "identity/authenticationEventsFlows/${var.user_flow_id}"
-  api_version = "beta"
+# via msgraph_resource_action: the POST fires once on create and is NOT repeated on
+# later applies (the action re-runs only if resource_url/body change, e.g. a new flow
+# or app id — which is when the link must be re-created anyway). Destroying this
+# resource only removes it from state; it does not unlink the app from the flow.
+resource "msgraph_resource_action" "this_user_flow_assignment" {
+  resource_url = "identity/authenticationEventsFlows/${var.user_flow_id}"
+  action       = "conditions/applications/includeApplications"
+  method       = "POST"
+  api_version  = "v1.0"
 
   body = {
-    conditions = {
-      applications = {
-        includeAllApplications = false
-        includeApplications = [
-          {
-            "@odata.type" = "#microsoft.graph.authenticationConditionApplication"
-            appId         = azuread_application.this.client_id
-          }
-        ]
-      }
-    }
+    "@odata.type" = "#microsoft.graph.authenticationConditionApplication"
+    appId         = azuread_application.this.client_id
   }
 
   depends_on = [azuread_service_principal.this_SP]
