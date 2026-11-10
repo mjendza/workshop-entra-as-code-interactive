@@ -29,6 +29,7 @@ The stage has two equally important halves:
 
 ## How to work with Terraform Workshop
 ![UseDedicated File](edit-file.png)
+
 Each Entra External ID workshop step should updated dedicated Terraform file - name is always same as step number.
 
 ## Part 1: the PoC application
@@ -198,8 +199,6 @@ poc_require_mfa       = false                        # OPTIONAL CA policy - see 
 Paste Part 1, Part 2 and Part 3 into the matching sections of
 [`external_tenant/external-02.tf`](../../external_tenant/external-02.tf), then:
 
-
-
 ```powershell
 cd external_tenant
 terraform init      # new modules
@@ -350,4 +349,4 @@ should return exactly one entry whose `appId` equals `external_poc_spa_client_id
 > **Report Issues:** Did you encounter a bug or need clarification? [Report the issue here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← External-01: Native Authentication](../external-01/README.MD)
+**Navigation:** [← External-01: Native Authentication](../external-01/README.MD) | [External-03: Passwordless SSO + MFA →](../external-03/README.md)
