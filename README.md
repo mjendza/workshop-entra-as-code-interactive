@@ -74,13 +74,14 @@ whichever apply to you. They intentionally don't cross-link into each other's st
 
 ### Path 2: External ID (CIAM) Tenant
 
-Native Authentication for a customer-facing Entra External ID tenant - a self-contained pair of
+Native Authentication for a customer-facing Entra External ID tenant - a self-contained set of
 stages using their own dedicated Service Principal and Terraform root ([`external_tenant/`](external_tenant)).
 
 | Step                           | Title                              | Description                                                                                                                                                                                                                           |
 |--------------------------------|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [external-00](doc/external-00) | Prerequisites (External ID tenant) | Create a second Service Principal, this time in your External ID (CIAM) tenant, with every Microsoft Graph permission the `external_tenant/` Terraform root needs (native auth, user flows, conditional access, groups, local users). |
 | [external-01](doc/external-01) | Native Authentication              | Enable Entra External ID's Native Authentication API (email + password) on a native app registration, and prove the sign-in flows end-to-end with Pester via registered user also in terraform .                                      |
+| [external-02](doc/external-02) | SSO for your PoC App               | Browser-based SSO for a PoC SPA + API with a dedicated email + password user flow assigned to the app; optional Conditional Access (MFA) - requires Security defaults to be disabled.                                                 |
 
 ### Path 3: Verified ID
 

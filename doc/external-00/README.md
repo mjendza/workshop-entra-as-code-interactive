@@ -1,9 +1,5 @@
 # External-00: Prerequisites (External ID / CIAM Tenant)
 
-<!-- Banner: generate via doc/assets/image-prompts.md, save as banner.png in this folder, then uncomment:
-![External-00 banner](banner.png)
--->
-
 This is the External ID (CIAM) counterpart of [Stage 0](../stage-00/README.md). Stage 0 bootstraps a
 Service Principal in your **home** Workforce tenant; this stage bootstraps a second, separate
 Service Principal in your **External ID (CIAM) tenant** ("Tenant B" elsewhere in this repo) - the one
@@ -58,7 +54,7 @@ Before starting, please ensure you have the following:
 ## Required Microsoft Graph Permissions
 
 Grant all of the following up front - each is used by a specific `external_tenant/` module, so the
-whole workshop path (Stage 18 target-tenant provisioning + External-01 native auth) works without
+whole workshop path (Stage 18 target-tenant provisioning, External-01 native auth, External-02 PoC SSO) works without
 returning to this screen:
 
 | Permission | Type | Description | Admin consent | Used by |
@@ -66,6 +62,7 @@ returning to this screen:
 | `Application.ReadWrite.All` | Application | Read and write all applications | Yes | Creating/updating app registrations (`modules/sso_app_native`, `modules/federation`, `modules/service_principal_rich`) |
 | `AppRoleAssignment.ReadWrite.All` | Application | Manage app permission grants and app role assignments | Yes | Granting admin consent / app role assignments for target-tenant Service Principals (Stage 18) |
 | `CustomAuthenticationExtension.ReadWrite.All` | Application | Read and write all custom authentication extensions | Yes | Managing the sign-up event flow and its attribute-collection hooks (`modules/user_flow`) |
+| `EventListener.ReadWrite.All` | Application | Read and write all authentication event listeners | Yes | Linking the PoC SPA to its user flow via `includeApplications` (External-02, `modules/user_flow`) |
 | `Group.ReadWrite.All` | Application | Read and write all groups | Yes | Group-scoped policies/assignments in the external tenant |
 | `Policy.Read.All` | Application | Read your organization's policies | Yes | Reading existing policies before updates (pairs with the `ReadWrite` policy permissions below) |
 | `Policy.ReadWrite.ApplicationConfiguration` | Application | Read and write your organization's application configuration policies | Yes | Enabling `nativeAuthenticationApisEnabled` on the native-auth app (`modules/sso_app_native`) |
@@ -73,6 +70,10 @@ returning to this screen:
 | `Policy.ReadWrite.ExternalIdentities` | Application | Read and write your organization's external identities policy | Yes | Creating the sign-up user flow and linking apps to it (`modules/user_flow`, `this_user_flow_assignment` in `modules/sso_app_native`) |
 | `User.Read` | Delegated | Sign in and read user profile | No | Default delegated permission added to every app registration |
 | `User.ReadWrite.All` | Application | Read and write all users' full profiles | Yes | Creating the native-auth sign-in test user (`modules/user`, the `native_auth_test_user` module) |
+
+> **Security defaults:** Conditional Access policies (the *optional* MFA policy in
+> [External-02](../external-02/README.md)) can only be created when **Security defaults are disabled**
+> in the External ID tenant. Nothing else in this path needs that - leave them on unless you opt into CA.
 
 5. **Document the Following Identifiers**
    - Application (client) ID: Retrieved from the application Overview blade.
@@ -110,7 +111,7 @@ tenant_default_domain = "yourtenant.onmicrosoft.com"
 ## Verification
 - [ ] `client_id`, `client_secret`, and `tenant_id` are populated in **both** provider blocks in
       `external_tenant/provider.tf`.
-- [ ] All 10 permissions above show "Granted for `<your External ID tenant>`" under API permissions.
+- [ ] All 11 permissions above show "Granted for `<your External ID tenant>`" under API permissions.
 - [ ] `tenant_default_domain` is set in `external_tenant/terraform.tfvars`.
 - [ ] `cd external_tenant && terraform init` succeeds.
 
@@ -128,7 +129,7 @@ tenant_default_domain = "yourtenant.onmicrosoft.com"
 - [ ] I have verified access to my External ID (CIAM) tenant.
 - [ ] I have successfully created the Service Principal within that tenant.
 - [ ] I have securely documented its `client_id`, `client_secret`, and `tenant_id`.
-- [ ] I have assigned and granted admin consent for all 10 API permissions listed above.
+- [ ] I have assigned and granted admin consent for all 11 API permissions listed above.
 - [ ] I have correctly populated both provider blocks in `external_tenant/provider.tf`.
 - [ ] I have set `tenant_default_domain` in `external_tenant/terraform.tfvars`.
 - [ ] I have successfully run `terraform init` inside `external_tenant/` and observed positive output.

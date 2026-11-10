@@ -1,9 +1,5 @@
 # External-01: Entra External ID Native Authentication Flow
 
-<!-- Banner: generate via doc/assets/image-prompts.md, save as banner.png in this folder, then uncomment:
-![External-01 banner](banner.png)
--->
-
 Similar to Stage 01 we enable a new SSO application, but this time using the `Native` application
 type. Native apps (mobile / desktop clients) authenticate directly against the tenant with
 Microsoft's [Native Authentication API](https://learn.microsoft.com/en-us/entra/identity-platform/reference-native-authentication-api?tabs=emailOtp)
@@ -15,7 +11,7 @@ feature and must be applied against that tenant (Tenant B), not the workshop's h
 
 ## What gets created
 
-Three resources, wired together in [`external_tenant/main.tf`](../../external_tenant/main.tf):
+Three resources, wired together in [`external_tenant/external-01.tf`](../../external_tenant/external-01.tf):
 
 ```hcl
 # 1. A self-service sign-up user flow with the "Email with password" identity provider
@@ -151,7 +147,7 @@ beta API (`msgraph_resource`), so the user can sign in with their e-mail. The in
 (`onmicrosoft.com`) domain is used as the identity `issuer`, and the module's default password
 (`Aa1!Workshop-Native-External-01`) matches `PeasterConfig.ps1`'s `NATIVE_AUTH_SIGNIN_PASSWORD` default -
 don't change one without the other (the password isn't currently exposed as a variable on the
-`native_signin_user` module call in `main.tf`).
+`native_signin_user` module call in `external-01.tf`).
 
 ## End-to-end tests (peaster / Pester)
 
@@ -228,4 +224,4 @@ See the "Known gap" note above - the id_token doesn't carry an email claim today
 `sub` instead.
 
 ---
-**Navigation:** [← External-00: Prerequisites](../external-00/README.md)
+**Navigation:** [← External-00: Prerequisites](../external-00/README.md) | [External-02: SSO for your PoC App →](../external-02/README.md)
