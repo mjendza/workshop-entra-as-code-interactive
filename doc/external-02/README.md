@@ -7,7 +7,8 @@ External ID tenant's authorization page (`<subdomain>.ciamlogin.com`), sign up o
 
 The stage has two equally important halves:
 
-1. The PoC application - an API and a SPA, with admin consent so no customer sees a consent prompt.
+1. The PoC application - an API and a SPA, with admin consent **granted manually in the Azure Portal**
+   so no customer sees a consent prompt.
 2. A dedicated user flow (email + password) assigned to the PoC application. In External ID,
    the user flow is what defines the sign-in experience: which identity providers are offered,
    whether sign-up is allowed, and which attributes are collected. An app registration without a
@@ -20,7 +21,7 @@ The stage has two equally important halves:
 |---------------------------|--------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 | API (resource server)     | `TF.Demo.<name>-PoC.API.API`         | `api://<client-id>`, scope `access_as_user` (Admin consent), app role `PoC.Admin`. No redirect URI, no secret.                    |
 | SPA                       | `TF.Demo.<name>-PoC.Spa.Application` | SPA platform only (auth code + PKCE, public client). Requests `openid profile email offline_access User.Read` + `access_as_user`. |
-| Admin consent             | -                                    | Tenant-wide grant for all of the SPA's delegated permissions.                                                                     |
+| Admin consent             | -                                    | **Manual** (Azure Portal, step 5) - tenant-wide grant for all of the SPA's delegated permissions. Not done by Terraform.          |
 | Sign-up/sign-in user flow | `TF.Workshop.<name>-PoC.Flow`        | Email + password only. Dedicated to the PoC app - the SPA is assigned to it.                                                      |
 | Conditional Access        | `TF.Demo.<name>-PoC.RequireMFA`      | Only when `poc_require_mfa = true`. Requires MFA (Email OTP) on the SPA and the API. Needs Security defaults disabled.            |
 
@@ -32,8 +33,9 @@ Each Entra External ID workshop step should updated dedicated Terraform file - n
 
 ## Part 1: the PoC application
 
-From [`external_tenant/modules/poc_app`](../../external_tenant/modules/poc_app/main.tf) - API, SPA,
-admin consent and the optional Conditional Access policy:
+From [`external_tenant/modules/poc_app`](../../external_tenant/modules/poc_app/main.tf) - API, SPA
+and the optional Conditional Access policy. Admin consent is NOT part of the Terraform code - you
+grant it manually in the Azure Portal after `apply` (step 5):
 
 ```hcl
 module "poc_app" {
@@ -143,10 +145,11 @@ The full solution is in [`doc/result/external_id/external-02.tf`](../result/exte
 
 ### 1. Prerequisites
 
-- [External-00](../external-00/README.md) completed - including the two permissions this stage adds
-  to the table: `EventListener.ReadWrite.All` (assigning the SPA to its user flow) and
-  `DelegatedPermissionGrant.ReadWrite.All` (admin consent for the SPA). If you did External-00
-  before these were listed, add them now and press Grant admin consent again.
+- [External-00](../external-00/README.md) completed - including `EventListener.ReadWrite.All`
+  (assigning the SPA to its user flow). If you did External-00 before it was listed, add it now
+  and press Grant admin consent again.
+- An account with the **Cloud Application Administrator** (or Global Administrator) role in the
+  External ID tenant - you need it to grant admin consent for the PoC SPA manually in step 5.
 - A PoC SPA you can run locally (any MSAL-based app - e.g. `@azure/msal-browser` / `@azure/msal-react`),
   served on `http://localhost:5173/` by default.
 
@@ -198,7 +201,23 @@ terraform plan      # expect module.poc_user_flow.msgraph_resource_action.app_as
 terraform apply
 ```
 
-### 5. Wire up your PoC app
+### 5. Grant admin consent for the PoC SPA (manual, Azure Portal)
+
+> [!IMPORTANT]
+> Terraform deliberately does **not** grant admin consent. Do it by hand in the portal - without
+> this step every sign-in fails with `AADSTS65001` (consent required), because `access_as_user`
+> has consent type *Admin* and customers cannot consent to it themselves.
+
+1. Entra admin center (switched to the External ID tenant) → **Identity** → **Applications** →
+   **App registrations** → **All applications** → `TF.Demo.<name>-PoC.Spa.Application`.
+2. **API permissions** → **Grant admin consent for `<tenant>`** → **Yes**.
+3. Every row - `openid`, `profile`, `email`, `offline_access`, `User.Read` (Microsoft Graph) and
+   `access_as_user` (`TF.Demo.<name>-PoC.API.API`) - must show *Granted for `<tenant>`*.
+
+Repeat this whenever the SPA's API permissions change, or after a `destroy` + re-`apply` (a new
+app registration has no consent).
+
+### 6. Wire up your PoC app
 
 ```powershell
 terraform output -raw external_poc_authority      # MSAL authority
@@ -224,7 +243,7 @@ Note there is no user flow name in the authority (unlike Azure AD B2C's `/B2C_1_
 policies). External ID picks the flow from the application: whichever flow the SPA's client ID is
 assigned to is the one the hosted page renders.
 
-### 6. Test the user flow
+### 7. Test the user flow
 
 1. Run the app and click sign in - you land on the External ID hosted page showing Email +
    Password fields and a "No account? Create one" link.
@@ -238,7 +257,7 @@ assigned to is the one the hosted page renders.
 ## Verification
 
 - [ ] `TF.Demo.<name>-PoC.Spa.Application` and `TF.Demo.<name>-PoC.API.API` exist under App registrations.
-- [ ] The SPA's API permissions all show *Granted for `<tenant>`*.
+- [ ] The SPA's API permissions all show *Granted for `<tenant>`* (manual consent, step 5).
 - [ ] External Identities → User flows → `TF.Workshop.<name>-PoC.Flow`:
   - Identity providers shows only Email with password.
   - Applications lists only `TF.Demo.<name>-PoC.Spa.Application`.
@@ -264,9 +283,8 @@ should return exactly one entry whose `appId` equals `external_poc_spa_client_id
 | Sign-in page doesn't show "No account? Create one"                                               | `poc_sign_up_allowed = false`, or the SPA isn't assigned to the flow.                                                                                                              |
 | `apply` fails creating the CA policy (`Security Defaults is enabled in the tenant`, 400/403)     | Security defaults are still on - see step 2, or set `poc_require_mfa = false`.                                                                                                     |
 | CA policy blocks sign-in instead of asking for a code                                            | Email OTP is not enabled in Authentication methods.                                                                                                                                |
-| 403 on `azuread_service_principal_delegated_permission_grant`                                    | Deployer SP is missing `DelegatedPermissionGrant.ReadWrite.All` (External-00).                                                                                                     |
 | `AADSTS50011` redirect URI mismatch                                                              | `poc_spa_redirect_uris` must match the app's redirect URI exactly, including the trailing slash.                                                                                   |
-| `AADSTS65001` consent required                                                                   | Admin consent wasn't granted - check `grant_admin_consent` (default `true`) and the permission above.                                                                              |
+| `AADSTS65001` consent required                                                                   | Admin consent wasn't granted. Do step 5: Portal → App registrations → PoC SPA → API permissions → Grant admin consent for `<tenant>`.                                              |
 | `destroy` fails deleting the user flow                                                           | Destroying the assignment doesn't unassign the app (the POST only runs on create). Remove the app from the flow in the portal (User flows → Applications) and run `destroy` again. |
 
 ---
@@ -274,6 +292,7 @@ should return exactly one entry whose `appId` equals `external_poc_spa_client_id
 ## Stage Completion Checklist
 - [ ] I have added `EventListener.ReadWrite.All` to the External-00 Service Principal.
 - [ ] I have applied External-02 and captured the outputs.
+- [ ] I have manually granted admin consent for the PoC SPA in the Azure Portal (API permissions → Grant admin consent).
 - [ ] The dedicated `TF.Workshop.<name>-PoC.Flow` user flow offers Email with password and has only the PoC SPA assigned.
 - [ ] My PoC app signs customers up (e-mail code + password) and in (password) through the External ID hosted page.
 - [ ] (Optional) I have disabled Security defaults, set `poc_require_mfa = true`, and seen the Email OTP prompt.

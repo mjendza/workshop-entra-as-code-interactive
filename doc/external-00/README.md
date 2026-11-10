@@ -62,7 +62,6 @@ returning to this screen:
 | `Application.ReadWrite.All` | Application | Read and write all applications | Yes | Creating/updating app registrations (`modules/sso_app_native`, `modules/federation`, `modules/service_principal_rich`) |
 | `AppRoleAssignment.ReadWrite.All` | Application | Manage app permission grants and app role assignments | Yes | Granting admin consent / app role assignments for target-tenant Service Principals (Stage 18) |
 | `CustomAuthenticationExtension.ReadWrite.All` | Application | Read and write all custom authentication extensions | Yes | Managing the sign-up event flow and its attribute-collection hooks (`modules/user_flow`) |
-| `DelegatedPermissionGrant.ReadWrite.All` | Application | Manage all delegated permission grants | Yes | Granting admin consent for the PoC SPA's delegated permissions (External-02, `modules/poc_app`) |
 | `EventListener.ReadWrite.All` | Application | Read and write all authentication event listeners | Yes | Linking the PoC SPA to its user flow via `includeApplications` (External-02, `modules/user_flow`) |
 | `Group.ReadWrite.All` | Application | Read and write all groups | Yes | Group-scoped policies/assignments in the external tenant |
 | `Policy.Read.All` | Application | Read your organization's policies | Yes | Reading existing policies before updates (pairs with the `ReadWrite` policy permissions below) |
@@ -112,7 +111,7 @@ tenant_default_domain = "yourtenant.onmicrosoft.com"
 ## Verification
 - [ ] `client_id`, `client_secret`, and `tenant_id` are populated in **both** provider blocks in
       `external_tenant/provider.tf`.
-- [ ] All 12 permissions above show "Granted for `<your External ID tenant>`" under API permissions.
+- [ ] All 11 permissions above show "Granted for `<your External ID tenant>`" under API permissions.
 - [ ] `tenant_default_domain` is set in `external_tenant/terraform.tfvars`.
 - [ ] `cd external_tenant && terraform init` succeeds.
 
@@ -130,7 +129,7 @@ tenant_default_domain = "yourtenant.onmicrosoft.com"
 - [ ] I have verified access to my External ID (CIAM) tenant.
 - [ ] I have successfully created the Service Principal within that tenant.
 - [ ] I have securely documented its `client_id`, `client_secret`, and `tenant_id`.
-- [ ] I have assigned and granted admin consent for all 12 API permissions listed above.
+- [ ] I have assigned and granted admin consent for all 11 API permissions listed above.
 - [ ] I have correctly populated both provider blocks in `external_tenant/provider.tf`.
 - [ ] I have set `tenant_default_domain` in `external_tenant/terraform.tfvars`.
 - [ ] I have successfully run `terraform init` inside `external_tenant/` and observed positive output.

@@ -4,7 +4,8 @@
 # One self-contained PoC application stack in the External ID tenant:
 #   - the exposed API (resource server),
 #   - the SPA that signs customers in and calls the API (auth code + PKCE),
-#   - tenant-wide admin consent for the SPA's delegated permissions,
+#   - NOT admin consent: it is granted MANUALLY in the Azure Portal
+#     (SPA -> API permissions -> Grant admin consent, see doc/external-02 step 5),
 #   - OPTIONAL: a Conditional Access policy requiring MFA on the SPA and API.
 #
 # Based on sandbox-terraform-entra-id/mail-external-id-local/modules/mail_instance.
@@ -28,7 +29,8 @@ module "api" {
   business_name = "${var.name}.API"
 
   # "Admin" consent type -- no customer is ever shown a consent prompt; the
-  # consent is granted at apply time (azuread_service_principal_delegated_permission_grant below).
+  # consent is granted MANUALLY in the Azure Portal (SPA -> API permissions ->
+  # Grant admin consent), not by Terraform.
   scopes = {
     "access_as_user" = {
       display_name = "Access the API as the signed-in user"

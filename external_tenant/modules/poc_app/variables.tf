@@ -23,12 +23,6 @@ variable "app_roles" {
   }
 }
 
-variable "grant_admin_consent" {
-  description = "Grant tenant-wide admin consent for the SPA's Graph sign-in scopes and the API's access_as_user scope. Requires DelegatedPermissionGrant.ReadWrite.All on the deployer SP."
-  type        = bool
-  default     = true
-}
-
 variable "require_mfa" {
   description = "OPTIONAL. Create a Conditional Access policy requiring MFA (Email OTP) for this SPA and API. Security defaults must be disabled in the tenant first."
   type        = bool

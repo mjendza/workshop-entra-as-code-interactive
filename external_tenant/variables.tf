@@ -34,7 +34,7 @@ variable "tenant_default_domain" {
 variable "poc_spa_redirect_uris" {
   description = "External-02: SPA redirect URIs of the PoC app. Entra matches these exactly -- a trailing slash difference is a mismatch (AADSTS50011)."
   type        = list(string)
-  default     = ["http://localhost:5173/", "https://oidcdebugger.com/debug"]
+  default     = ["http://localhost:5173/", "https://oidcdebugger.com/debug", "http://localhost:3000/oidcdebugger/debug", "https://tenant.factorlabs.pl/oidcdebugger/debug"]
 }
 
 variable "poc_sign_up_allowed" {
