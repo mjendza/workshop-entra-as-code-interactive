@@ -184,15 +184,21 @@ Skip this step entirely to keep `poc_require_mfa = false` (the default).
 All three variables have defaults - add them only to change something:
 
 ```hcl
-poc_spa_redirect_uris = ["http://localhost:5173/"]   # must match your SPA EXACTLY (trailing slash!)
+poc_spa_redirect_uris = [                            # must match EXACTLY (trailing slash!)
+  "http://localhost:5173/",                          # your own PoC SPA
+  "https://tenant.factorlabs.pl/oidcdebugger/debug", # OIDC debugger used in step 6 - keep it!
+]
 poc_sign_up_allowed   = true                         # user flow: false = sign-in only, nobody can self-register
 poc_require_mfa       = false                        # OPTIONAL CA policy - see step 2 first
 ```
 
 ### 4. Add the code and apply
+![Terraform Output](output.png)
 
 Paste Part 1, Part 2 and Part 3 into the matching sections of
 [`external_tenant/external-02.tf`](../../external_tenant/external-02.tf), then:
+
+
 
 ```powershell
 cd external_tenant
@@ -217,7 +223,49 @@ terraform apply
 Repeat this whenever the SPA's API permissions change, or after a `destroy` + re-`apply` (a new
 app registration has no consent).
 
-### 6. Wire up your PoC app
+### 6. Test the SPA with the OIDC debugger
+
+![OIDC Debugger](debugger-for-SPA.png)
+You don't need your own app to test the sign-in. Use the workshop OIDC debugger:
+**https://tenant.factorlabs.pl/oidcdebugger**
+
+> [!IMPORTANT]
+> Before you start, check that **admin consent is granted** (step 5). Every row under the SPA's
+> **API permissions** must show *Granted for `<tenant>`*. Without consent, the debugger ends with
+> `AADSTS65001` and not a token.
+
+1. Export the Terraform outputs (from `external_tenant`):
+
+   ```powershell
+   terraform output -json
+   ```
+
+2. Open the debugger, expand **Import from Terraform output**, paste the JSON and press **Import**.
+   It fills the form from the `external_poc_*` outputs:
+
+   | Debugger field         | Filled from                                                                                       |
+   |------------------------|---------------------------------------------------------------------------------------------------|
+   | Authorization endpoint | `external_poc_authority`, completed to `https://<subdomain>.ciamlogin.com/<tenant-id>/oauth2/v2.0/authorize` |
+   | Client ID              | `external_poc_spa_client_id`                                                                      |
+   | Scope                  | `openid profile offline_access` + `external_poc_api_scope`                                        |
+   | Expected audience      | `external_poc_api_client_id`                                                                      |
+
+   Filling it in by hand works too (`terraform output -raw <name>`). If you paste only the
+   authority, the debugger offers to **Complete** it to the authorization endpoint.
+   The redirect URI is `https://tenant.factorlabs.pl/oidcdebugger/debug`. It must be in
+   `poc_spa_redirect_uris` (registered as SPA). The debugger uses the authorization code flow
+   with PKCE: the SPA is a public client, so there is no secret.
+3. (Optional) Put `PoC.Admin` in **Expected roles** if you assigned that app role to your test user.
+4. Press **Authorize**. You land on the External ID hosted page of the PoC user flow (Email +
+   Password and "No account? Create one"). Sign up or sign in.
+5. Check the **Checks** table on the callback page. Every row should be PASS:
+   - **ID token** `aud` = `external_poc_spa_client_id`, `nonce` matches the request,
+   - **access token** `aud` = `external_poc_api_client_id`, `scp` contains `access_as_user`,
+   - `roles` contains `PoC.Admin` (only when you set **Expected roles**).
+
+   If sign-in fails, the callback explains the `AADSTS` code, e.g. `AADSTS65001` → go back to step 5.
+
+### 7. Wire up your PoC app
 
 ```powershell
 terraform output -raw external_poc_authority      # MSAL authority
@@ -243,9 +291,9 @@ Note there is no user flow name in the authority (unlike Azure AD B2C's `/B2C_1_
 policies). External ID picks the flow from the application: whichever flow the SPA's client ID is
 assigned to is the one the hosted page renders.
 
-### 7. Test the user flow
+### 8. Test the user flow
 
-1. Run the app and click sign in - you land on the External ID hosted page showing Email +
+1. Run the app (or the OIDC debugger from step 6) and click sign in - you land on the External ID hosted page showing Email +
    Password fields and a "No account? Create one" link.
 2. Sign up: enter a new e-mail → enter the verification code sent to it → set a password →
    (optionally) a display name → you return to the PoC app signed in.
@@ -261,6 +309,7 @@ assigned to is the one the hosted page renders.
 - [ ] External Identities → User flows → `TF.Workshop.<name>-PoC.Flow`:
   - Identity providers shows only Email with password.
   - Applications lists only `TF.Demo.<name>-PoC.Spa.Application`.
+- [ ] Sign-in through https://tenant.factorlabs.pl/oidcdebugger returns an access token with `aud` = `external_poc_api_client_id`.
 - [ ] Sign-up (with e-mail code + password) and sign-in (password only) both work from the PoC app.
 - [ ] (Optional) Conditional Access lists `TF.Demo.<name>-PoC.RequireMFA` and sign-in asks for an Email OTP.
 
@@ -294,6 +343,7 @@ should return exactly one entry whose `appId` equals `external_poc_spa_client_id
 - [ ] I have applied External-02 and captured the outputs.
 - [ ] I have manually granted admin consent for the PoC SPA in the Azure Portal (API permissions → Grant admin consent).
 - [ ] The dedicated `TF.Workshop.<name>-PoC.Flow` user flow offers Email with password and has only the PoC SPA assigned.
+- [ ] I have signed in to the PoC SPA through https://tenant.factorlabs.pl/oidcdebugger with the Terraform outputs.
 - [ ] My PoC app signs customers up (e-mail code + password) and in (password) through the External ID hosted page.
 - [ ] (Optional) I have disabled Security defaults, set `poc_require_mfa = true`, and seen the Email OTP prompt.
 
