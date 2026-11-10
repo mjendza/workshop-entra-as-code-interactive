@@ -1,6 +1,7 @@
 variable "multitenant_client_id" {
-  description = "Application (client) ID of the multi-tenant app from the home tenant. Get it by running `terraform output -raw multitenant_client_id` from the repo root after the root `terraform apply`."
+  description = "Stage 18 only: Application (client) ID of the multi-tenant app from the home tenant. Get it by running `terraform output -raw multitenant_client_id` from the repo root after the root `terraform apply`. Not needed by the External-0x steps."
   type        = string
+  default     = ""
 }
 
 variable "graph_permissions" {
