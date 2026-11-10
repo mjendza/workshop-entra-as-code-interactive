@@ -87,13 +87,13 @@ variable "github_repo" {
 }
 ```
 
-The Stage 18 module call in `main.tf` (already wired) reuses the existing `./modules/multitenant_workload_identity` module, drops the certificate path, and replaces the `User.Read.All` permission with **`Application.Read.All`** (`9a5d68dd-52b0-4cc2-bbf0-d5f35e9def5b`):
+The Stage 18 module call in `main.tf` (already wired) reuses the existing `./modules/multitenant_workload_identity` module, drops the certificate path, and replaces the `User.Read.All` permission with **`Application.Read.All`** (`9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30`):
 
 ```hcl
 module "SecretMonitor" {
   source            = "./modules/multitenant_workload_identity"
   business_name     = "${var.deployment_unique_name}-SecretMonitor"
-  graph_permissions = ["9a5d68dd-52b0-4cc2-bbf0-d5f35e9def5b"] # Application.Read.All
+  graph_permissions = ["9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30"] # Application.Read.All
 
   federated_identity_credentials = var.github_repo == "" ? [] : [
     {
@@ -128,13 +128,15 @@ cd external_tenant
 
 # Edit provider.tf — replace the three Tenant-B placeholders
 # Edit terraform.tfvars — set multitenant_client_id to the home-tenant output
+# Edit stage-18.tf — paste the code from doc/result/external_id/stage-18.tf
+#   (the file ships empty so the External-0x steps run without Stage 18)
 
 terraform init
 terraform plan
 terraform apply
 ```
 
-The default `var.graph_permissions = ["9a5d68dd-52b0-4cc2-bbf0-d5f35e9def5b"]` (Application.Read.All) matches the home-tenant request. See [`../../external_tenant/README.md`](../../external_tenant/README.md) for the full guide.
+The default `var.graph_permissions = ["9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30"]` (Application.Read.All) matches the home-tenant request. See [`../../external_tenant/README.md`](../../external_tenant/README.md) for the full guide.
 
 #### 2.1 Optional
 Use a link to register and grant admin consent to initialize the SP in the target tenant without Terraform:
