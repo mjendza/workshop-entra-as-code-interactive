@@ -32,7 +32,7 @@ terraform {
 }
 
 variable "name" {
-  description = "Display name prefix, e.g. Alice-PoC-TokenEnrichment -> TF.Demo.<name>.ExtensionAPI."
+  description = "Display name prefix, e.g. Alice-CustomerHelpdesk-TokenEnrichment -> TF.Demo.<name>.ExtensionAPI."
   type        = string
 }
 

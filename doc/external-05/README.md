@@ -279,7 +279,8 @@ output "external_sync_profile_api" {
 
 - [External-04](../external-04/README.md) applied: `module.attr_terms_of_use` and
   `module.attr_privacy_policy` must exist in your configuration.
-- External-00 permissions. This stage uses `CustomAuthenticationExtension.ReadWrite.All`,
+- [External-00 permissions](../external-00/README.md#required-microsoft-graph-permissions).
+  This stage uses `CustomAuthenticationExtension.ReadWrite.All`,
   `EventListener.ReadWrite.All`, `Policy.ReadWrite.ApplicationConfiguration` and
   `AppRoleAssignment.ReadWrite.All`, which are all already on the list.
 

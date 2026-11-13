@@ -68,7 +68,8 @@ PATCH https://graph.microsoft.com/v1.0/policies/authenticationMethodsPolicy/auth
 - Email OTP in Authentication methods stays as it is. External-02's optional MFA still depends on
   it.
 
-Requires `Policy.ReadWrite.AuthenticationMethod` on the deployer Service Principal (External-00).
+Requires `Policy.ReadWrite.AuthenticationMethod` on the deployer Service Principal
+([External-00 permissions](../external-00/README.md#required-microsoft-graph-permissions)).
 
 ## Part 2: the CustomerHelpdesk-OTP application (with MFA)
 
@@ -193,7 +194,8 @@ The full solution is in [`doc/result/external_id/external-03.tf`](../result/exte
 - [External-02](../external-02/README.md) completed. You reuse its modules and
   `poc_spa_redirect_uris`.
 - **New permission:** add `Policy.ReadWrite.AuthenticationMethod` (Application) to the
-  External-00 Service Principal and press **Grant admin consent**. Without it, the SMS PATCH fails
+  [External-00 Service Principal](../external-00/README.md#required-microsoft-graph-permissions)
+  and press **Grant admin consent**. Without it, the SMS PATCH fails
   with 403.
 - An account with **Cloud Application Administrator** (or Global Administrator) rights in the
   External ID tenant, for the manual admin consent in step 6.

@@ -1,7 +1,7 @@
 # =============================================================================
 # Module: poc_app  (External-02)
 # =============================================================================
-# One self-contained PoC application stack in the External ID tenant:
+# One self-contained CustomerHelpdesk application stack in the External ID tenant:
 #   - the exposed API (resource server),
 #   - the SPA that signs customers in and calls the API (auth code + PKCE),
 #   - NOT admin consent: it is granted MANUALLY in the Azure Portal

@@ -319,8 +319,9 @@ The full solution is in [`doc/result/external_id/external-04.tf`](../result/exte
 
 - [External-02](../external-02/README.md) completed. You reuse its `poc_app` module and
   `poc_spa_redirect_uris`.
-- New permission: add `IdentityUserFlow.ReadWrite.All` (Application) to the External-00
-  Service Principal and press Grant admin consent. Without it, creating the custom attributes
+- New permission: add `IdentityUserFlow.ReadWrite.All` (Application) to the
+  [External-00 Service Principal](../external-00/README.md#required-microsoft-graph-permissions)
+  and press Grant admin consent. Without it, creating the custom attributes
   fails with 403.
 - For Step C: `Policy.ReadWrite.ApplicationConfiguration` (Application) on the same Service Principal,
   for the claims mapping policy. It's already there if you did External-05.

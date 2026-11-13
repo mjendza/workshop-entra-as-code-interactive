@@ -104,7 +104,8 @@ module "poc_user_flow" {
   the client ID changes). Destroying it removes it from state but does not unassign the app -
   see Troubleshooting.
 
-Requires `EventListener.ReadWrite.All` on the deployer Service Principal (External-00).
+Requires `EventListener.ReadWrite.All` on the deployer Service Principal
+([External-00 permissions](../external-00/README.md#required-microsoft-graph-permissions)).
 
 ## Part 3: outputs for the CustomerHelpdesk app
 
@@ -146,7 +147,8 @@ The full solution is in [`doc/result/external_id/external-02.tf`](../result/exte
 
 ### 1. Prerequisites
 
-- [External-00](../external-00/README.md) completed - including `EventListener.ReadWrite.All`
+- [External-00](../external-00/README.md) completed with the
+  [required Microsoft Graph permissions](../external-00/README.md#required-microsoft-graph-permissions) - including `EventListener.ReadWrite.All`
   (assigning the SPA to its user flow). If you did External-00 before it was listed, add it now
   and press Grant admin consent again.
 - An account with the **Cloud Application Administrator** (or Global Administrator) role in the

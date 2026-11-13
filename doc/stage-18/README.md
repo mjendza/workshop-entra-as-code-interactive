@@ -72,6 +72,8 @@ This is the "Observe" phase of the Musketeers cycle — read-only, scheduled, an
 
 - A "home" Entra tenant where you can create app registrations (Application Administrator or higher).
 - One or more **target tenants** where you have a bootstrap Service Principal with `Application.ReadWrite.All` / **Cloud Application Administrator** so you can provision the SP and grant admin consent.
+- For an External ID target tenant, configure the bootstrap Service Principal and grant the
+  [required Microsoft Graph permissions from External-00](../external-00/README.md#required-microsoft-graph-permissions).
 - A GitHub repository hosting this workflow. You will set its `OWNER/REPO` value on `var.github_repo`.
 - `terraform` ≥ 1.6, `pwsh` ≥ 7.4 (only needed for local dry-runs and tests).
 

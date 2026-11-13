@@ -92,7 +92,8 @@ E-mail is verified with an OTP *and* a password is set:
 
 - Complete [External-00: Prerequisites](../external-00/README.md) first - it creates the bootstrap
   Service Principal in your External ID (CIAM) tenant (Tenant B), configured in
-  [`external_tenant/provider.tf`](../../external_tenant/provider.tf), with every Graph permission the
+  [`external_tenant/provider.tf`](../../external_tenant/provider.tf), with every
+  [required Microsoft Graph permission](../external-00/README.md#required-microsoft-graph-permissions) the
   `external_tenant/` modules need (including the ones this stage's `password_user_flow` and
   `native_auth_app` modules require). If you already did this for Stage 18, it's the same
   file/tenant/Service Principal - nothing more to do here.
