@@ -47,14 +47,14 @@ one-file C# minimal API that does the same thing and keeps the profiles in memor
 
 | Object                                  | Display name                                                 | Notes |
 |-----------------------------------------|--------------------------------------------------------------|-------|
-| App registration (represents your API)  | `TF.Demo.<name>-PoC-TokenEnrichment.ExtensionAPI`                       | Identifier URI `api://<api host>/<client-id>`, access token v2. Entra gets a token for it (client credentials) before every call. |
+| App registration (represents your API)  | `TF.Demo.<name>-CustomerHelpdesk-TokenEnrichment.ExtensionAPI`                       | Identifier URI `api://<api host>/<client-id>`, access token v2. Entra gets a token for it (client credentials) before every call. |
 | Graph app permission + admin consent    | `CustomAuthenticationExtension.Receive.Payload`              | Granted by Terraform (the portal's Grant permission button). |
-| Custom authentication extension         | `TF.<name>.PoC-TokenEnrichment.OnAttributeCollectionSubmit`             | `onAttributeCollectionSubmitCustomExtension` → `/api/OnAttributeCollectionSubmit`. |
-| Custom authentication extension         | `TF.<name>.PoC-TokenEnrichment.OnTokenIssuanceStart`                    | `onTokenIssuanceStartCustomExtension` → `/api/OnTokenIssuanceStart`, accepts claims `CorrelationId`, `ApiVersion`, `CrmId`, `LoyaltyNumber`, `LoyaltyTier`. |
+| Custom authentication extension         | `TF.<name>.CustomerHelpdesk-TokenEnrichment.OnAttributeCollectionSubmit`             | `onAttributeCollectionSubmitCustomExtension` → `/api/OnAttributeCollectionSubmit`. |
+| Custom authentication extension         | `TF.<name>.CustomerHelpdesk-TokenEnrichment.OnTokenIssuanceStart`                    | `onTokenIssuanceStartCustomExtension` → `/api/OnTokenIssuanceStart`, accepts claims `CorrelationId`, `ApiVersion`, `CrmId`, `LoyaltyNumber`, `LoyaltyTier`. |
 | Event listener                          | -                                                            | `onTokenIssuanceStartListener` for the Sync SPA and the Sync API. |
-| Claims mapping policy                   | `TF.<name>.PoC-TokenEnrichment.ProfileClaims`                           | `customClaimsProvider.*` → `correlationId`, `apiVersion`, `crmId`, `loyaltyNumber`, `loyaltyTier`. Assigned to the SPA (ID token) and the API (access token). |
-| API + SPA                               | `TF.Demo.<name>-PoC-TokenEnrichment.API.API`, `TF.Demo.<name>-PoC-TokenEnrichment.Spa.Application` | A fourth `poc_app`. Admin consent is manual (step 6). |
-| Sign-up/sign-in user flow               | `TF.Workshop.<name>-PoC-TokenEnrichment.Flow`                           | Email + password, the External-04 fields, and "When a user submits their information" → the submit extension. |
+| Claims mapping policy                   | `TF.<name>.CustomerHelpdesk-TokenEnrichment.ProfileClaims`                           | `customClaimsProvider.*` → `correlationId`, `apiVersion`, `crmId`, `loyaltyNumber`, `loyaltyTier`. Assigned to the SPA (ID token) and the API (access token). |
+| API + SPA                               | `TF.Demo.<name>-CustomerHelpdesk-TokenEnrichment.API.API`, `TF.Demo.<name>-CustomerHelpdesk-TokenEnrichment.Spa.Application` | A fourth `poc_app`. Admin consent is manual (step 6). |
+| Sign-up/sign-in user flow               | `TF.Workshop.<name>-CustomerHelpdesk-TokenEnrichment.Flow`                           | Email + password, the External-04 fields, and "When a user submits their information" → the submit extension. |
 
 `<name>` is your `deployment_unique_name`. External-02, 03 and 04 stay untouched. The two custom
 attributes are reused from External-04 (they're tenant-wide), so External-04 must be applied.
@@ -95,7 +95,7 @@ locals {
 
 module "profile_api" {
   source   = "./modules/auth_extension_api"
-  name     = "${var.deployment_unique_name}-PoC-TokenEnrichment"
+  name     = "${var.deployment_unique_name}-CustomerHelpdesk-TokenEnrichment"
   api_host = local.profile_api_host
 }
 ```
@@ -109,7 +109,7 @@ extension (Graph beta `identity/customAuthenticationExtensions`):
 module "profile_sync_extension" {
   source       = "./modules/custom_auth_extension"
   event        = "attribute_collection_submit"
-  display_name = "TF.${var.deployment_unique_name}.PoC-TokenEnrichment.OnAttributeCollectionSubmit"
+  display_name = "TF.${var.deployment_unique_name}.CustomerHelpdesk-TokenEnrichment.OnAttributeCollectionSubmit"
   description  = "Push the sign-up profile (name + consents) to the profile API."
   target_url   = local.profile_api_submit_url
   resource_id  = module.profile_api.resource_id
@@ -118,27 +118,27 @@ module "profile_sync_extension" {
 }
 ```
 
-## Part 3: the Sync PoC application and the token extension
+## Part 3: the CustomerHelpdesk-TokenEnrichment application and the token extension
 
 ```hcl
 module "sync_app" {
   source            = "./modules/poc_app"
-  name              = "${var.deployment_unique_name}-PoC-TokenEnrichment"
+  name              = "${var.deployment_unique_name}-CustomerHelpdesk-TokenEnrichment"
   spa_redirect_uris = var.poc_spa_redirect_uris
 }
 
 check "sync_api_open_to_role_less_users" {
   assert {
     condition     = module.sync_app.api_user_assignment_required == false
-    error_message = "The Sync PoC API enterprise application requires user assignment. Role-less customers cannot obtain a token at all."
+    error_message = "The CustomerHelpdesk-TokenEnrichment API enterprise application requires user assignment. Role-less customers cannot obtain a token at all."
   }
 }
 
-# Token issuance: enrich the SPA's ID token AND the PoC API's access token.
+# Token issuance: enrich the SPA's ID token AND the CustomerHelpdesk API's access token.
 module "profile_token_extension" {
   source       = "./modules/custom_auth_extension"
   event        = "token_issuance_start"
-  display_name = "TF.${var.deployment_unique_name}.PoC-TokenEnrichment.OnTokenIssuanceStart"
+  display_name = "TF.${var.deployment_unique_name}.CustomerHelpdesk-TokenEnrichment.OnTokenIssuanceStart"
   description  = "Read the customer's profile from the profile API into the token."
   target_url   = local.profile_api_token_url
   resource_id  = module.profile_api.resource_id
@@ -154,7 +154,7 @@ module "profile_token_extension" {
 
 module "profile_claims_policy" {
   source       = "./modules/claims_mapping_policy"
-  display_name = "TF.${var.deployment_unique_name}.PoC-TokenEnrichment.ProfileClaims"
+  display_name = "TF.${var.deployment_unique_name}.CustomerHelpdesk-TokenEnrichment.ProfileClaims"
   claims       = [for source, jwt in local.profile_token_claims : { source = source, jwt_claim_type = jwt }]
 
   # ID token (audience = SPA) and access token (audience = API).
@@ -184,7 +184,7 @@ Same fields as External-04. The only new line is `attribute_collection_submit_ex
 module "sync_user_flow" {
   source              = "./modules/user_flow"
   deployment_env_name = var.deployment_env_name
-  business_name       = "${var.deployment_unique_name}-PoC-TokenEnrichment"
+  business_name       = "${var.deployment_unique_name}-CustomerHelpdesk-TokenEnrichment"
   sign_up_allowed     = true
 
   # The External-04 tenant-level attributes, collected again on THIS flow.
@@ -364,15 +364,15 @@ Entra admin center (External ID tenant):
 1. External Identities → Custom authentication extensions: both extensions. Open each one.
    *API Authentication* shows the `…ExtensionAPI` app with the permission granted, and the
    *Target URL* is your Beeceptor path.
-2. External Identities → User flows → `TF.Workshop.<name>-PoC-TokenEnrichment.Flow` → Custom authentication
+2. External Identities → User flows → `TF.Workshop.<name>-CustomerHelpdesk-TokenEnrichment.Flow` → Custom authentication
    extensions: *When a user submits their information* = the `…OnAttributeCollectionSubmit`
    extension.
-3. Enterprise applications → `TF.Demo.<name>-PoC-TokenEnrichment.Spa.Application` → Single sign-on →
+3. Enterprise applications → `TF.Demo.<name>-CustomerHelpdesk-TokenEnrichment.Spa.Application` → Single sign-on →
    Attributes & Claims: the custom claims provider and the five `customClaimsProvider.*` claims.
 
-### 6. Grant admin consent for the Sync PoC SPA (manual, Azure Portal)
+### 6. Grant admin consent for the CustomerHelpdesk-TokenEnrichment SPA (manual, Azure Portal)
 
-App registrations → `TF.Demo.<name>-PoC-TokenEnrichment.Spa.Application` → API permissions →
+App registrations → `TF.Demo.<name>-CustomerHelpdesk-TokenEnrichment.Spa.Application` → API permissions →
 Grant admin consent for `<tenant>`. Without it, sign-in ends in `AADSTS65001`.
 
 ### 7. Sign up and watch the payloads arrive
@@ -522,7 +522,7 @@ and claim names.
 ## Verification
 
 - [ ] Both custom authentication extensions exist, with the API permission granted.
-- [ ] `TF.Workshop.<name>-PoC-TokenEnrichment.Flow` calls the submit extension *When a user submits their information*.
+- [ ] `TF.Workshop.<name>-CustomerHelpdesk-TokenEnrichment.Flow` calls the submit extension *When a user submits their information*.
 - [ ] Beeceptor shows `OnAttributeCollectionSubmit` with `givenName`, `surname` and both
   `extension_…Accepted = true` for a new sign-up.
 - [ ] Beeceptor shows `OnTokenIssuanceStart` on every sign-in, with `authenticationContext.user.id`.
@@ -558,7 +558,7 @@ and claim names.
 - [ ] My profile API is public (Beeceptor or a Cloudflare tunnel). Entra can reach it, `localhost` can't.
 - [ ] I have signed in with the link from `./doc/external-05/New-SpaConfigBase64.ps1` and landed on `https://tenant.factorlabs.pl/oidcdebugger/debug`.
 - [ ] I have set `profile_api_base_url` and applied External-05.
-- [ ] I have manually granted admin consent for the Sync PoC SPA.
+- [ ] I have manually granted admin consent for the CustomerHelpdesk-TokenEnrichment SPA.
 - [ ] I have signed up and seen the sign-up payload (name + consents) in Beeceptor.
 - [ ] I have seen the token-issuance call on every sign-in and the profile claims in my tokens.
 - [ ] (Optional) I have run `ProfileApi.cs` behind a tunnel and seen the profiles in `/api/profiles`.

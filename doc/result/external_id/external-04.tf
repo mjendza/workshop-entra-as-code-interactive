@@ -7,7 +7,7 @@
 #        PrivacyPolicyAccepted (portal API, see modules/custom_user_attribute)
 #        + their ids output,
 #   Step B (apply #2)
-#     2. a third PoC application: API + SPA (admin consent = MANUAL, step 5),
+#     2. a third CustomerHelpdesk application: API + SPA (admin consent = MANUAL, step 5),
 #     3. a DEDICATED email + password user flow that also collects first name,
 #        last name and both REQUIRED consent checkboxes, assigned to that SPA,
 #     4. outputs.
@@ -48,19 +48,19 @@ output "external_signup_custom_attribute_ids" {
 }
 
 # ---------------------------------------------------------------------------
-# Step B - External-04 PoC application: API + SPA; consent = manual
+# Step B - External-04 CustomerHelpdesk application: API + SPA; consent = manual
 # ---------------------------------------------------------------------------
 # A THIRD poc_app instance: an application can belong to only ONE user flow.
 module "signup_app" {
   source            = "./modules/poc_app"
-  name              = "${var.deployment_unique_name}-PoC-Extensions"
+  name              = "${var.deployment_unique_name}-CustomerHelpdesk-Extensions"
   spa_redirect_uris = var.poc_spa_redirect_uris
 }
 
 check "signup_api_open_to_role_less_users" {
   assert {
     condition     = module.signup_app.api_user_assignment_required == false
-    error_message = "The Signup PoC API enterprise application requires user assignment. Role-less customers cannot obtain a token at all."
+    error_message = "The CustomerHelpdesk-Extensions API enterprise application requires user assignment. Role-less customers cannot obtain a token at all."
   }
 }
 
@@ -73,7 +73,7 @@ check "signup_api_open_to_role_less_users" {
 module "signup_user_flow" {
   source              = "./modules/user_flow"
   deployment_env_name = var.deployment_env_name
-  business_name       = "${var.deployment_unique_name}-PoC-Extensions"
+  business_name       = "${var.deployment_unique_name}-CustomerHelpdesk-Extensions"
   sign_up_allowed     = true
 
   extra_attributes = [
@@ -129,22 +129,22 @@ output "external_signup_authority" {
 }
 
 output "external_signup_spa_client_id" {
-  description = "Client ID of the Signup PoC SPA (MSAL clientId)."
+  description = "Client ID of the CustomerHelpdesk-Extensions SPA (MSAL clientId)."
   value       = module.signup_app.spa_client_id
 }
 
 output "external_signup_api_client_id" {
-  description = "Client ID of the Signup PoC API (expected aud claim of its access tokens)."
+  description = "Client ID of the CustomerHelpdesk-Extensions API (expected aud claim of its access tokens)."
   value       = module.signup_app.api_client_id
 }
 
 output "external_signup_api_scope" {
-  description = "Scope the Signup PoC SPA requests to call the API."
+  description = "Scope the CustomerHelpdesk-Extensions SPA requests to call the API."
   value       = module.signup_app.api_scope_uri
 }
 
 output "external_signup_user_flow_id" {
-  description = "ID of the Signup PoC app's dedicated user flow."
+  description = "ID of the CustomerHelpdesk-Extensions app's dedicated user flow."
   value       = module.signup_user_flow.user_flow_id
 }
 
@@ -159,7 +159,7 @@ output "external_signup_user_flow_id" {
 # mapped_claims_enabled = true). Requires Policy.ReadWrite.ApplicationConfiguration.
 module "signup_claims_policy" {
   source       = "./modules/claims_mapping_policy"
-  display_name = "TF.${var.deployment_unique_name}.PoC-Extensions.ConsentClaims"
+  display_name = "TF.${var.deployment_unique_name}.CustomerHelpdesk-Extensions.ConsentClaims"
 
   claims = [
     {

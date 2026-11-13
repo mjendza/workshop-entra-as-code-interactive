@@ -7,7 +7,7 @@
 #        PrivacyPolicyAccepted (portal API, see modules/custom_user_attribute)
 #        + their ids output,
 #   Step B (apply #2)
-#     2. a third PoC application: API + SPA (admin consent = MANUAL, step 5),
+#     2. a third CustomerHelpdesk application: API + SPA (admin consent = MANUAL, step 5),
 #     3. a DEDICATED email + password user flow that also collects first name,
 #        last name and both REQUIRED consent checkboxes, assigned to that SPA,
 #     4. outputs.
@@ -23,7 +23,7 @@
 # full extension_<b2c-extensions-app appId>_<name> the flow and Graph expect.
 
 # ---------------------------------------------------------------------------
-# Step B - External-04 PoC application: API + SPA; consent = manual
+# Step B - External-04 CustomerHelpdesk application: API + SPA; consent = manual
 # ---------------------------------------------------------------------------
 # A THIRD poc_app instance: an application can belong to only ONE user flow.
 

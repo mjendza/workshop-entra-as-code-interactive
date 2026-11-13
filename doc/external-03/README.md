@@ -1,7 +1,7 @@
-# External-03: Passwordless SSO for your PoC App (Email OTP) with MFA (SMS)
+# External-03: Passwordless SSO for your CustomerHelpdesk App (Email OTP) with MFA (SMS)
 
 External-02 signed customers in with `email + password`, and MFA was optional. This stage builds the
-same PoC app (SPA + API) again, with three differences:
+same CustomerHelpdesk app (SPA + API) again, with three differences:
 
 1. **No password at all.** The dedicated user flow uses the built-in **Email one-time passcode**
    identity provider (`EmailOtpSignup-OAUTH`). Each sign-up and sign-in sends a code to the
@@ -22,14 +22,14 @@ same PoC app (SPA + API) again, with three differences:
 | Object                    | Display name                             | Notes                                                                                                                              |
 |---------------------------|------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
 | SMS authentication method | *(tenant-wide policy)*                   | `authenticationMethodConfigurations/Sms` → `enabled` for `all_users`, `isUsableForSignIn = false` (second factor only). Singleton PATCH. |
-| API (resource server)     | `TF.Demo.<name>-PoC-OTP.API.API`         | `api://<client-id>`, scope `access_as_user` (Admin consent), app role `PoC.Admin`. No redirect URI, no secret.                     |
-| SPA                       | `TF.Demo.<name>-PoC-OTP.Spa.Application` | SPA platform only (auth code + PKCE, public client). Requests `openid profile email offline_access User.Read` + `access_as_user`.  |
+| API (resource server)     | `TF.Demo.<name>-CustomerHelpdesk-OTP.API.API`         | `api://<client-id>`, scope `access_as_user` (Admin consent), app role `CustomerHelpdesk.Admin`. No redirect URI, no secret.                     |
+| SPA                       | `TF.Demo.<name>-CustomerHelpdesk-OTP.Spa.Application` | SPA platform only (auth code + PKCE, public client). Requests `openid profile email offline_access User.Read` + `access_as_user`.  |
 | Admin consent             | -                                        | **Manual** (Azure Portal, step 6). Not done by Terraform.                                                                         |
-| Sign-up/sign-in user flow | `TF.Workshop.<name>-PoC-OTP.Flow`        | **Email one-time passcode** only, passwordless. Dedicated to the OTP PoC app.                                                     |
-| Conditional Access        | `TF.Demo.<name>-PoC-OTP.RequireMFA`      | On by default (`otp_require_mfa = true`). Requires MFA (SMS) on the SPA and the API. Needs Security defaults disabled.            |
+| Sign-up/sign-in user flow | `TF.Workshop.<name>-CustomerHelpdesk-OTP.Flow`        | **Email one-time passcode** only, passwordless. Dedicated to the CustomerHelpdesk-OTP app.                                                     |
+| Conditional Access        | `TF.Demo.<name>-CustomerHelpdesk-OTP.RequireMFA`      | On by default (`otp_require_mfa = true`). Requires MFA (SMS) on the SPA and the API. Needs Security defaults disabled.            |
 
 `<name>` is your `deployment_unique_name`. External-03 lives next to External-02. It does not
-replace it: both PoC apps, flows and CA policies exist side by side.
+replace it: both CustomerHelpdesk apps, flows and CA policies exist side by side.
 
 ## How to work with Terraform Workshop
 ![UseDedicated File](../external-02/edit-file.png)
@@ -70,7 +70,7 @@ PATCH https://graph.microsoft.com/v1.0/policies/authenticationMethodsPolicy/auth
 
 Requires `Policy.ReadWrite.AuthenticationMethod` on the deployer Service Principal (External-00).
 
-## Part 2: the OTP PoC application (with MFA)
+## Part 2: the CustomerHelpdesk-OTP application (with MFA)
 
 This is a second instance of External-02's
 [`poc_app`](../../external_tenant/modules/poc_app/main.tf) module. You need a **new** SPA: an
@@ -80,7 +80,7 @@ email + password flow.
 ```hcl
 module "otp_app" {
   source            = "./modules/poc_app"
-  name              = "${var.deployment_unique_name}-PoC-OTP"
+  name              = "${var.deployment_unique_name}-CustomerHelpdesk-OTP"
   spa_redirect_uris = var.poc_spa_redirect_uris
 
   # Conditional Access (MFA via SMS). On by default in this stage.
@@ -94,7 +94,7 @@ module "otp_app" {
 check "otp_api_open_to_role_less_users" {
   assert {
     condition     = module.otp_app.api_user_assignment_required == false
-    error_message = "The OTP PoC API enterprise application requires user assignment. Role-less customers cannot obtain a token at all."
+    error_message = "The CustomerHelpdesk-OTP API enterprise application requires user assignment. Role-less customers cannot obtain a token at all."
   }
 }
 
@@ -116,7 +116,7 @@ out of External-02's app.
 module "otp_user_flow" {
   source              = "./modules/user_flow"
   deployment_env_name = var.deployment_env_name
-  business_name       = "${var.deployment_unique_name}-PoC-OTP"
+  business_name       = "${var.deployment_unique_name}-CustomerHelpdesk-OTP"
   sign_up_allowed     = var.otp_sign_up_allowed
   primary_method      = "otp"
 
@@ -150,7 +150,7 @@ Everything else in the flow matches External-02:
 The SPA is assigned to the flow the same way as in External-02: a one-off
 `POST .../conditions/applications/includeApplications` on create (`EventListener.ReadWrite.All`).
 
-## Part 4: outputs for the OTP PoC app
+## Part 4: outputs for the CustomerHelpdesk-OTP app
 
 ```hcl
 output "external_otp_authority" {
@@ -159,22 +159,22 @@ output "external_otp_authority" {
 }
 
 output "external_otp_spa_client_id" {
-  description = "Client ID of the OTP PoC SPA (MSAL clientId)."
+  description = "Client ID of the CustomerHelpdesk-OTP SPA (MSAL clientId)."
   value       = module.otp_app.spa_client_id
 }
 
 output "external_otp_api_client_id" {
-  description = "Client ID of the OTP PoC API (expected aud claim of its access tokens)."
+  description = "Client ID of the CustomerHelpdesk-OTP API (expected aud claim of its access tokens)."
   value       = module.otp_app.api_client_id
 }
 
 output "external_otp_api_scope" {
-  description = "Scope the OTP PoC SPA requests to call the API."
+  description = "Scope the CustomerHelpdesk-OTP SPA requests to call the API."
   value       = module.otp_app.api_scope_uri
 }
 
 output "external_otp_user_flow_id" {
-  description = "ID of the OTP PoC app's dedicated Email OTP user flow."
+  description = "ID of the CustomerHelpdesk-OTP app's dedicated Email OTP user flow."
   value       = module.otp_user_flow.user_flow_id
 }
 
@@ -220,7 +220,7 @@ The full solution is in [`doc/result/external_id/external-03.tf`](../result/exte
 > Properties → Manage security defaults → Disabled → Save.
 >
 > Disabling security defaults removes the tenant-wide baseline protection. Do it only in a
-> workshop/PoC tenant, or replace it with your own Conditional Access policies.
+> workshop/test tenant, or replace it with your own Conditional Access policies.
 
 If you already did this for External-02's optional MFA, skip it.
 
@@ -249,14 +249,14 @@ terraform plan      # expect module.otp_sms, module.otp_app (incl. ca_require_mf
 terraform apply
 ```
 
-### 6. Grant admin consent for the OTP PoC SPA (manual, Azure Portal)
+### 6. Grant admin consent for the CustomerHelpdesk-OTP SPA (manual, Azure Portal)
 
 > [!IMPORTANT]
 > Terraform deliberately does **not** grant admin consent. Without this step, every sign-in fails
 > with `AADSTS65001`.
 
 1. Entra admin center → **Identity** → **Applications** → **App registrations** →
-   **All applications** → `TF.Demo.<name>-PoC-OTP.Spa.Application`.
+   **All applications** → `TF.Demo.<name>-CustomerHelpdesk-OTP.Spa.Application`.
 2. **API permissions** → **Grant admin consent for `<tenant>`** → **Yes**.
 3. Every row (`openid`, `profile`, `email`, `offline_access`, `User.Read`, `access_as_user`) must
    show *Granted for `<tenant>`*.
@@ -281,7 +281,7 @@ Every row in the **Checks** table on the callback page should be PASS. In partic
 **access token** `aud` must equal `external_otp_api_client_id`, and `scp` must contain
 `access_as_user`.
 
-### 8. Wire up your PoC app
+### 8. Wire up your CustomerHelpdesk app
 
 The MSAL configuration is the same as in External-02, using the `external_otp_*` outputs:
 
@@ -316,12 +316,12 @@ ID, and the flow decides what the hosted page shows.
 
 - [ ] Authentication methods → Policies → **SMS** is *Enabled* for *All users*, with
   *Use for sign-in* off.
-- [ ] `TF.Demo.<name>-PoC-OTP.Spa.Application` and `TF.Demo.<name>-PoC-OTP.API.API` exist, and
+- [ ] `TF.Demo.<name>-CustomerHelpdesk-OTP.Spa.Application` and `TF.Demo.<name>-CustomerHelpdesk-OTP.API.API` exist, and
   consent is granted.
-- [ ] External Identities → User flows → `TF.Workshop.<name>-PoC-OTP.Flow`:
+- [ ] External Identities → User flows → `TF.Workshop.<name>-CustomerHelpdesk-OTP.Flow`:
   - Identity providers shows only **Email one-time passcode**.
-  - Applications lists only `TF.Demo.<name>-PoC-OTP.Spa.Application`.
-- [ ] Conditional Access lists `TF.Demo.<name>-PoC-OTP.RequireMFA` (*On*), targeting the OTP SPA and API.
+  - Applications lists only `TF.Demo.<name>-CustomerHelpdesk-OTP.Spa.Application`.
+- [ ] Conditional Access lists `TF.Demo.<name>-CustomerHelpdesk-OTP.RequireMFA` (*On*), targeting the OTP SPA and API.
 - [ ] Sign-in asks for an e-mail code and then an SMS code, and never for a password.
 - [ ] External-02's app still signs in with email + password (unaffected).
 
@@ -356,11 +356,11 @@ The first must return `"state": "enabled"`. The second must return a single prov
 - [ ] I have added `Policy.ReadWrite.AuthenticationMethod` to the External-00 Service Principal and granted consent.
 - [ ] My External ID tenant is linked to a subscription for the SMS add-on.
 - [ ] Security defaults are disabled in the External ID tenant.
-- [ ] I have applied External-03: SMS enabled, OTP PoC app, Email OTP user flow and the RequireMFA CA policy.
-- [ ] I have manually granted admin consent for the OTP PoC SPA.
+- [ ] I have applied External-03: SMS enabled, CustomerHelpdesk-OTP app, Email OTP user flow and the RequireMFA CA policy.
+- [ ] I have manually granted admin consent for the CustomerHelpdesk-OTP SPA.
 - [ ] I signed up and in **without a password** (e-mail code) and completed MFA with an **SMS code**.
 
 > **Report Issues:** Did you encounter a bug or need clarification? [Report the issue here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← External-02: SSO for your PoC App](../external-02/README.md) | [External-04: Sign-up with extra attributes →](../external-04/README.md)
+**Navigation:** [← External-02: SSO for your CustomerHelpdesk App](../external-02/README.md) | [External-04: Sign-up with extra attributes →](../external-04/README.md)

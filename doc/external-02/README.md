@@ -1,4 +1,4 @@
-# External-02: SSO for your PoC App (SPA + API) with a dedicated user flow
+# External-02: SSO for your CustomerHelpdesk App (SPA + API) with a dedicated user flow
 
 External-01 used the Native Authentication API (custom developed; custom branded; maybe simpler;). This stage does the classic thing: a
 browser-based single sign-on for a proof-of-concept (your first DEMO) web app. Customers are redirected to your
@@ -7,9 +7,9 @@ External ID tenant's authorization page (`<subdomain>.ciamlogin.com`), sign up o
 
 The stage has two equally important halves:
 
-1. The PoC application - an API and a SPA, with admin consent **granted manually in the Azure Portal**
+1. The CustomerHelpdesk application - an API and a SPA, with admin consent **granted manually in the Azure Portal**
    so no customer sees a consent prompt.
-2. A dedicated user flow (email + password) assigned to the PoC application. In External ID,
+2. A dedicated user flow (email + password) assigned to the CustomerHelpdesk application. In External ID,
    the user flow is what defines the sign-in experience: which identity providers are offered,
    whether sign-up is allowed, and which attributes are collected. An app registration without a
    user flow has no customer sign-up experience at all.
@@ -19,11 +19,11 @@ The stage has two equally important halves:
 
 | Object                    | Display name                         | Notes                                                                                                                             |
 |---------------------------|--------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| API (resource server)     | `TF.Demo.<name>-PoC.API.API`         | `api://<client-id>`, scope `access_as_user` (Admin consent), app role `PoC.Admin`. No redirect URI, no secret.                    |
-| SPA                       | `TF.Demo.<name>-PoC.Spa.Application` | SPA platform only (auth code + PKCE, public client). Requests `openid profile email offline_access User.Read` + `access_as_user`. |
+| API (resource server)     | `TF.Demo.<name>-CustomerHelpdesk.API.API`         | `api://<client-id>`, scope `access_as_user` (Admin consent), app role `CustomerHelpdesk.Admin`. No redirect URI, no secret.                    |
+| SPA                       | `TF.Demo.<name>-CustomerHelpdesk.Spa.Application` | SPA platform only (auth code + PKCE, public client). Requests `openid profile email offline_access User.Read` + `access_as_user`. |
 | Admin consent             | -                                    | **Manual** (Azure Portal, step 5) - tenant-wide grant for all of the SPA's delegated permissions. Not done by Terraform.          |
-| Sign-up/sign-in user flow | `TF.Workshop.<name>-PoC.Flow`        | Email + password only. Dedicated to the PoC app - the SPA is assigned to it.                                                      |
-| Conditional Access        | `TF.Demo.<name>-PoC.RequireMFA`      | Only when `poc_require_mfa = true`. Requires MFA (Email OTP) on the SPA and the API. Needs Security defaults disabled.            |
+| Sign-up/sign-in user flow | `TF.Workshop.<name>-CustomerHelpdesk.Flow`        | Email + password only. Dedicated to the CustomerHelpdesk app - the SPA is assigned to it.                                                      |
+| Conditional Access        | `TF.Demo.<name>-CustomerHelpdesk.RequireMFA`      | Only when `poc_require_mfa = true`. Requires MFA (Email OTP) on the SPA and the API. Needs Security defaults disabled.            |
 
 `<name>` is your `deployment_unique_name`.
 
@@ -32,7 +32,7 @@ The stage has two equally important halves:
 
 Each Entra External ID workshop step should updated dedicated Terraform file - name is always same as step number.
 
-## Part 1: the PoC application
+## Part 1: the CustomerHelpdesk application
 
 From [`external_tenant/modules/poc_app`](../../external_tenant/modules/poc_app/main.tf) - API, SPA
 and the optional Conditional Access policy. Admin consent is NOT part of the Terraform code - you
@@ -41,7 +41,7 @@ grant it manually in the Azure Portal after `apply` (step 5):
 ```hcl
 module "poc_app" {
   source            = "./modules/poc_app"
-  name              = "${var.deployment_unique_name}-PoC"
+  name              = "${var.deployment_unique_name}-CustomerHelpdesk"
   spa_redirect_uris = var.poc_spa_redirect_uris
 
   # OPTIONAL - Conditional Access (MFA via Email OTP). Off by default.
@@ -54,18 +54,18 @@ module "poc_app" {
 check "poc_api_open_to_role_less_users" {
   assert {
     condition     = module.poc_app.api_user_assignment_required == false
-    error_message = "The PoC API enterprise application requires user assignment. Role-less customers cannot obtain a token at all."
+    error_message = "The CustomerHelpdesk API enterprise application requires user assignment. Role-less customers cannot obtain a token at all."
   }
 }
 ```
 
-## Part 2: the dedicated user flow (email + password) assigned to the PoC app
+## Part 2: the dedicated user flow (email + password) assigned to the CustomerHelpdesk app
 
 ```hcl
 module "poc_user_flow" {
   source              = "./modules/user_flow"
   deployment_env_name = var.deployment_env_name
-  business_name       = "${var.deployment_unique_name}-PoC"
+  business_name       = "${var.deployment_unique_name}-CustomerHelpdesk"
   sign_up_allowed     = var.poc_sign_up_allowed
 
   app_client_ids = {
@@ -88,7 +88,7 @@ module "poc_user_flow" {
 | Collected attributes | `email` (hidden, from verification), `displayName` (optional) | Fields shown on the sign-up page and written to the user object.                                                                                                 |
 | User type created    | `member`                                                      | Signed-up customers become member users of the External ID tenant.                                                                                               |
 
-### How the PoC app is assigned to it
+### How the CustomerHelpdesk app is assigned to it
 
 - `app_client_ids` takes a map of static label → client ID. For each entry, the module calls
   `POST identity/authenticationEventsFlows/{id}/conditions/applications/includeApplications` with
@@ -97,8 +97,8 @@ module "poc_user_flow" {
   directly - it only receives the access token issued during the SPA's sign-in, so it doesn't need a flow.
 - `depends_on = [module.poc_app]` - `includeApplications` rejects an app that has no service
   principal yet, so the assignment must wait for the SPA's enterprise application.
-- An application can be assigned to only ONE user flow. That's why the PoC app gets its own
-  flow instead of reusing External-01's `password_user_flow`, and it's what lets the PoC app have its
+- An application can be assigned to only ONE user flow. That's why the CustomerHelpdesk app gets its own
+  flow instead of reusing External-01's `password_user_flow`, and it's what lets the CustomerHelpdesk app have its
   own sign-up policy (`poc_sign_up_allowed`) without touching any other app.
 - The POST runs once, on create. Later applies don't re-send it (it re-runs only if the flow ID or
   the client ID changes). Destroying it removes it from state but does not unassign the app -
@@ -106,7 +106,7 @@ module "poc_user_flow" {
 
 Requires `EventListener.ReadWrite.All` on the deployer Service Principal (External-00).
 
-## Part 3: outputs for the PoC app
+## Part 3: outputs for the CustomerHelpdesk app
 
 ```hcl
 output "external_poc_authority" {
@@ -115,12 +115,12 @@ output "external_poc_authority" {
 }
 
 output "external_poc_spa_client_id" {
-  description = "Client ID of the PoC SPA (MSAL clientId)."
+  description = "Client ID of the CustomerHelpdesk SPA (MSAL clientId)."
   value       = module.poc_app.spa_client_id
 }
 
 output "external_poc_api_client_id" {
-  description = "Client ID of the PoC API (expected aud claim of its access tokens)."
+  description = "Client ID of the CustomerHelpdesk API (expected aud claim of its access tokens)."
   value       = module.poc_app.api_client_id
 }
 
@@ -130,7 +130,7 @@ output "external_poc_api_scope" {
 }
 
 output "external_poc_user_flow_id" {
-  description = "ID of the PoC app's dedicated email + password user flow."
+  description = "ID of the CustomerHelpdesk app's dedicated email + password user flow."
   value       = module.poc_user_flow.user_flow_id
 }
 
@@ -150,8 +150,8 @@ The full solution is in [`doc/result/external_id/external-02.tf`](../result/exte
   (assigning the SPA to its user flow). If you did External-00 before it was listed, add it now
   and press Grant admin consent again.
 - An account with the **Cloud Application Administrator** (or Global Administrator) role in the
-  External ID tenant - you need it to grant admin consent for the PoC SPA manually in step 5.
-- A PoC SPA you can run locally (any MSAL-based app - e.g. `@azure/msal-browser` / `@azure/msal-react`),
+  External ID tenant - you need it to grant admin consent for the CustomerHelpdesk SPA manually in step 5.
+- A CustomerHelpdesk SPA you can run locally (any MSAL-based app - e.g. `@azure/msal-browser` / `@azure/msal-react`),
   served on `http://localhost:5173/` by default.
 
 ### 2. (Optional) Conditional Access - disable Security defaults first
@@ -165,16 +165,16 @@ The full solution is in [`doc/result/external_id/external-02.tf`](../result/exte
 > Properties → Manage security defaults → Disabled → Save.
 >
 > Disabling security defaults removes the tenant-wide baseline protection. Do it only in a
-> workshop/PoC tenant, or replace it with your own Conditional Access policies.
+> workshop/test tenant, or replace it with your own Conditional Access policies.
 
-Only if you want MFA on the PoC app:
+Only if you want MFA on the CustomerHelpdesk app:
 
 1. Disable Security defaults (above).
 2. Authentication methods → Email OTP: enabled for all users. If it is disabled, the policy
    blocks sign-ins outright instead of prompting for a code.
 3. Leave SMS off if Email OTP must be the only second factor (SMS is a paid add-on).
 
-The policy targets *All users* but only the PoC SPA and API, so it can't lock you out of the portal.
+The policy targets *All users* but only the CustomerHelpdesk SPA and API, so it can't lock you out of the portal.
 MFA works here because the user flow's primary method is email + password - an email-OTP primary
 sign-in cannot also count as the second factor.
 
@@ -186,7 +186,7 @@ All three variables have defaults - add them only to change something:
 
 ```hcl
 poc_spa_redirect_uris = [                            # must match EXACTLY (trailing slash!)
-  "http://localhost:5173/",                          # your own PoC SPA
+  "http://localhost:5173/",                          # your own CustomerHelpdesk SPA
   "https://tenant.factorlabs.pl/oidcdebugger/debug", # OIDC debugger used in step 6 - keep it!
 ]
 poc_sign_up_allowed   = true                         # user flow: false = sign-in only, nobody can self-register
@@ -206,7 +206,7 @@ terraform plan      # expect module.poc_user_flow.msgraph_resource_action.app_as
 terraform apply
 ```
 
-### 5. Grant admin consent for the PoC SPA (manual, Azure Portal)
+### 5. Grant admin consent for the CustomerHelpdesk SPA (manual, Azure Portal)
 
 > [!IMPORTANT]
 > Terraform deliberately does **not** grant admin consent. Do it by hand in the portal - without
@@ -214,10 +214,10 @@ terraform apply
 > has consent type *Admin* and customers cannot consent to it themselves.
 
 1. Entra admin center (switched to the External ID tenant) → **Identity** → **Applications** →
-   **App registrations** → **All applications** → `TF.Demo.<name>-PoC.Spa.Application`.
+   **App registrations** → **All applications** → `TF.Demo.<name>-CustomerHelpdesk.Spa.Application`.
 2. **API permissions** → **Grant admin consent for `<tenant>`** → **Yes**.
 3. Every row - `openid`, `profile`, `email`, `offline_access`, `User.Read` (Microsoft Graph) and
-   `access_as_user` (`TF.Demo.<name>-PoC.API.API`) - must show *Granted for `<tenant>`*.
+   `access_as_user` (`TF.Demo.<name>-CustomerHelpdesk.API.API`) - must show *Granted for `<tenant>`*.
 
 Repeat this whenever the SPA's API permissions change, or after a `destroy` + re-`apply` (a new
 app registration has no consent).
@@ -254,17 +254,17 @@ You don't need your own app to test the sign-in. Use the workshop OIDC debugger:
    The redirect URI is `https://tenant.factorlabs.pl/oidcdebugger/debug`. It must be in
    `poc_spa_redirect_uris` (registered as SPA). The debugger uses the authorization code flow
    with PKCE: the SPA is a public client, so there is no secret.
-3. (Optional) Put `PoC.Admin` in **Expected roles** if you assigned that app role to your test user.
-4. Press **Authorize**. You land on the External ID hosted page of the PoC user flow (Email +
+3. (Optional) Put `CustomerHelpdesk.Admin` in **Expected roles** if you assigned that app role to your test user.
+4. Press **Authorize**. You land on the External ID hosted page of the CustomerHelpdesk user flow (Email +
    Password and "No account? Create one"). Sign up or sign in.
 5. Check the **Checks** table on the callback page. Every row should be PASS:
    - **ID token** `aud` = `external_poc_spa_client_id`, `nonce` matches the request,
    - **access token** `aud` = `external_poc_api_client_id`, `scp` contains `access_as_user`,
-   - `roles` contains `PoC.Admin` (only when you set **Expected roles**).
+   - `roles` contains `CustomerHelpdesk.Admin` (only when you set **Expected roles**).
 
    If sign-in fails, the callback explains the `AADSTS` code, e.g. `AADSTS65001` → go back to step 5.
 
-### 7. Wire up your PoC app
+### 7. Wire up your CustomerHelpdesk app
 
 ```powershell
 terraform output -raw external_poc_authority      # MSAL authority
@@ -295,7 +295,7 @@ assigned to is the one the hosted page renders.
 1. Run the app (or the OIDC debugger from step 6) and click sign in - you land on the External ID hosted page showing Email +
    Password fields and a "No account? Create one" link.
 2. Sign up: enter a new e-mail → enter the verification code sent to it → set a password →
-   (optionally) a display name → you return to the PoC app signed in.
+   (optionally) a display name → you return to the CustomerHelpdesk app signed in.
 3. Sign in: sign out, then sign in again with the same e-mail and password - no code this time.
 4. Set `poc_sign_up_allowed = false`, apply, reload the sign-in page: the "Create one" link is gone,
    while existing accounts can still sign in.
@@ -303,14 +303,14 @@ assigned to is the one the hosted page renders.
 
 ## Verification
 
-- [ ] `TF.Demo.<name>-PoC.Spa.Application` and `TF.Demo.<name>-PoC.API.API` exist under App registrations.
+- [ ] `TF.Demo.<name>-CustomerHelpdesk.Spa.Application` and `TF.Demo.<name>-CustomerHelpdesk.API.API` exist under App registrations.
 - [ ] The SPA's API permissions all show *Granted for `<tenant>`* (manual consent, step 5).
-- [ ] External Identities → User flows → `TF.Workshop.<name>-PoC.Flow`:
+- [ ] External Identities → User flows → `TF.Workshop.<name>-CustomerHelpdesk.Flow`:
   - Identity providers shows only Email with password.
-  - Applications lists only `TF.Demo.<name>-PoC.Spa.Application`.
+  - Applications lists only `TF.Demo.<name>-CustomerHelpdesk.Spa.Application`.
 - [ ] Sign-in through https://tenant.factorlabs.pl/oidcdebugger returns an access token with `aud` = `external_poc_api_client_id`.
-- [ ] Sign-up (with e-mail code + password) and sign-in (password only) both work from the PoC app.
-- [ ] (Optional) Conditional Access lists `TF.Demo.<name>-PoC.RequireMFA` and sign-in asks for an Email OTP.
+- [ ] Sign-up (with e-mail code + password) and sign-in (password only) both work from the CustomerHelpdesk app.
+- [ ] (Optional) Conditional Access lists `TF.Demo.<name>-CustomerHelpdesk.RequireMFA` and sign-in asks for an Email OTP.
 
 Graph check of the assignment (Graph Explorer signed in to the External ID tenant):
 
@@ -327,12 +327,12 @@ should return exactly one entry whose `appId` equals `external_poc_spa_client_id
 | 403 on `msgraph_resource_action.app_assignment`                                                  | Deployer SP is missing `EventListener.ReadWrite.All` (External-00).                                                                                                                |
 | 400 on `app_assignment` - app is already linked to another flow                                  | An application can belong to only one user flow. Remove the SPA from the other flow (User flows → *other flow* → Applications) and apply again.                                    |
 | 400 on `app_assignment` - application/service principal not found                                | The SPA's service principal didn't exist yet. Keep `depends_on = [module.poc_app]` on `poc_user_flow` and re-run `apply`.                                                          |
-| Hosted page has no sign-up option and the e-mail + password sign-in doesn't behave as configured | The SPA isn't assigned to the PoC user flow. Check the flow's Applications blade.                                                                                              |
+| Hosted page has no sign-up option and the e-mail + password sign-in doesn't behave as configured | The SPA isn't assigned to the CustomerHelpdesk user flow. Check the flow's Applications blade.                                                                                              |
 | Sign-in page doesn't show "No account? Create one"                                               | `poc_sign_up_allowed = false`, or the SPA isn't assigned to the flow.                                                                                                              |
 | `apply` fails creating the CA policy (`Security Defaults is enabled in the tenant`, 400/403)     | Security defaults are still on - see step 2, or set `poc_require_mfa = false`.                                                                                                     |
 | CA policy blocks sign-in instead of asking for a code                                            | Email OTP is not enabled in Authentication methods.                                                                                                                                |
 | `AADSTS50011` redirect URI mismatch                                                              | `poc_spa_redirect_uris` must match the app's redirect URI exactly, including the trailing slash.                                                                                   |
-| `AADSTS65001` consent required                                                                   | Admin consent wasn't granted. Do step 5: Portal → App registrations → PoC SPA → API permissions → Grant admin consent for `<tenant>`.                                              |
+| `AADSTS65001` consent required                                                                   | Admin consent wasn't granted. Do step 5: Portal → App registrations → CustomerHelpdesk SPA → API permissions → Grant admin consent for `<tenant>`.                                              |
 | `destroy` fails deleting the user flow                                                           | Destroying the assignment doesn't unassign the app (the POST only runs on create). Remove the app from the flow in the portal (User flows → Applications) and run `destroy` again. |
 
 ---
@@ -340,10 +340,10 @@ should return exactly one entry whose `appId` equals `external_poc_spa_client_id
 ## Stage Completion Checklist
 - [ ] I have added `EventListener.ReadWrite.All` to the External-00 Service Principal.
 - [ ] I have applied External-02 and captured the outputs.
-- [ ] I have manually granted admin consent for the PoC SPA in the Azure Portal (API permissions → Grant admin consent).
-- [ ] The dedicated `TF.Workshop.<name>-PoC.Flow` user flow offers Email with password and has only the PoC SPA assigned.
-- [ ] I have signed in to the PoC SPA through https://tenant.factorlabs.pl/oidcdebugger with the Terraform outputs.
-- [ ] My PoC app signs customers up (e-mail code + password) and in (password) through the External ID hosted page.
+- [ ] I have manually granted admin consent for the CustomerHelpdesk SPA in the Azure Portal (API permissions → Grant admin consent).
+- [ ] The dedicated `TF.Workshop.<name>-CustomerHelpdesk.Flow` user flow offers Email with password and has only the CustomerHelpdesk SPA assigned.
+- [ ] I have signed in to the CustomerHelpdesk SPA through https://tenant.factorlabs.pl/oidcdebugger with the Terraform outputs.
+- [ ] My CustomerHelpdesk app signs customers up (e-mail code + password) and in (password) through the External ID hosted page.
 - [ ] (Optional) I have disabled Security defaults, set `poc_require_mfa = true`, and seen the Email OTP prompt.
 
 > **Report Issues:** Did you encounter a bug or need clarification? [Report the issue here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).

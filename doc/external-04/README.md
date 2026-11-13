@@ -25,11 +25,11 @@ Finally, both consent flags are added as claims to the SPA's ID token and the AP
 |---------------------------|---------------------------------------------|-----------------------------------------------------------------------------------------------------------|
 | Custom user attribute     | `TermsOfUseAccepted`                        | Tenant-level, `boolean`. Created via the portal API (`b2cadmin`). Usable by any user flow in the tenant. |
 | Custom user attribute     | `PrivacyPolicyAccepted`                     | Tenant-level, `boolean`.                                                                                  |
-| API (resource server)     | `TF.Demo.<name>-PoC-Extensions.API.API`         | Same as External-02: scope `access_as_user`, app role `PoC.Admin`.                                        |
-| SPA                       | `TF.Demo.<name>-PoC-Extensions.Spa.Application` | Same as External-02: SPA platform, auth code + PKCE.                                                      |
+| API (resource server)     | `TF.Demo.<name>-CustomerHelpdesk-Extensions.API.API`         | Same as External-02: scope `access_as_user`, app role `CustomerHelpdesk.Admin`.                                        |
+| SPA                       | `TF.Demo.<name>-CustomerHelpdesk-Extensions.Spa.Application` | Same as External-02: SPA platform, auth code + PKCE.                                                      |
 | Admin consent             | -                                           | Manual (Azure Portal, step 5).                                                                        |
-| Sign-up/sign-in user flow | `TF.Workshop.<name>-PoC-Extensions.Flow`        | Email + password, plus first name, last name and the two required checkboxes. Only the SPA is assigned. |
-| Claims mapping policy     | `TF.<name>.PoC-Extensions.ConsentClaims`        | Step C. Adds `terms_of_use_accepted` and `privacy_policy_accepted` to the ID token (SPA) and the access token (API). |
+| Sign-up/sign-in user flow | `TF.Workshop.<name>-CustomerHelpdesk-Extensions.Flow`        | Email + password, plus first name, last name and the two required checkboxes. Only the SPA is assigned. |
+| Claims mapping policy     | `TF.<name>.CustomerHelpdesk-Extensions.ConsentClaims`        | Step C. Adds `terms_of_use_accepted` and `privacy_policy_accepted` to the ID token (SPA) and the access token (API). |
 
 `<name>` is your `deployment_unique_name`. External-02 and 03 stay untouched.
 
@@ -123,7 +123,7 @@ Requires:
 - `IdentityUserFlow.ReadWrite.All` on the deployer Service Principal (External-00), used to read
   the id back and for the user flow.
 
-## Part 2 (Step B): the Signup PoC application
+## Part 2 (Step B): the CustomerHelpdesk-Extensions application
 
 This is a third instance of the External-02 [`poc_app`](../../external_tenant/modules/poc_app/main.tf)
 module, because an application can belong to only ONE user flow:
@@ -131,14 +131,14 @@ module, because an application can belong to only ONE user flow:
 ```hcl
 module "signup_app" {
   source            = "./modules/poc_app"
-  name              = "${var.deployment_unique_name}-PoC-Extensions"
+  name              = "${var.deployment_unique_name}-CustomerHelpdesk-Extensions"
   spa_redirect_uris = var.poc_spa_redirect_uris
 }
 
 check "signup_api_open_to_role_less_users" {
   assert {
     condition     = module.signup_app.api_user_assignment_required == false
-    error_message = "The Signup PoC API enterprise application requires user assignment. Role-less customers cannot obtain a token at all."
+    error_message = "The CustomerHelpdesk-Extensions API enterprise application requires user assignment. Role-less customers cannot obtain a token at all."
   }
 }
 ```
@@ -149,7 +149,7 @@ check "signup_api_open_to_role_less_users" {
 module "signup_user_flow" {
   source              = "./modules/user_flow"
   deployment_env_name = var.deployment_env_name
-  business_name       = "${var.deployment_unique_name}-PoC-Extensions"
+  business_name       = "${var.deployment_unique_name}-CustomerHelpdesk-Extensions"
   sign_up_allowed     = true
 
   extra_attributes = [
@@ -233,22 +233,22 @@ output "external_signup_authority" {
 }
 
 output "external_signup_spa_client_id" {
-  description = "Client ID of the Signup PoC SPA (MSAL clientId)."
+  description = "Client ID of the CustomerHelpdesk-Extensions SPA (MSAL clientId)."
   value       = module.signup_app.spa_client_id
 }
 
 output "external_signup_api_client_id" {
-  description = "Client ID of the Signup PoC API (expected aud claim of its access tokens)."
+  description = "Client ID of the CustomerHelpdesk-Extensions API (expected aud claim of its access tokens)."
   value       = module.signup_app.api_client_id
 }
 
 output "external_signup_api_scope" {
-  description = "Scope the Signup PoC SPA requests to call the API."
+  description = "Scope the CustomerHelpdesk-Extensions SPA requests to call the API."
   value       = module.signup_app.api_scope_uri
 }
 
 output "external_signup_user_flow_id" {
-  description = "ID of the Signup PoC app's dedicated user flow."
+  description = "ID of the CustomerHelpdesk-Extensions app's dedicated user flow."
   value       = module.signup_user_flow.user_flow_id
 }
 ```
@@ -264,7 +264,7 @@ Step C reuses the External-05
 ```hcl
 module "signup_claims_policy" {
   source       = "./modules/claims_mapping_policy"
-  display_name = "TF.${var.deployment_unique_name}.PoC-Extensions.ConsentClaims"
+  display_name = "TF.${var.deployment_unique_name}.CustomerHelpdesk-Extensions.ConsentClaims"
 
   claims = [
     {
@@ -382,15 +382,15 @@ terraform apply
 
 Check the result in the portal → External Identities:
 
-1. User flows → `TF.Workshop.<name>-PoC-Extensions.Flow` → User attributes: Email Address,
+1. User flows → `TF.Workshop.<name>-CustomerHelpdesk-Extensions.Flow` → User attributes: Email Address,
    Display Name, Given Name, Surname, TermsOfUseAccepted, PrivacyPolicyAccepted.
 2. … → Page layouts: the order and labels from `extra_attributes`, with every new field
    *Required*.
-3. … → Applications: only `TF.Demo.<name>-PoC-Extensions.Spa.Application`.
+3. … → Applications: only `TF.Demo.<name>-CustomerHelpdesk-Extensions.Spa.Application`.
 
-### 5. Grant admin consent for the Signup PoC SPA (manual, Azure Portal)
+### 5. Grant admin consent for the CustomerHelpdesk-Extensions SPA (manual, Azure Portal)
 
-App registrations → `TF.Demo.<name>-PoC-Extensions.Spa.Application` → API permissions →
+App registrations → `TF.Demo.<name>-CustomerHelpdesk-Extensions.Spa.Application` → API permissions →
 Grant admin consent for `<tenant>`. Without it, sign-in ends in `AADSTS65001`.
 
 ### 6. Test the sign-up page
@@ -460,8 +460,8 @@ See [Add attributes to the token](https://learn.microsoft.com/entra/external-id/
 ## Verification
 
 - [ ] Custom user attributes lists `TermsOfUseAccepted` and `PrivacyPolicyAccepted` (Boolean, Custom).
-- [ ] `TF.Workshop.<name>-PoC-Extensions.Flow` collects Given Name, Surname and both custom attributes,
-  all required, and has only `TF.Demo.<name>-PoC-Extensions.Spa.Application` assigned.
+- [ ] `TF.Workshop.<name>-CustomerHelpdesk-Extensions.Flow` collects Given Name, Surname and both custom attributes,
+  all required, and has only `TF.Demo.<name>-CustomerHelpdesk-Extensions.Spa.Application` assigned.
 - [ ] The sign-up page shows both checkboxes with clickable links and won't continue until both are ticked.
 - [ ] Graph returns `givenName`, `surname` and both `extension_…Accepted = true` for the new user.
 - [ ] External-02's and External-03's sign-up pages are unchanged (no new fields).
@@ -497,8 +497,8 @@ See [Add attributes to the token](https://learn.microsoft.com/entra/external-id/
 - [ ] I have added `IdentityUserFlow.ReadWrite.All` to the External-00 Service Principal and granted consent.
 - [ ] I have signed in to the External ID tenant with `az login --tenant <external tenant id> --allow-no-subscriptions`.
 - [ ] Step A: I have applied the two custom boolean attributes and checked them in the portal.
-- [ ] Step B: I have applied the Signup PoC app and its user flow.
-- [ ] I have manually granted admin consent for the Signup PoC SPA.
+- [ ] Step B: I have applied the CustomerHelpdesk-Extensions app and its user flow.
+- [ ] I have manually granted admin consent for the CustomerHelpdesk-Extensions SPA.
 - [ ] I have signed up with first name, last name and both consents, and confirmed I can't continue without them.
 - [ ] I have read the stored values back with Microsoft Graph.
 - [ ] Step C: I have applied the claims mapping policy and seen both consent claims in the ID token and the access token.

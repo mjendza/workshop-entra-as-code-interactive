@@ -1,20 +1,20 @@
 # =============================================================================
-# external_tenant — External-02: SSO for a PoC application (SPA + API)
+# external_tenant — External-02: SSO for a CustomerHelpdesk application (SPA + API)
 # =============================================================================
 # See doc/external-02/README.md. Three parts:
-#   1. the PoC application itself: API + SPA (+ OPTIONAL CA,
+#   1. the CustomerHelpdesk application itself: API + SPA (+ OPTIONAL CA,
 #      which requires security defaults to be DISABLED). Admin consent is NOT
 #      granted here - do it MANUALLY in the Azure Portal (README step 5),
-#   2. a DEDICATED email + password user flow, assigned to the PoC SPA only,
-#   3. outputs for the PoC app's MSAL configuration.
+#   2. a DEDICATED email + password user flow, assigned to the CustomerHelpdesk SPA only,
+#   3. outputs for the CustomerHelpdesk app's MSAL configuration.
 # =============================================================================
 
 # ---------------------------------------------------------------------------
-# External-02 PoC application: API + SPA (+ optional CA); consent = manual
+# External-02 CustomerHelpdesk application: API + SPA (+ optional CA); consent = manual
 # ---------------------------------------------------------------------------
 module "poc_app" {
   source            = "./modules/poc_app"
-  name              = "${var.deployment_unique_name}-PoC"
+  name              = "${var.deployment_unique_name}-CustomerHelpdesk"
   spa_redirect_uris = var.poc_spa_redirect_uris
 
   # OPTIONAL - Conditional Access (MFA via Email OTP). Off by default.
@@ -27,15 +27,15 @@ module "poc_app" {
 check "poc_api_open_to_role_less_users" {
   assert {
     condition     = module.poc_app.api_user_assignment_required == false
-    error_message = "The PoC API enterprise application requires user assignment. Role-less customers cannot obtain a token at all."
+    error_message = "The CustomerHelpdesk API enterprise application requires user assignment. Role-less customers cannot obtain a token at all."
   }
 }
 
 # ---------------------------------------------------------------------------
-# External-02 dedicated user flow (email + password) assigned to the PoC SPA
+# External-02 dedicated user flow (email + password) assigned to the CustomerHelpdesk SPA
 # ---------------------------------------------------------------------------
 # A separate flow from External-01's password_user_flow: an application can be
-# assigned to ONLY ONE user flow, and a dedicated flow lets the PoC app have its
+# assigned to ONLY ONE user flow, and a dedicated flow lets the CustomerHelpdesk app have its
 # own sign-up policy (poc_sign_up_allowed) without touching other apps.
 #
 # app_client_ids assigns the SPA via POST .../conditions/applications/includeApplications.
@@ -45,7 +45,7 @@ check "poc_api_open_to_role_less_users" {
 module "poc_user_flow" {
   source              = "./modules/user_flow"
   deployment_env_name = var.deployment_env_name
-  business_name       = "${var.deployment_unique_name}-PoC"
+  business_name       = "${var.deployment_unique_name}-CustomerHelpdesk"
   sign_up_allowed     = var.poc_sign_up_allowed
 
   app_client_ids = {
@@ -56,7 +56,7 @@ module "poc_user_flow" {
 }
 
 # ---------------------------------------------------------------------------
-# External-02 outputs - everything the PoC app needs in its MSAL config
+# External-02 outputs - everything the CustomerHelpdesk app needs in its MSAL config
 # ---------------------------------------------------------------------------
 output "external_poc_authority" {
   description = "MSAL authority for the External ID tenant (https://<subdomain>.ciamlogin.com/)."
@@ -64,12 +64,12 @@ output "external_poc_authority" {
 }
 
 output "external_poc_spa_client_id" {
-  description = "Client ID of the PoC SPA (MSAL clientId)."
+  description = "Client ID of the CustomerHelpdesk SPA (MSAL clientId)."
   value       = module.poc_app.spa_client_id
 }
 
 output "external_poc_api_client_id" {
-  description = "Client ID of the PoC API (expected aud claim of its access tokens)."
+  description = "Client ID of the CustomerHelpdesk API (expected aud claim of its access tokens)."
   value       = module.poc_app.api_client_id
 }
 
@@ -79,7 +79,7 @@ output "external_poc_api_scope" {
 }
 
 output "external_poc_user_flow_id" {
-  description = "ID of the PoC app's dedicated email + password user flow."
+  description = "ID of the CustomerHelpdesk app's dedicated email + password user flow."
   value       = module.poc_user_flow.user_flow_id
 }
 

@@ -224,4 +224,4 @@ See the "Known gap" note above - the id_token doesn't carry an email claim today
 `sub` instead.
 
 ---
-**Navigation:** [← External-00: Prerequisites](../external-00/README.md) | [External-02: SSO for your PoC App →](../external-02/README.md)
+**Navigation:** [← External-00: Prerequisites](../external-00/README.md) | [External-02: SSO for your CustomerHelpdesk App →](../external-02/README.md)

@@ -10,7 +10,7 @@
 #          (sign-up data: email, first/last name, both consent flags),
 #        - OnTokenIssuanceStart        -> POST <api>/api/OnTokenIssuanceStart
 #          (returns profile claims for the token),
-#   3. a fourth PoC application (API + SPA) and its sign-up flow - the
+#   3. a fourth CustomerHelpdesk application (API + SPA) and its sign-up flow - the
 #      External-04 attributes plus the submit extension,
 #   4. the token listener + claims mapping policy for that SPA and API,
 #   5. outputs.
@@ -43,7 +43,7 @@ locals {
 # ---------------------------------------------------------------------------
 module "profile_api" {
   source   = "./modules/auth_extension_api"
-  name     = "${var.deployment_unique_name}-PoC-TokenEnrichment"
+  name     = "${var.deployment_unique_name}-CustomerHelpdesk-TokenEnrichment"
   api_host = local.profile_api_host
 }
 
@@ -53,7 +53,7 @@ module "profile_api" {
 module "profile_sync_extension" {
   source       = "./modules/custom_auth_extension"
   event        = "attribute_collection_submit"
-  display_name = "TF.${var.deployment_unique_name}.PoC-TokenEnrichment.OnAttributeCollectionSubmit"
+  display_name = "TF.${var.deployment_unique_name}.CustomerHelpdesk-TokenEnrichment.OnAttributeCollectionSubmit"
   description  = "Push the sign-up profile (name + consents) to the profile API."
   target_url   = local.profile_api_submit_url
   resource_id  = module.profile_api.resource_id
@@ -62,27 +62,27 @@ module "profile_sync_extension" {
 }
 
 # ---------------------------------------------------------------------------
-# External-05 PoC application: API + SPA; consent = manual
+# External-05 CustomerHelpdesk application: API + SPA; consent = manual
 # ---------------------------------------------------------------------------
 # A FOURTH poc_app instance: an application can belong to only ONE user flow.
 module "sync_app" {
   source            = "./modules/poc_app"
-  name              = "${var.deployment_unique_name}-PoC-TokenEnrichment"
+  name              = "${var.deployment_unique_name}-CustomerHelpdesk-TokenEnrichment"
   spa_redirect_uris = var.poc_spa_redirect_uris
 }
 
 check "sync_api_open_to_role_less_users" {
   assert {
     condition     = module.sync_app.api_user_assignment_required == false
-    error_message = "The Sync PoC API enterprise application requires user assignment. Role-less customers cannot obtain a token at all."
+    error_message = "The CustomerHelpdesk-TokenEnrichment API enterprise application requires user assignment. Role-less customers cannot obtain a token at all."
   }
 }
 
-# Token issuance: enrich the SPA's ID token AND the PoC API's access token.
+# Token issuance: enrich the SPA's ID token AND the CustomerHelpdesk API's access token.
 module "profile_token_extension" {
   source       = "./modules/custom_auth_extension"
   event        = "token_issuance_start"
-  display_name = "TF.${var.deployment_unique_name}.PoC-TokenEnrichment.OnTokenIssuanceStart"
+  display_name = "TF.${var.deployment_unique_name}.CustomerHelpdesk-TokenEnrichment.OnTokenIssuanceStart"
   description  = "Read the customer's profile from the profile API into the token."
   target_url   = local.profile_api_token_url
   resource_id  = module.profile_api.resource_id
@@ -98,7 +98,7 @@ module "profile_token_extension" {
 
 module "profile_claims_policy" {
   source       = "./modules/claims_mapping_policy"
-  display_name = "TF.${var.deployment_unique_name}.PoC-TokenEnrichment.ProfileClaims"
+  display_name = "TF.${var.deployment_unique_name}.CustomerHelpdesk-TokenEnrichment.ProfileClaims"
   claims       = [for source, jwt in local.profile_token_claims : { source = source, jwt_claim_type = jwt }]
 
   # ID token (audience = SPA) and access token (audience = API).
@@ -114,7 +114,7 @@ module "profile_claims_policy" {
 module "sync_user_flow" {
   source              = "./modules/user_flow"
   deployment_env_name = var.deployment_env_name
-  business_name       = "${var.deployment_unique_name}-PoC-TokenEnrichment"
+  business_name       = "${var.deployment_unique_name}-CustomerHelpdesk-TokenEnrichment"
   sign_up_allowed     = true
 
   # The External-04 tenant-level attributes, collected again on THIS flow.
@@ -174,22 +174,22 @@ output "external_sync_authority" {
 }
 
 output "external_sync_spa_client_id" {
-  description = "Client ID of the Sync PoC SPA (MSAL clientId)."
+  description = "Client ID of the CustomerHelpdesk-TokenEnrichment SPA (MSAL clientId)."
   value       = module.sync_app.spa_client_id
 }
 
 output "external_sync_api_client_id" {
-  description = "Client ID of the Sync PoC API (expected aud claim of its access tokens)."
+  description = "Client ID of the CustomerHelpdesk-TokenEnrichment API (expected aud claim of its access tokens)."
   value       = module.sync_app.api_client_id
 }
 
 output "external_sync_api_scope" {
-  description = "Scope the Sync PoC SPA requests to call the API."
+  description = "Scope the CustomerHelpdesk-TokenEnrichment SPA requests to call the API."
   value       = module.sync_app.api_scope_uri
 }
 
 output "external_sync_user_flow_id" {
-  description = "ID of the Sync PoC app's sign-up flow."
+  description = "ID of the CustomerHelpdesk-TokenEnrichment app's sign-up flow."
   value       = module.sync_user_flow.user_flow_id
 }
 
