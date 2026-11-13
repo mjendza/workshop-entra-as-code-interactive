@@ -8,7 +8,7 @@ variable "identifier_uri" {
     Identifier URI of the API. Leave null (the default) to use api://<client-id>,
     which is what a client requests scopes against as api://<client-id>/<scope>.
 
-    Set it explicitly to use a vanity URI instead, e.g. api://contoso.com/PoC.
+    Set it explicitly to use a vanity URI instead, e.g. api://contoso.com/CustomerHelpdesk.
     A vanity URI requires the domain to be verified on the tenant; api://<client-id>
     never does, which is why it is the default.
   EOT

@@ -54,22 +54,25 @@ Before starting, please ensure you have the following:
 ## Required Microsoft Graph Permissions
 
 Grant all of the following up front - each is used by a specific `external_tenant/` module, so the
-whole workshop path (Stage 18 target-tenant provisioning, External-01 native auth, External-02 PoC SSO) works without
-returning to this screen:
+whole workshop path works without returning to this screen. The **Stage** column links to the
+corresponding workshop guide where available:
 
-| Permission | Type | Description | Admin consent | Used by |
-|---|---|---|---|---|
-| `Application.ReadWrite.All` | Application | Read and write all applications | Yes | Creating/updating app registrations (`modules/sso_app_native`, `modules/federation`, `modules/service_principal_rich`) |
-| `AppRoleAssignment.ReadWrite.All` | Application | Manage app permission grants and app role assignments | Yes | Granting admin consent / app role assignments for target-tenant Service Principals (Stage 18) |
-| `CustomAuthenticationExtension.ReadWrite.All` | Application | Read and write all custom authentication extensions | Yes | Managing the sign-up event flow and its attribute-collection hooks (`modules/user_flow`) |
-| `EventListener.ReadWrite.All` | Application | Read and write all authentication event listeners | Yes | Linking the PoC SPA to its user flow via `includeApplications` (External-02, `modules/user_flow`) |
-| `Group.ReadWrite.All` | Application | Read and write all groups | Yes | Group-scoped policies/assignments in the external tenant |
-| `Policy.Read.All` | Application | Read your organization's policies | Yes | Reading existing policies before updates (pairs with the `ReadWrite` policy permissions below) |
-| `Policy.ReadWrite.ApplicationConfiguration` | Application | Read and write your organization's application configuration policies | Yes | Enabling `nativeAuthenticationApisEnabled` on the native-auth app (`modules/sso_app_native`) |
-| `Policy.ReadWrite.ConditionalAccess` | Application | Read and write your organization's conditional access policies | Yes | Conditional Access policies in the external tenant |
-| `Policy.ReadWrite.ExternalIdentities` | Application | Read and write your organization's external identities policy | Yes | Creating the sign-up user flow and linking apps to it (`modules/user_flow`, `this_user_flow_assignment` in `modules/sso_app_native`) |
-| `User.Read` | Delegated | Sign in and read user profile | No | Default delegated permission added to every app registration |
-| `User.ReadWrite.All` | Application | Read and write all users' full profiles | Yes | Creating the native-auth sign-in test user (`modules/user`, the `native_auth_test_user` module) |
+| Stage | Permission | Type | Description | Admin consent | Used by |
+|---|---|---|---|---|---|
+| [Stage 18](../stage-18/README.md), [External-01](../external-01/README.MD), [External-02](../external-02/README.md), [External-03](../external-03/README.md), [External-04](../external-04/README.md), [External-05](../external-05/README.md) | `Application.ReadWrite.All` | Application | Read and write all applications | Yes | Creating/updating app registrations (`modules/sso_app_native`, `modules/poc_app`, `modules/federation`, `modules/service_principal_rich`) |
+| [Stage 18](../stage-18/README.md), [External-05](../external-05/README.md) | `AppRoleAssignment.ReadWrite.All` | Application | Manage app permission grants and app role assignments | Yes | Granting admin consent / app role assignments for target-tenant Service Principals; granting `CustomAuthenticationExtension.Receive.Payload` to the extension API (`modules/auth_extension_api`) |
+| [External-01](../external-01/README.MD), [External-02](../external-02/README.md), [External-03](../external-03/README.md), [External-04](../external-04/README.md), [External-05](../external-05/README.md) | `CustomAuthenticationExtension.ReadWrite.All` | Application | Read and write all custom authentication extensions | Yes | Managing the sign-up event flow and its attribute-collection hooks (`modules/user_flow`); creating the submit and token-issuance custom authentication extensions (`modules/custom_auth_extension`) |
+| [External-02](../external-02/README.md), [External-03](../external-03/README.md), [External-04](../external-04/README.md), [External-05](../external-05/README.md) | `EventListener.ReadWrite.All` | Application | Read and write all authentication event listeners | Yes | Linking the CustomerHelpdesk SPA to its user flow via `includeApplications` (`modules/user_flow`); the token-issuance listener (`modules/custom_auth_extension`) |
+| External-06, External-07 | `OrganizationalBranding.ReadWrite.All` | Application | Read and write organizational branding information | Yes | Uploading the company branding - texts, logos, background, custom CSS - in one Graph batch (`modules/company_branding`); the per-app branding theme and its files (`modules/branding_theme`) |
+| Shared / optional | `Group.ReadWrite.All` | Application | Read and write all groups | Yes | Group-scoped policies/assignments in the external tenant |
+| [External-04](../external-04/README.md) | `IdentityUserFlow.ReadWrite.All` | Application | Read and write all identity user flows | Yes | Creating the tenant-level custom user attributes (`modules/custom_user_attribute`) |
+| [External-02](../external-02/README.md) (optional MFA), [External-03](../external-03/README.md) | `Policy.Read.All` | Application | Read your organization's policies | Yes | Reading existing policies before updates (pairs with the `ReadWrite` policy permissions below) |
+| [External-03](../external-03/README.md) | `Policy.ReadWrite.AuthenticationMethod` | Application | Read and write all authentication method policies | Yes | Enabling SMS as an authentication method for MFA (`modules/auth_methods_sms`) |
+| [External-01](../external-01/README.MD), [External-04](../external-04/README.md), [External-05](../external-05/README.md) | `Policy.ReadWrite.ApplicationConfiguration` | Application | Read and write your organization's application configuration policies | Yes | Enabling `nativeAuthenticationApisEnabled` on the native-auth app (`modules/sso_app_native`); the token claims mapping policy (`modules/claims_mapping_policy`) |
+| [External-02](../external-02/README.md) (optional MFA), [External-03](../external-03/README.md) | `Policy.ReadWrite.ConditionalAccess` | Application | Read and write your organization's conditional access policies | Yes | Conditional Access policies in the external tenant |
+| [External-01](../external-01/README.MD), [External-02](../external-02/README.md), [External-03](../external-03/README.md), [External-04](../external-04/README.md), [External-05](../external-05/README.md) | `Policy.ReadWrite.ExternalIdentities` | Application | Read and write your organization's external identities policy | Yes | Creating the sign-up user flow and linking apps to it (`modules/user_flow`, `this_user_flow_assignment` in `modules/sso_app_native`) |
+| [External-00](#steps-to-create-a-service-principal-in-the-external-id-tenant) (default) | `User.Read` | Delegated | Sign in and read user profile | No | Default delegated permission added to every app registration |
+| [External-01](../external-01/README.MD) (optional test user) | `User.ReadWrite.All` | Application | Read and write all users' full profiles | Yes | Creating the native-auth sign-in test user (`modules/user`, the `native_auth_test_user` module) |
 
 > **Security defaults:** Conditional Access policies (the *optional* MFA policy in
 > [External-02](../external-02/README.md)) can only be created when **Security defaults are disabled**
@@ -111,7 +114,7 @@ tenant_default_domain = "yourtenant.onmicrosoft.com"
 ## Verification
 - [ ] `client_id`, `client_secret`, and `tenant_id` are populated in **both** provider blocks in
       `external_tenant/provider.tf`.
-- [ ] All 11 permissions above show "Granted for `<your External ID tenant>`" under API permissions.
+- [ ] All permissions above show "Granted for `<your External ID tenant>`" under API permissions.
 - [ ] `tenant_default_domain` is set in `external_tenant/terraform.tfvars`.
 - [ ] `cd external_tenant && terraform init` succeeds.
 
@@ -129,7 +132,7 @@ tenant_default_domain = "yourtenant.onmicrosoft.com"
 - [ ] I have verified access to my External ID (CIAM) tenant.
 - [ ] I have successfully created the Service Principal within that tenant.
 - [ ] I have securely documented its `client_id`, `client_secret`, and `tenant_id`.
-- [ ] I have assigned and granted admin consent for all 11 API permissions listed above.
+- [ ] I have assigned and granted admin consent for all API permissions listed above.
 - [ ] I have correctly populated both provider blocks in `external_tenant/provider.tf`.
 - [ ] I have set `tenant_default_domain` in `external_tenant/terraform.tfvars`.
 - [ ] I have successfully run `terraform init` inside `external_tenant/` and observed positive output.
