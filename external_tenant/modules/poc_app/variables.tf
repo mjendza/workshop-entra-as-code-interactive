@@ -1,5 +1,5 @@
 variable "name" {
-  description = "Instance name, e.g. Alice-PoC. Prefixes every display name: TF.Demo.<name>.API.API, TF.Demo.<name>.Spa.Application."
+  description = "Instance name, e.g. Alice-CustomerHelpdesk. Prefixes every display name: TF.Demo.<name>.API.API, TF.Demo.<name>.Spa.Application."
   type        = string
 }
 
@@ -16,9 +16,9 @@ variable "app_roles" {
     allowed_member_types = optional(list(string), ["User"])
   }))
   default = {
-    "PoC.Admin" = {
-      display_name = "PoC administrator"
-      description  = "Administrative access to the PoC application."
+    "CustomerHelpdesk.Admin" = {
+      display_name = "CustomerHelpdesk administrator"
+      description  = "Administrative access to the CustomerHelpdesk application."
     }
   }
 }
