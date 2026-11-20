@@ -11,6 +11,8 @@
 # Usage:
 #   scripts/ci/validate.sh                       # all solutions
 #   scripts/ci/validate.sh root external_tenant  # selected solutions
+#   scripts/ci/validate.sh experimental-workforce # experimental Intune path
+#                                                # (opt-in: not in the default list)
 #   NO_FINAL=1 scripts/ci/validate.sh            # check starter files as-is
 #                                                # (CI runs both: matrix.variant)
 #   IN_PLACE=1 scripts/ci/validate.sh root       # CI: run in checkout, no copy
@@ -71,22 +73,27 @@ overlay_final() {
     root)            cp "$WORK/doc/result/root/main.tf"        "$WORK/main.tf" ;;
     verified_id)     cp "$WORK/doc/result/verified_id/main.tf" "$WORK/verified_id/main.tf" ;;
     external_tenant) cp "$WORK"/doc/result/external_id/*.tf    "$WORK/external_tenant/" ;;
+    experimental-workforce)
+      cp "$WORK"/experimental-workforce/doc/result/*.tf "$WORK/experimental-workforce/"
+      cp "$WORK"/experimental-workforce/doc/result/tests/*.tftest.hcl "$WORK/experimental-workforce/tests/" ;;
   esac
 }
 
 solution_path() {
   case "$1" in
     root) echo "." ;;
-    external_tenant|verified_id) echo "$1" ;;
-    *) err "unknown solution '$1' (root|external_tenant|verified_id)"; exit 2 ;;
+    external_tenant|verified_id|experimental-workforce) echo "$1" ;;
+    *) err "unknown solution '$1' (root|external_tenant|verified_id|experimental-workforce)"; exit 2 ;;
   esac
 }
 
-# Dirs with .tf files that belong to a solution (root excludes the other two).
+# Dirs with .tf files that belong to a solution (root excludes the others).
 lint_dirs() {
   local p; p="$(solution_path "$1")"
   local extra=()
-  [ "$1" = root ] && extra=(-not -path './doc/*' -not -path './external_tenant/*' -not -path './verified_id/*')
+  [ "$1" = root ] && extra=(-not -path './doc/*' -not -path './external_tenant/*' -not -path './verified_id/*' -not -path './experimental-workforce/*')
+  # experimental-workforce keeps its final solution in its own doc/result - not a root
+  [ "$1" = experimental-workforce ] && extra=(-not -path '*/doc/*')
   [ "$p" = . ] || p="./$p"
   (cd "$WORK" && find "$p" -name '*.tf' -not -path '*/.terraform/*' "${extra[@]}" -printf '%h\n' | sort -u)
 }

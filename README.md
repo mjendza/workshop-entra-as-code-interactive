@@ -42,7 +42,7 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 
 ## Workshop Paths
 
-This workshop is organized into **three independent paths**. Each is self-contained - pick
+This workshop is organized into **three independent paths** (plus an experimental fourth). Each is self-contained - pick
 whichever apply to you. They intentionally don't cross-link into each other's stage numbering
 (separate label sets, separate issue sequences when generated via the interactive mode).
 
@@ -100,6 +100,18 @@ stages layered on top of the certificate-bound Service Principal pattern from St
 > [workshop-verified-id](https://github.com/mjendza/workshop-verified-id) developer workshop to
 > actually issue, present, and verify the credential you created here from a real app.
 
+### Path 4: Experimental - Workforce Intune Baseline (OpenIntuneBaseline)
+
+Experimental and independent: Intune app and device policies for a Workforce tenant, using the
+GPL-3.0 [OpenIntuneBaseline](https://github.com/SkipToTheEndpoint/OpenIntuneBaseline) as the reference
+implementation. Own Terraform root and Service Principal: [`experimental-workforce/`](experimental-workforce).
+
+| Step | Title | Description |
+|------|-------|-------------|
+| [experimental-workforce-01](experimental-workforce/doc/experimental-workforce-01/README.md) | BYOD - App Protection | Intune Service Principal prerequisites, OIB Android + iOS BYOD L2+ app protection policies, *Managed apps* filters for unmanaged devices, Conditional Access requiring app protection and blocking legacy auth. |
+| [experimental-workforce-02](experimental-workforce/doc/experimental-workforce-02/README.md) | WINDOWS | A curated subset of the Windows OIB v4.0 (compliance, update ring, Settings Catalog / Endpoint Security) for Entra joined Windows 11, driven by `PolicyManifest.json`. |
+| [experimental-workforce-03](experimental-workforce/doc/experimental-workforce-03/README.md) | WINDOWS365 | Windows 365 OIB add-on: connectivity and redirection profiles, Cloud PC compliance, Cloud PC filter excluding BitLocker / Device Health, optional provisioning policy. |
+
 ## Changelog 
 | Version | Date       | Description                                                                                    |
 |---------|------------|------------------------------------------------------------------------------------------------|
@@ -124,6 +136,7 @@ stages layered on top of the certificate-bound Service Principal pattern from St
 | v1.10   | 2026.06.23 | Added Stage 19 (Temporary Access Pass)                                                         |
 | v1.11   | 2026.07.04 | Added Stage Extra External ID - Native Authentication |
 | v2.0   | 2026.07.06 | 🎆 Reorganized into 3 independent paths (Workforce, External, Verified ID)  |
+| v2.1   | 2026.11.16 | Added experimental Path 4: Workforce Intune Baseline (OpenIntuneBaseline BYOD, Windows, Windows 365) |
 
 ## Frequently Asked Questions (FAQ)
 
