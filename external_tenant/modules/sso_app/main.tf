@@ -7,7 +7,7 @@
 # Unlike ../sso_app_native this module does NOT enable the native
 # authentication APIs and does NOT link itself to a user flow -- the caller
 # links it (see ../user_flow, var.app_client_ids). Used by External-02 for the
-# PoC SPA (browser redirect + PKCE).
+# CustomerHelpdesk SPA (browser redirect + PKCE).
 #
 # Note: owners are intentionally never set. The deployer service principal is
 # added as owner automatically when it creates the app.

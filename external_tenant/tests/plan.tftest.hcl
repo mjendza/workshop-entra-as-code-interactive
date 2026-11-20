@@ -34,6 +34,7 @@ variables {
   deployment_unique_name   = "CiTest"
   tenant_default_domain    = "citest.onmicrosoft.com"
   native_signin_user_email = "ci.user@example.com"
+  profile_api_base_url     = "https://citest.free.beeceptor.com"
 }
 
 run "plan" {

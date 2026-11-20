@@ -42,7 +42,7 @@ This workshop features **interactive progress tracking via GitHub Issues**. Each
 
 ## Workshop Paths
 
-This workshop is organized into **three independent paths**. Each is self-contained - pick
+This workshop is organized into **three independent paths** (plus an experimental fourth). Each is self-contained - pick
 whichever apply to you. They intentionally don't cross-link into each other's stage numbering
 (separate label sets, separate issue sequences when generated via the interactive mode).
 
@@ -81,7 +81,10 @@ stages using their own dedicated Service Principal and Terraform root ([`externa
 |--------------------------------|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [external-00](doc/external-00) | Prerequisites (External ID tenant) | Create a second Service Principal, this time in your External ID (CIAM) tenant, with every Microsoft Graph permission the `external_tenant/` Terraform root needs (native auth, user flows, conditional access, groups, local users). |
 | [external-01](doc/external-01) | Native Authentication              | Enable Entra External ID's Native Authentication API (email + password) on a native app registration, and prove the sign-in flows end-to-end with Pester via registered user also in terraform .                                      |
-| [external-02](doc/external-02) | SSO for your PoC App               | Browser-based SSO for a PoC SPA + API with a dedicated email + password user flow assigned to the app; optional Conditional Access (MFA) - requires Security defaults to be disabled.                                                 |
+| [external-02](doc/external-02) | SSO for your CustomerHelpdesk App               | Browser-based SSO for a CustomerHelpdesk SPA + API with a dedicated email + password user flow assigned to the app; optional Conditional Access (MFA) - requires Security defaults to be disabled.                                                 |
+| [external-03](doc/external-03) | Passwordless SSO + MFA (SMS)      | Same CustomerHelpdesk SPA + API pattern with a passwordless Email OTP user flow, SMS enabled as a tenant authentication method, and a required Conditional Access MFA policy (SMS as second factor). |
+| [external-04](doc/external-04) | Sign-up with extra attributes     | Collect first and last name plus two required custom boolean checkboxes (terms of use, privacy policy) during sign-up, using tenant-level custom user attributes created by Terraform. |
+| [external-05](doc/external-05) | Profile sync + token enrichment   | Custom authentication extensions: push the sign-up data (name + consents) to your own profile API on submit, and enrich ID/access tokens with profile claims on token issuance. Starts with a Stub Profile Implementation. |
 
 ### Path 3: Verified ID
 
@@ -96,6 +99,18 @@ stages layered on top of the certificate-bound Service Principal pattern from St
 > 🚀 **Next steps after this path:** use the dedicated
 > [workshop-verified-id](https://github.com/mjendza/workshop-verified-id) developer workshop to
 > actually issue, present, and verify the credential you created here from a real app.
+
+### Path 4: Experimental - Workforce Intune Baseline (OpenIntuneBaseline)
+
+Experimental and independent: Intune app and device policies for a Workforce tenant, using the
+GPL-3.0 [OpenIntuneBaseline](https://github.com/SkipToTheEndpoint/OpenIntuneBaseline) as the reference
+implementation. Own Terraform root and Service Principal: [`experimental-workforce/`](experimental-workforce).
+
+| Step | Title | Description |
+|------|-------|-------------|
+| [experimental-workforce-01](experimental-workforce/doc/experimental-workforce-01/README.md) | BYOD - App Protection | Intune Service Principal prerequisites, OIB Android + iOS BYOD L2+ app protection policies, *Managed apps* filters for unmanaged devices, Conditional Access requiring app protection and blocking legacy auth. |
+| [experimental-workforce-02](experimental-workforce/doc/experimental-workforce-02/README.md) | WINDOWS | A curated subset of the Windows OIB v4.0 (compliance, update ring, Settings Catalog / Endpoint Security) for Entra joined Windows 11, driven by `PolicyManifest.json`. |
+| [experimental-workforce-03](experimental-workforce/doc/experimental-workforce-03/README.md) | WINDOWS365 | Windows 365 OIB add-on: connectivity and redirection profiles, Cloud PC compliance, Cloud PC filter excluding BitLocker / Device Health, optional provisioning policy. |
 
 ## Changelog 
 | Version | Date       | Description                                                                                    |
@@ -121,6 +136,7 @@ stages layered on top of the certificate-bound Service Principal pattern from St
 | v1.10   | 2026.06.23 | Added Stage 19 (Temporary Access Pass)                                                         |
 | v1.11   | 2026.07.04 | Added Stage Extra External ID - Native Authentication |
 | v2.0   | 2026.07.06 | 🎆 Reorganized into 3 independent paths (Workforce, External, Verified ID)  |
+| v2.1   | 2026.11.16 | Added experimental Path 4: Workforce Intune Baseline (OpenIntuneBaseline BYOD, Windows, Windows 365) |
 
 ## Frequently Asked Questions (FAQ)
 

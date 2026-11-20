@@ -1,0 +1,31 @@
+{
+  // Experimental Workforce Intune path (experimental-workforce/) - OpenIntuneBaseline as code.
+  // VS Code: "Dev Containers: Reopen in Container" -> pick "Experimental Workforce (Intune)".
+  "name": "Experimental Workforce (Intune)",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "remoteUser": "vscode",
+  "containerEnv": {
+    "TF_PLUGIN_CACHE_DIR": "/home/vscode/.terraform.d/plugin-cache"
+  },
+  "mounts": [
+    // keep downloaded providers between container rebuilds
+    "source=experimental-workforce-tf-plugins,target=/home/vscode/.terraform.d/plugin-cache,type=volume"
+  ],
+  // Offline check of starter + final solution (mocked providers, no tenant needed)
+  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.terraform.d && git config --global --add safe.directory ${containerWorkspaceFolder}",
+  "postAttachCommand": "echo 'Run: NO_FINAL=1 bash scripts/ci/validate.sh experimental-workforce  &&  bash scripts/ci/validate.sh experimental-workforce'",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "hashicorp.terraform",
+        "humao.rest-client"
+      ],
+      "settings": {
+        "terminal.integrated.cwd": "${containerWorkspaceFolder}/experimental-workforce"
+      }
+    }
+  }
+}

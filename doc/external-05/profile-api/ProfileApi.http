@@ -1,0 +1,114 @@
+### External-05 profile API - manual tests (VS Code REST Client / Visual Studio / Rider)
+### Start the API first:  dotnet run ProfileApi.cs
+### Run the requests top to bottom: sign-up -> first sign-in (links by e-mail)
+### -> second sign-in (found by object id) -> user from before External-05 -> list.
+
+@baseUrl = http://localhost:5000
+# @baseUrl = https://<random-words>.trycloudflare.com
+@email = test.user@example.com
+@objectId = 00000000-0000-0000-0000-000000000042
+# The b2c-extensions-app appId without hyphens (only the suffix after the last "_" is matched).
+@ext = extension_00000000000000000000000000000000
+
+### 1. Sign-up submitted (OnAttributeCollectionSubmit) - same shape Entra sends
+# Expect: continueWithDefaultBehavior; console: STORED profile (ObjectId = null)
+POST {{baseUrl}}/api/OnAttributeCollectionSubmit
+Content-Type: application/json
+
+{
+  "type": "microsoft.graph.authenticationEvent.attributeCollectionSubmit",
+  "source": "/tenants/aaaabbbb-0000-cccc-1111-dddd2222eeee/applications/11111111-1111-1111-1111-111111111111",
+  "data": {
+    "@odata.type": "microsoft.graph.onAttributeCollectionSubmitCalloutData",
+    "tenantId": "aaaabbbb-0000-cccc-1111-dddd2222eeee",
+    "authenticationContext": {
+      "correlationId": "11111111-0000-0000-0000-000000000001",
+      "client": { "ip": "127.0.0.1", "locale": "en-us", "market": "en-us" },
+      "protocol": "OAUTH2.0"
+    },
+    "userSignUpInfo": {
+      "attributes": {
+        "email":       { "@odata.type": "microsoft.graph.stringDirectoryAttributeValue", "value": "{{email}}", "attributeType": "builtIn" },
+        "displayName": { "@odata.type": "microsoft.graph.stringDirectoryAttributeValue", "value": "Test User", "attributeType": "builtIn" },
+        "givenName":   { "@odata.type": "microsoft.graph.stringDirectoryAttributeValue", "value": "Test", "attributeType": "builtIn" },
+        "surname":     { "@odata.type": "microsoft.graph.stringDirectoryAttributeValue", "value": "User", "attributeType": "builtIn" },
+        "{{ext}}_TermsOfUseAccepted":    { "@odata.type": "microsoft.graph.booleanDirectoryAttributeValue", "value": true, "attributeType": "directorySchemaExtension" },
+        "{{ext}}_PrivacyPolicyAccepted": { "@odata.type": "microsoft.graph.booleanDirectoryAttributeValue", "value": true, "attributeType": "directorySchemaExtension" }
+      },
+      "identities": [
+        { "signInType": "email", "issuer": "contoso.onmicrosoft.com", "issuerAssignedId": "{{email}}" }
+      ]
+    }
+  }
+}
+
+### 2. First token after sign-up (OnTokenIssuanceStart) - found by e-mail, object id linked
+# Expect: provideClaimsForToken with CorrelationId, ApiVersion, CrmId, LoyaltyNumber, LoyaltyTier (PascalCase!)
+POST {{baseUrl}}/api/OnTokenIssuanceStart
+Content-Type: application/json
+
+{
+  "type": "microsoft.graph.authenticationEvent.tokenIssuanceStart",
+  "source": "/tenants/aaaabbbb-0000-cccc-1111-dddd2222eeee/applications/11111111-1111-1111-1111-111111111111",
+  "data": {
+    "@odata.type": "microsoft.graph.onTokenIssuanceStartCalloutData",
+    "tenantId": "aaaabbbb-0000-cccc-1111-dddd2222eeee",
+    "authenticationContext": {
+      "correlationId": "11111111-0000-0000-0000-000000000002",
+      "protocol": "OAUTH2.0",
+      "user": {
+        "id": "{{objectId}}",
+        "mail": "{{email}}",
+        "displayName": "Test User",
+        "givenName": "Test",
+        "surname": "User",
+        "userType": "Member"
+      }
+    }
+  }
+}
+
+### 3. Next sign-in - same profile found by object id (SignInCount = 2, same CrmId)
+POST {{baseUrl}}/api/OnTokenIssuanceStart
+Content-Type: application/json
+
+{
+  "data": {
+    "authenticationContext": {
+      "correlationId": "11111111-0000-0000-0000-000000000003",
+      "user": { "id": "{{objectId}}", "mail": "{{email}}" }
+    }
+  }
+}
+
+### 4. User who signed up BEFORE External-05 (no submit call) - profile created lazily
+POST {{baseUrl}}/api/OnTokenIssuanceStart
+Content-Type: application/json
+
+{
+  "data": {
+    "authenticationContext": {
+      "correlationId": "11111111-0000-0000-0000-000000000004",
+      "user": { "id": "00000000-0000-0000-0000-000000000099", "mail": "old.user@example.com" }
+    }
+  }
+}
+
+### 5. Bearer token is decoded and logged (NOT validated) - see the console
+# Fake JWT payload: {"aud":"<extension API client id>","azp":"99045fe1-7639-4a75-9d4a-577b6ca3810f"}
+POST {{baseUrl}}/api/OnTokenIssuanceStart
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJub25lIn0.eyJhdWQiOiI8ZXh0ZW5zaW9uIEFQSSBjbGllbnQgaWQ-IiwiYXpwIjoiOTkwNDVmZTEtNzYzOS00YTc1LTlkNGEtNTc3YjZjYTM4MTBmIn0.sig
+
+{
+  "data": {
+    "authenticationContext": {
+      "correlationId": "11111111-0000-0000-0000-000000000005",
+      "user": { "id": "{{objectId}}", "mail": "{{email}}" }
+    }
+  }
+}
+
+### 6. Everything in memory
+# Expect: test.user (ObjectId linked, consents true, SignInCount 3) and old.user (no name, no consents)
+GET {{baseUrl}}/api/profiles

@@ -43,3 +43,7 @@ Install the TFLint plugin defined in `.tflint.hcl`, then run the linter:
 tflint --init
 tflint --recursive
 ```
+
+## Terraform state
+
+Removing, re-creating and importing items in the state: [terraform.md](terraform.md).
