@@ -397,3 +397,33 @@ module "Tenant_TapPolicy" {
   # Use "all_users" to target every user, or paste a specific group object ID:
   include_target_group_id = "all_users"
 }
+
+#########################################################################
+# Stage 20: High Assurance - Verified ID step-up with Conditional Access PLACEHOLDER
+#########################################################################
+module "HighAssurance_SSO" {
+  source        = "./modules/sso_app"
+  business_name = "${var.deployment_unique_name}-HighAssurance-OidcDebuggerSSO"
+  web_uri       = ["https://oidcdebugger.com/debug"]
+}
+
+module "HighAssurance_Policy" {
+  source                  = "./modules/conditional_access_verified_id"
+  business_name           = "${var.deployment_unique_name}-RequireVerifiedId"
+  included_applications   = [module.HighAssurance_SSO.client_id]
+  pilot_member_object_ids = ["PUT_PILOT_USER_OBJECT_ID_HERE"]
+  excluded_user_ids       = ["PUT_BREAK_GLASS_USER_OBJECT_ID_HERE"]
+  state                   = "enabled"
+}
+
+output "high_assurance_client_id" {
+  value = module.HighAssurance_SSO.client_id
+}
+
+output "high_assurance_policy_id" {
+  value = module.HighAssurance_Policy.policy_id
+}
+
+output "high_assurance_pilot_group_id" {
+  value = module.HighAssurance_Policy.pilot_group_id
+}

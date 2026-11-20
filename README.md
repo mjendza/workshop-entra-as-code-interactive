@@ -46,7 +46,7 @@ This workshop is organized into **three independent paths**. Each is self-contai
 whichever apply to you. They intentionally don't cross-link into each other's stage numbering
 (separate label sets, separate issue sequences when generated via the interactive mode).
 
-### Path 1: Workforce Tenant (Stages 0-19)
+### Path 1: Workforce Tenant (Stages 0-20)
 
 | Step               | Title                                                          | Description                                                                                                                                                                                                                                                                        | Additional requirements |
 |--------------------|----------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------|
@@ -70,6 +70,7 @@ whichever apply to you. They intentionally don't cross-link into each other's st
 | [17](doc/stage-17) | CI/CD Pipelines                                                | Integrate your Terraform configurations and Maester tests into GitHub Actions pipelines. This stage demonstrates how to automate the deployment and security assessment of your Entra ID tenant on every code change, ensuring continuous compliance and security validation.      | GitHub Repository       |
 | [18](doc/stage-18) | Multitenant Secret Monitoring                                  | Monitor secrets across multiple tenants using a centralized approach. This stage demonstrates how to track and manage secrets in a multitenant environment, ensuring security and compliance via Multitenant App Registration and Federated Identity Credentials.                  | GitHub Repository       |
 | [19](doc/stage-19) | Temporary Access Pass (TAP)                                    | This stage demonstrates how to create and manage TAP policies for secure temporary access to your Entra ID tenant.                                                                                                                                                                 | External ID tenant      |
+| [20](doc/stage-20) | High Assurance - Verified ID with Conditional Access (Preview) | Create an SSO application (Service Principal) and a Conditional Access policy, via the msgraph provider, that requires identity verification: the user must present a Verified ID before accessing the app. Configure an identity verification profile scoped to a Terraform-managed pilot group.       | Verified ID onboarded (VC-00), P1 |
 | Cleanup            | Architecture Disassembly                                       | Execute a broad programmatic tracking destruction mapping using Terraform destroy. Formally complete the deployment workshop and zero the environment successfully. This safely removes all provisioned resources.                                                        |                         |
 
 ### Path 2: External ID (CIAM) Tenant
@@ -124,6 +125,7 @@ stages layered on top of the certificate-bound Service Principal pattern from St
 | v1.10   | 2026.06.23 | Added Stage 19 (Temporary Access Pass)                                                         |
 | v1.11   | 2026.07.04 | Added Stage Extra External ID - Native Authentication |
 | v2.0   | 2026.07.06 | 🎆 Reorganized into 3 independent paths (Workforce, External, Verified ID)  |
+| v2.1   | 2026.11.20 | Added Stage 20 (High Assurance - Verified ID step-up with Conditional Access)  |
 
 ## Frequently Asked Questions (FAQ)
 

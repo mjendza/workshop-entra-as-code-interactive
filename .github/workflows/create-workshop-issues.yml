@@ -64,7 +64,8 @@ jobs:
                   { file: 'doc/stage-16/README.md', title: 'Stage 16: Use Certificate instead of Client Secret for Service Principal', label: 'stage-16' },
                   { file: 'doc/stage-17/README.md', title: 'Stage 17: CI/CD Pipelines', label: 'stage-17' },
                   { file: 'doc/stage-18/README.md', title: 'Stage 18: Multitenant Secret Monitoring', label: 'stage-18' },
-                  { file: 'doc/stage-19/README.md', title: 'Stage 19: Temporary Access Pass (TAP)', label: 'stage-19' }
+                  { file: 'doc/stage-19/README.md', title: 'Stage 19: Temporary Access Pass (TAP)', label: 'stage-19' },
+                  { file: 'doc/stage-20/README.md', title: 'Stage 20: High Assurance - Verified ID with Conditional Access (Preview)', label: 'stage-20' }
                 ]
               },
               {
