@@ -1,0 +1,289 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="1200" height="540">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e17" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#0a0e17" />
+    </linearGradient>
+
+    <!-- Card Background Gradient -->
+    <linearGradient id="card-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.9" />
+    </linearGradient>
+
+    <!-- Card 1 Accent: Blue -->
+    <linearGradient id="blue-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0ea5e9" />
+    </linearGradient>
+    <linearGradient id="blue-border" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#0284c7" stop-opacity="0.1" />
+    </linearGradient>
+
+    <!-- Card 2 Accent: Purple -->
+    <linearGradient id="purple-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#a855f7" />
+    </linearGradient>
+    <linearGradient id="purple-border" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0.1" />
+    </linearGradient>
+
+    <!-- Card 3 Accent: Emerald -->
+    <linearGradient id="emerald-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+    <linearGradient id="emerald-border" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#059669" stop-opacity="0.1" />
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="glow-blue" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <style>
+    .font-title { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 800; }
+    .font-sub { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 600; }
+    .font-body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 400; }
+    .font-mono { font-family: 'Consolas', 'Cascadia Code', 'Courier New', monospace; font-weight: 600; }
+  </style>
+
+  <!-- Deep Canvas Background -->
+  <rect width="1200" height="540" rx="16" fill="url(#bg-grad)" stroke="#1e293b" stroke-width="1.5" />
+
+  <!-- Ambient Light Accents -->
+  <circle cx="216" cy="70" r="140" fill="#0284c7" opacity="0.08" />
+  <circle cx="600" cy="70" r="140" fill="#8b5cf6" opacity="0.08" />
+  <circle cx="984" cy="70" r="140" fill="#10b981" opacity="0.08" />
+
+  <!-- ==================== HEADER SECTION ==================== -->
+  <g transform="translate(600, 36)" text-anchor="middle">
+    <!-- Badge -->
+    <rect x="-140" y="0" width="280" height="26" rx="13" fill="#1e293b" stroke="#334155" stroke-width="1" />
+    <circle cx="-116" cy="13" r="4" fill="#38bdf8" />
+    <text x="5" y="17" fill="#94a3b8" font-size="11.5" letter-spacing="1.2" class="font-mono">MICROSOFT ENTRA AS CODE</text>
+
+    <!-- Main Title -->
+    <text x="0" y="58" fill="#f8fafc" font-size="28" letter-spacing="-0.5" class="font-title">
+      3 Independent Workshop Tracks
+    </text>
+
+    <!-- Subtitle -->
+    <text x="0" y="82" fill="#94a3b8" font-size="14.5" class="font-body">
+      Declarative Identity &amp; Access Management with Terraform • Self-Contained • Choose Your Journey
+    </text>
+  </g>
+
+  <!-- ==================== TRACK 1: WORKFORCE ==================== -->
+  <g transform="translate(40, 136)">
+    <!-- Card Frame -->
+    <rect width="360" height="330" rx="14" fill="url(#card-grad)" stroke="url(#blue-border)" stroke-width="1.5" />
+    
+    <!-- Top Accent Line -->
+    <path d="M 0 14 Q 0 0 14 0 L 346 0 Q 360 0 360 14 L 360 4 L 0 4 Z" fill="url(#blue-grad)" />
+
+    <!-- Track Header -->
+    <g transform="translate(24, 28)">
+      <!-- Icon Container -->
+      <rect x="0" y="0" width="42" height="42" rx="10" fill="#0284c7" fill-opacity="0.15" stroke="#38bdf8" stroke-width="1" />
+      <!-- Building/Enterprise Icon -->
+      <path d="M 14 31 L 14 13 L 28 13 L 28 31 Z M 18 17 L 20 17 L 20 19 L 18 19 Z M 22 17 L 24 17 L 24 19 L 22 19 Z M 18 22 L 20 22 L 20 24 L 18 24 Z M 22 22 L 24 22 L 24 24 L 22 24 Z M 20 31 L 20 27 L 22 27 L 22 31 Z" fill="#38bdf8" />
+
+      <!-- Track Name & Scope -->
+      <text x="54" y="18" fill="#f1f5f9" font-size="17" class="font-title">Entra ID (Workforce)</text>
+      <text x="54" y="36" fill="#38bdf8" font-size="12" class="font-sub">Path 1 • Enterprise Tenant</text>
+
+      <!-- Pill Badge -->
+      <rect x="232" y="6" width="80" height="22" rx="11" fill="#0369a1" fill-opacity="0.3" stroke="#0284c7" stroke-width="1" />
+      <text x="272" y="21" fill="#7dd3fc" font-size="10.5" text-anchor="middle" class="font-mono">Stages 0–20</text>
+    </g>
+
+    <!-- Divider -->
+    <line x1="24" y1="88" x2="336" y2="88" stroke="#334155" stroke-width="1" />
+
+    <!-- Feature Items -->
+    <g transform="translate(24, 108)" font-size="12.5" fill="#cbd5e1" class="font-body">
+      <g transform="translate(0, 0)">
+        <circle cx="5" cy="5" r="3" fill="#38bdf8" />
+        <text x="16" y="9">SSO, App Registrations &amp; SPs</text>
+      </g>
+      <g transform="translate(0, 26)">
+        <circle cx="5" cy="5" r="3" fill="#38bdf8" />
+        <text x="16" y="9">Workload Federation &amp; Cert-based SP</text>
+      </g>
+      <g transform="translate(0, 52)">
+        <circle cx="5" cy="5" r="3" fill="#38bdf8" />
+        <text x="16" y="9">Conditional Access, Access Packages &amp; PIM</text>
+      </g>
+      <g transform="translate(0, 78)">
+        <circle cx="5" cy="5" r="3" fill="#38bdf8" />
+        <text x="16" y="9">Security Hardening &amp; Agent Blueprint</text>
+      </g>
+      <g transform="translate(0, 104)">
+        <circle cx="5" cy="5" r="3" fill="#38bdf8" />
+        <text x="16" y="9">Maester, EntraExporter, Drift &amp; Lokka MCP</text>
+      </g>
+      <g transform="translate(0, 130)">
+        <circle cx="5" cy="5" r="3" fill="#38bdf8" />
+        <text x="16" y="9">TAP Policy &amp; Verified ID High Assurance</text>
+      </g>
+    </g>
+
+    <!-- Bottom Action Pill -->
+    <g transform="translate(24, 276)">
+      <rect width="312" height="34" rx="8" fill="#0369a1" fill-opacity="0.18" stroke="#0284c7" stroke-width="1" />
+      <text x="156" y="22" fill="#38bdf8" font-size="12" text-anchor="middle" class="font-sub">
+        21 Stages • Core Enterprise IAM
+      </text>
+    </g>
+  </g>
+
+  <!-- ==================== TRACK 2: EXTERNAL ID ==================== -->
+  <g transform="translate(420, 136)">
+    <!-- Card Frame -->
+    <rect width="360" height="330" rx="14" fill="url(#card-grad)" stroke="url(#purple-border)" stroke-width="1.5" />
+    
+    <!-- Top Accent Line -->
+    <path d="M 0 14 Q 0 0 14 0 L 346 0 Q 360 0 360 14 L 360 4 L 0 4 Z" fill="url(#purple-grad)" />
+
+    <!-- Track Header -->
+    <g transform="translate(24, 28)">
+      <!-- Icon Container -->
+      <rect x="0" y="0" width="42" height="42" rx="10" fill="#7c3aed" fill-opacity="0.15" stroke="#c084fc" stroke-width="1" />
+      <!-- Users / Customer Icon -->
+      <path d="M 21 19 A 4 4 0 1 0 21 11 A 4 4 0 1 0 21 19 Z M 14 29 C 14 25.5 17 23 21 23 C 25 23 28 25.5 28 29 Z M 27 18 A 3 3 0 1 0 27 12 M 29 27 C 30.5 26 31.5 24.5 31.5 23 C 31.5 21.5 30 20 28 20" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" />
+
+      <!-- Track Name & Scope -->
+      <text x="54" y="18" fill="#f1f5f9" font-size="17" class="font-title">Entra External ID</text>
+      <text x="54" y="36" fill="#c084fc" font-size="12" class="font-sub">Path 2 • CIAM / Customer Tenant</text>
+
+      <!-- Pill Badge -->
+      <rect x="232" y="6" width="80" height="22" rx="11" fill="#581c87" fill-opacity="0.4" stroke="#7c3aed" stroke-width="1" />
+      <text x="272" y="21" fill="#e9d5ff" font-size="10.5" text-anchor="middle" class="font-mono">Ext-00 – 02</text>
+    </g>
+
+    <!-- Divider -->
+    <line x1="24" y1="88" x2="336" y2="88" stroke="#334155" stroke-width="1" />
+
+    <!-- Feature Items -->
+    <g transform="translate(24, 108)" font-size="12.5" fill="#cbd5e1" class="font-body">
+      <g transform="translate(0, 0)">
+        <circle cx="5" cy="5" r="3" fill="#c084fc" />
+        <text x="16" y="9">Dedicated CIAM Root (<tspan fill="#e9d5ff" font-family="monospace">external_tenant/</tspan>)</text>
+      </g>
+      <g transform="translate(0, 26)">
+        <circle cx="5" cy="5" r="3" fill="#c084fc" />
+        <text x="16" y="9">Native Authentication API (Email + Password)</text>
+      </g>
+      <g transform="translate(0, 52)">
+        <circle cx="5" cy="5" r="3" fill="#c084fc" />
+        <text x="16" y="9">Automated Sign-In Validation with Pester</text>
+      </g>
+      <g transform="translate(0, 78)">
+        <circle cx="5" cy="5" r="3" fill="#c084fc" />
+        <text x="16" y="9">Customer PoC App (SPA + Protected API)</text>
+      </g>
+      <g transform="translate(0, 104)">
+        <circle cx="5" cy="5" r="3" fill="#c084fc" />
+        <text x="16" y="9">Dedicated Sign-up &amp; Sign-in User Flows</text>
+      </g>
+      <g transform="translate(0, 130)">
+        <circle cx="5" cy="5" r="3" fill="#c084fc" />
+        <text x="16" y="9">Optional Conditional Access (Customer MFA)</text>
+      </g>
+    </g>
+
+    <!-- Bottom Action Pill -->
+    <g transform="translate(24, 276)">
+      <rect width="312" height="34" rx="8" fill="#581c87" fill-opacity="0.25" stroke="#7c3aed" stroke-width="1" />
+      <text x="156" y="22" fill="#c084fc" font-size="12" text-anchor="middle" class="font-sub">
+        3 Stages • Native Auth &amp; CIAM
+      </text>
+    </g>
+  </g>
+
+  <!-- ==================== TRACK 3: VERIFIED ID ==================== -->
+  <g transform="translate(800, 136)">
+    <!-- Card Frame -->
+    <rect width="360" height="330" rx="14" fill="url(#card-grad)" stroke="url(#emerald-border)" stroke-width="1.5" />
+    
+    <!-- Top Accent Line -->
+    <path d="M 0 14 Q 0 0 14 0 L 346 0 Q 360 0 360 14 L 360 4 L 0 4 Z" fill="url(#emerald-grad)" />
+
+    <!-- Track Header -->
+    <g transform="translate(24, 28)">
+      <!-- Icon Container -->
+      <rect x="0" y="0" width="42" height="42" rx="10" fill="#059669" fill-opacity="0.15" stroke="#34d399" stroke-width="1" />
+      <!-- Credential / Badge Icon -->
+      <path d="M 14 13 L 28 13 C 29.1 13 30 13.9 30 15 L 30 27 C 30 28.1 29.1 29 28 29 L 14 29 C 12.9 29 12 28.1 12 27 L 12 15 C 12 13.9 12.9 13 14 13 Z M 17 21 A 2 2 0 1 0 17 17 A 2 2 0 1 0 17 21 Z M 22 18 L 26 18 M 22 22 L 26 22 M 15 26 L 25 26" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" fill="none" />
+
+      <!-- Track Name & Scope -->
+      <text x="54" y="18" fill="#f1f5f9" font-size="17" class="font-title">Entra Verified ID</text>
+      <text x="54" y="36" fill="#34d399" font-size="12" class="font-sub">Path 3 • Decentralized Identity</text>
+
+      <!-- Pill Badge -->
+      <rect x="232" y="6" width="80" height="22" rx="11" fill="#064e3b" fill-opacity="0.4" stroke="#059669" stroke-width="1" />
+      <text x="272" y="21" fill="#a7f3d0" font-size="10.5" text-anchor="middle" class="font-mono">VC-00 – 01</text>
+    </g>
+
+    <!-- Divider -->
+    <line x1="24" y1="88" x2="336" y2="88" stroke="#334155" stroke-width="1" />
+
+    <!-- Feature Items -->
+    <g transform="translate(24, 108)" font-size="12.5" fill="#cbd5e1" class="font-body">
+      <g transform="translate(0, 0)">
+        <circle cx="5" cy="5" r="3" fill="#34d399" />
+        <text x="16" y="9">Tenant Onboarding &amp; DID Authority</text>
+      </g>
+      <g transform="translate(0, 26)">
+        <circle cx="5" cy="5" r="3" fill="#34d399" />
+        <text x="16" y="9">Azure Key Vault DID Signing Keys</text>
+      </g>
+      <g transform="translate(0, 52)">
+        <circle cx="5" cy="5" r="3" fill="#34d399" />
+        <text x="16" y="9">Declarative W3C Verifiable Credentials</text>
+      </g>
+      <g transform="translate(0, 78)">
+        <circle cx="5" cy="5" r="3" fill="#34d399" />
+        <text x="16" y="9">Custom <tspan fill="#a7f3d0" font-family="monospace">mjendza/verifiedid</tspan> Provider</text>
+      </g>
+      <g transform="translate(0, 104)">
+        <circle cx="5" cy="5" r="3" fill="#34d399" />
+        <text x="16" y="9">High Assurance Foundation for Stage 20</text>
+      </g>
+      <g transform="translate(0, 130)">
+        <circle cx="5" cy="5" r="3" fill="#34d399" />
+        <text x="16" y="9">Developer Bridge to <tspan fill="#a7f3d0">workshop-verified-id</tspan></text>
+      </g>
+    </g>
+
+    <!-- Bottom Action Pill -->
+    <g transform="translate(24, 276)">
+      <rect width="312" height="34" rx="8" fill="#064e3b" fill-opacity="0.25" stroke="#059669" stroke-width="1" />
+      <text x="156" y="22" fill="#34d399" font-size="12" text-anchor="middle" class="font-sub">
+        2 Stages • Verifiable Credentials
+      </text>
+    </g>
+  </g>
+
+  <!-- ==================== FOOTER BADGE BAR ==================== -->
+  <g transform="translate(600, 500)" text-anchor="middle">
+    <rect x="-420" y="-18" width="840" height="32" rx="16" fill="#0f172a" stroke="#334155" stroke-width="1" />
+    <text x="0" y="3" fill="#94a3b8" font-size="12.5" class="font-sub">
+      <tspan fill="#38bdf8">⚡ 100% Independent Paths</tspan>
+      <tspan fill="#475569">   •   </tspan>
+      <tspan fill="#c084fc">🚀 Run in Any Order</tspan>
+      <tspan fill="#475569">   •   </tspan>
+      <tspan fill="#34d399">📋 Interactive GitHub Issues Tracking</tspan>
+    </text>
+  </g>
+</svg>
