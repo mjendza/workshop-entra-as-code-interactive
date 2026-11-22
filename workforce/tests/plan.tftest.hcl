@@ -44,7 +44,9 @@ mock_provider "msgraph" {}
 # config may not declare them (mocking an undeclared provider is an error).
 
 variables {
-  deployment_unique_name = "CiTest"
+  deployment_unique_name              = "CiTest"
+  high_assurance_pilot_user_ids       = ["aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"]
+  high_assurance_break_glass_user_ids = ["bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"]
 }
 
 run "plan" {

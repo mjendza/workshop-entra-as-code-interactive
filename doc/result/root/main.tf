@@ -401,6 +401,16 @@ module "Tenant_TapPolicy" {
 #########################################################################
 # Stage 20: High Assurance - Verified ID step-up with Conditional Access PLACEHOLDER
 #########################################################################
+variable "high_assurance_pilot_user_ids" {
+  description = "Object IDs of pilot users for the Verified ID policy."
+  type        = list(string)
+}
+
+variable "high_assurance_break_glass_user_ids" {
+  description = "Object IDs of emergency access users excluded from the Verified ID policy."
+  type        = list(string)
+}
+
 module "HighAssurance_SSO" {
   source        = "./modules/sso_app"
   business_name = "${var.deployment_unique_name}-HighAssurance-OidcDebuggerSSO"
@@ -412,8 +422,8 @@ module "HighAssurance_Policy" {
   source                  = "./modules/conditional_access_verified_id"
   business_name           = "${var.deployment_unique_name}-RequireVerifiedId"
   included_applications   = [module.HighAssurance_SSO.client_id]
-  pilot_member_object_ids = ["PUT_PILOT_USER_OBJECT_ID_HERE"]
-  excluded_user_ids       = ["PUT_BREAK_GLASS_USER_OBJECT_ID_HERE"]
+  pilot_member_object_ids = var.high_assurance_pilot_user_ids
+  excluded_user_ids       = var.high_assurance_break_glass_user_ids
   # After creating the profiles: all profile IDs from scripts/stage-20/verify.ps1
   verified_id_profile_ids = []
   state                   = "enabled"
