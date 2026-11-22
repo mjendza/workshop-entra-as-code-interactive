@@ -63,6 +63,7 @@ module "AppRolePim" {
   source                     = "./modules/pim_app_roles"
   business_name              = "${var.deployment_unique_name}-AppRolePim"
   app_role_values            = ["reader", "operator", "admin"]
+  spa_uri                    = ["https://oidcdebugger.com/debug", "https://tenant.factorlabs.pl/oidcdebugger/debug"]
   eligible_member_object_ids = ["PUT_TEST_USER_OBJECT_ID_HERE"]
   standing_role_value        = "reader"
 }
@@ -82,7 +83,13 @@ output "app_role_pim_eligible_group_id" {
 output "app_role_pim_app_role_ids" {
   value = module.AppRolePim.app_role_ids
 }
+
+output "app_role_pim_oidc_debugger_link" {
+  value = module.AppRolePim.oidc_debugger_link
+}
 ```
+
+> `app_role_pim_oidc_debugger_link` is a ready-to-open link `https://tenant.factorlabs.pl/oidcdebugger?data=<base64 JSON>` with the authorization endpoint, client ID and scope (`openid profile`) already filled in.
 
 > **Don't** add an `azuread_app_role_assignment` for `admin`. That creates standing access to the privileged role, and PIM can't take it away. Use `standing_role_value` only for low-privilege roles.
 
@@ -124,7 +131,11 @@ The plan should show the application with three `app_role` blocks, the Service P
 
 ### 4. Before activation: only the standing role
 
-1. Open a private browser window and go to [https://oidcdebugger.com](https://oidcdebugger.com). Set:
+1. Open a private browser window with the prefilled workshop OIDC debugger link:
+   ```powershell
+   terraform output -raw app_role_pim_oidc_debugger_link
+   ```
+   Or go to [https://oidcdebugger.com](https://oidcdebugger.com) and set:
    - **Authorize URI:** `https://login.microsoftonline.com/<TENANT_ID>/oauth2/v2.0/authorize`
    - **Redirect URI:** `https://oidcdebugger.com/debug`
    - **Client ID:** `terraform output -raw app_role_pim_client_id`

@@ -64,6 +64,7 @@ module "HighAssurance_SSO" {
   source        = "./modules/sso_app"
   business_name = "${var.deployment_unique_name}-HighAssurance-OidcDebuggerSSO"
   web_uri       = ["https://oidcdebugger.com/debug"]
+  spa_uri       = ["https://tenant.factorlabs.pl/oidcdebugger/debug"]
 }
 
 module "HighAssurance_Policy" {
@@ -86,7 +87,13 @@ output "high_assurance_policy_id" {
 output "high_assurance_pilot_group_id" {
   value = module.HighAssurance_Policy.pilot_group_id
 }
+
+output "high_assurance_oidc_debugger_link" {
+  value = module.HighAssurance_SSO.oidc_debugger_link
+}
 ```
+
+> `spa_uri` registers the workshop OIDC debugger as a **SPA** redirect (it uses PKCE in the browser). `high_assurance_oidc_debugger_link` is a ready-to-open link `https://tenant.factorlabs.pl/oidcdebugger?data=<base64 JSON>` with the authorization endpoint, client ID and scope already filled in.
 
 > **Why `state = "enabled"`?** Report-only mode evaluates the policy but **never triggers** identity verification, so you'd see nothing during the test. The policy is scoped to the pilot group only, so other users aren't affected.
 
@@ -130,7 +137,11 @@ Inline issuance from the Conditional Access challenge is **deferred** for Verifi
 ## Verification Steps
 
 ### 4. Test the step-up
-1. Open a private browser window and go to [https://oidcdebugger.com](https://oidcdebugger.com). Set:
+1. Open a private browser window with the prefilled workshop OIDC debugger link:
+   ```powershell
+   terraform output -raw high_assurance_oidc_debugger_link
+   ```
+   Or go to [https://oidcdebugger.com](https://oidcdebugger.com) and set:
    - **Authorize URI:** `https://login.microsoftonline.com/<TENANT_ID>/oauth2/v2.0/authorize`
    - **Client ID:** `terraform output -raw high_assurance_client_id`
    - **Scope:** `openid profile`, **Response type:** `code`
