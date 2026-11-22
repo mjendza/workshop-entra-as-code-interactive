@@ -181,7 +181,7 @@ resource "azuread_application_certificate" "this_cert" {
   count          = var.use_certificate ? 1 : 0
   application_id = azuread_application.this.id
   type           = "AsymmetricX509Cert"
-  value          = file("${path.module}/../../cert/${var.certificate_file}")
+  value          = file("${path.module}/../../../cert/${var.certificate_file}")
   start_date     = time_static.cert_created[0].rfc3339
   end_date       = timeadd(time_static.cert_created[0].rfc3339, "${var.certificate_validity_months * 30 * 24}h")
 }

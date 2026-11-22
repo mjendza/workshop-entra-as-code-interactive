@@ -96,6 +96,11 @@ output "high_assurance_oidc_debugger_link" {
 }
 ```
 
+The final solution in `doc/result/root/main.tf` uses the required variables
+`high_assurance_pilot_user_ids` and `high_assurance_break_glass_user_ids` instead
+of these placeholders. Set both to lists of your tenant's user object IDs when
+using that solution.
+
 > `spa_uri` registers the workshop OIDC debugger as a SPA redirect (it uses PKCE in the browser). `high_assurance_oidc_debugger_link` is a ready-to-open link `https://tenant.factorlabs.pl/oidcdebugger?data=<base64 JSON>` with the authorization endpoint, client ID and scope already filled in.
 
 > **Why `state = "enabled"`?** Report-only mode evaluates the policy but never triggers identity verification, so you'd see nothing during the test. The policy is scoped to the pilot group only, so other users aren't affected.

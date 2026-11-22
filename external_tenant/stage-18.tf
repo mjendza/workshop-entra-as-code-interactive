@@ -6,7 +6,7 @@
 #
 # When you do Stage 18:
 #   1. set multitenant_client_id in terraform.tfvars
-#      (root: terraform output -raw multitenant_client_id),
+#      (workforce/: terraform output -raw multitenant_client_id),
 #   2. paste the code from doc/result/external_id/stage-18.tf into the
 #      sections below,
 #   3. terraform plan / terraform apply.

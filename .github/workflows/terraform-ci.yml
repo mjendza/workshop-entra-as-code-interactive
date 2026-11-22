@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        solution: [root, external_tenant, verified_id]
+        solution: [workforce, external_tenant, verified_id]
         # starter = files participants begin with, final = doc/result/** overlay
         variant: [starter, final]
 

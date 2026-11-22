@@ -81,7 +81,7 @@ This is the "Observe" phase of the Musketeers cycle — read-only, scheduled, an
 
 ### 1. Configure the home-tenant Terraform
 
-Set `var.github_repo` in `variables.tf` (or via `-var` / `TF_VAR_github_repo`):
+Set `var.github_repo` in `workforce/variables.tf` (or via `-var` / `TF_VAR_github_repo`):
 
 ```hcl
 variable "github_repo" {
@@ -116,6 +116,7 @@ output "multitenant_client_id" {
 Apply:
 
 ```powershell
+cd workforce
 terraform plan
 terraform apply
 terraform output -raw multitenant_client_id
@@ -206,7 +207,7 @@ The default GitHub OIDC token is short-lived; long-running matrix jobs may need 
 ## Stage Completion Checklist
 - [ ] I have read and comprehended this stage.
 - [ ] I have set `var.github_repo` to my `OWNER/REPO`.
-- [ ] I have run `terraform plan` and `terraform apply` from the repo root.
+- [ ] I have run `terraform plan` and `terraform apply` inside `workforce/`.
 - [ ] I have captured `terraform output -raw multitenant_client_id`.
 - [ ] I have run `terraform apply` inside `external_tenant/` for **every** tenant I want to monitor.
 - [ ] I have set the repository secrets `AZURE_CLIENT_ID` and `TENANT_IDS`.

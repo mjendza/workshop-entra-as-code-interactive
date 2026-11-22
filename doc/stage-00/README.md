@@ -77,12 +77,14 @@ git --version
 
 ## Code Configuration
 
-Update the **terraform.tfvars** file. Set a unique prefix (such as your initials) as the value for `deployment_unique_name`.
+All Workforce (Path 1) Terraform code lives in the [`workforce/`](../../workforce/) folder. Run every `terraform` command from inside it (`cd workforce`); file names in Stages 00 – 21 (`main.tf`, `provider.tf`, `terraform.tfvars`, `./modules/...`) are relative to that folder.
+
+Update the **workforce/terraform.tfvars** file. Set a unique prefix (such as your initials) as the value for `deployment_unique_name`.
 ```hcl
 deployment_unique_name = "MJ"
 ```
 
-Update the `provider.tf` file using the Service Principal credentials documented earlier:
+Update the `workforce/provider.tf` file using the Service Principal credentials documented earlier:
 ```hcl
 provider "azuread" {
   client_id     = "YOUR_CLIENT_ID_HERE"
@@ -95,7 +97,7 @@ provider "azuread" {
 - [ ] Ensure that `client_id` and `client_secret` are properly stored inside the `provider.tf` file.
 - [ ] Confirm the `Application.ReadWrite.All` permission has been granted, including admin consent. For more details, review the [Provider Service Principal Configuration Guide](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_configuration).
 - [ ] Confirm each module has a distinct `deployment_unique_name` to avoid potential collisions (optional).
-- [ ] Execute `terraform init` to ensure the provider dependencies download and initialize successfully.
+- [ ] Execute `terraform init` inside `workforce/` to ensure the provider dependencies download and initialize successfully.
 
 ## Troubleshooting
 | Issue | Solution |

@@ -148,6 +148,7 @@ module "GitHubMicrosoftZTA_ServicePrincipal" {
 Initialize and apply:
 
 ```bash
+cd workforce
 terraform init
 terraform plan
 terraform apply

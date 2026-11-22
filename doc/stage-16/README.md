@@ -25,7 +25,7 @@ Microsoft Entra recommends **certificate credentials** for confidential clients:
 
 We will use `./modules/service_principal_rich`, which now supports certificate credentials via the same pattern proven by `sso_app_rich`. Terraform reads the public certificate from `<repo-root>/cert/cert.pem`; the matching private key stays in `cert/cert.pfx` for the auth script. Both files come from `scripts/stage-16/init.ps1`.
 
-> **Note:** Pick a unique business name prefix for your tenant. The cert files live at the repo root because `sso_app_rich` and `service_principal_rich` both expect `${path.module}/../../cert/`.
+> **Note:** Pick a unique business name prefix for your tenant. The cert files live at the repo root (not in `workforce/`) because `sso_app_rich` and `service_principal_rich` both expect `${path.module}/../../../cert/` (i.e. `workforce/modules/<module>/../../../cert/`).
 
 ### 1. Generate the certificate
 
@@ -135,7 +135,7 @@ The live tests resolve the SP from `terraform output -raw sp_with_certificate_cl
 ## Troubleshooting
 
 **`file: cert/cert.pem not found` during `terraform apply`**
-The cert hasn't been generated yet. Run `pwsh ./scripts/stage-16/init.ps1` from the repo root, then re-apply.
+The cert hasn't been generated yet. Run `pwsh ./scripts/stage-16/init.ps1` from the repo root, then re-apply from `workforce/`.
 
 **`AADSTS700027: Client assertion failed signature validation`**
 The certificate uploaded to the SP doesn't match the one signing the token. This usually means `init.ps1` was run again after `terraform apply`. Run `terraform taint 'module.Workload_CertSp.time_static.cert_created[0]'` and `terraform apply` to re-anchor and re-upload, or re-run `init.ps1` followed by `terraform apply`.

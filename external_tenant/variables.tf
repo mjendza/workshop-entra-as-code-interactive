@@ -1,5 +1,5 @@
 variable "multitenant_client_id" {
-  description = "Stage 18 only: Application (client) ID of the multi-tenant app from the home tenant. Get it by running `terraform output -raw multitenant_client_id` from the repo root after the root `terraform apply`. Not needed by the External-0x steps."
+  description = "Stage 18 only: Application (client) ID of the multi-tenant app from the home tenant. Get it by running `terraform output -raw multitenant_client_id` in `workforce/` after the Workforce `terraform apply`. Not needed by the External-0x steps."
   type        = string
   default     = ""
 }
