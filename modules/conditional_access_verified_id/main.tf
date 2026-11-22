@@ -31,12 +31,20 @@ variable "pilot_member_object_ids" {
   description = "Object IDs of users added to the pilot group. Only members of this group are challenged for a Verified ID. Use the same group as the scope of your identity verification profile."
   type        = list(string)
   default     = []
+  validation {
+    condition     = alltrue([for id in var.pilot_member_object_ids : can(regex("^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$", id))])
+    error_message = "pilot_member_object_ids must contain user object IDs (UUIDs). Replace any placeholder values."
+  }
 }
 
 variable "excluded_user_ids" {
   description = "Object IDs of users always excluded from the policy (e.g. emergency access / break-glass accounts)."
   type        = list(string)
   default     = []
+  validation {
+    condition     = alltrue([for id in var.excluded_user_ids : can(regex("^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$", id))])
+    error_message = "excluded_user_ids must contain user object IDs (UUIDs). Replace any placeholder values."
+  }
 }
 
 variable "state" {

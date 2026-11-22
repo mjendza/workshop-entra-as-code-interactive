@@ -190,4 +190,4 @@ Another Conditional Access policy applies (for example the Stage 4 location poli
 > **Report Issues:** Did you encounter a bug or hold a question? [Report your issue here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← Previous: Stage 19](../stage-19/README.md) | [Next → Stage Cleanup](../stage-cleanup/README.md)
+**Navigation:** [← Previous: Stage 19](../stage-19/README.md) | [Next → Stage 21: App Role PIM](../stage-21/README.md)

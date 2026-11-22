@@ -4,6 +4,18 @@ variable "web_uri" {
   default     = []
 }
 
+variable "spa_uri" {
+  description = "List of SPA (PKCE) redirect URIs, e.g. https://tenant.factorlabs.pl/oidcdebugger/debug"
+  type        = list(string)
+  default     = []
+}
+
+variable "oidc_debugger_url" {
+  description = "OIDC debugger page used to build the oidc_debugger_link output (?data=<base64 JSON>)."
+  type        = string
+  default     = "https://tenant.factorlabs.pl/oidcdebugger"
+}
+
 variable "graph_permissions" {
   description = "List of Graph API permissions for Role"
   type        = list(string)
@@ -50,6 +62,12 @@ resource "azuread_application" "this" {
       id_token_issuance_enabled     = false
     }
   }
+  dynamic "single_page_application" {
+    for_each = length(var.spa_uri) > 0 ? [1] : []
+    content {
+      redirect_uris = var.spa_uri
+    }
+  }
   required_resource_access {
     # Microsoft Graph
     resource_app_id = "00000003-0000-0000-c000-000000000000"
@@ -75,6 +93,19 @@ resource "azuread_service_principal" "this" {
   app_role_assignment_required = false
 }
 
+data "azuread_client_config" "current" {}
+
 output "client_id" {
   value = azuread_application.this.client_id
+}
+
+# Same format as doc/external-05/New-SpaConfigBase64.ps1: ?data=<url-encoded base64 JSON>.
+# The redirect URI <oidc_debugger_url>/debug must be in spa_uri.
+output "oidc_debugger_link" {
+  value = "${trimsuffix(var.oidc_debugger_url, "/")}?data=${urlencode(base64encode(jsonencode({
+    name                  = azuread_application.this.display_name
+    authorizationEndpoint = "https://login.microsoftonline.com/${data.azuread_client_config.current.tenant_id}/oauth2/v2.0/authorize"
+    clientId              = azuread_application.this.client_id
+    scope                 = "openid profile offline_access"
+  })))}"
 }

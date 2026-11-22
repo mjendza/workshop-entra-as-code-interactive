@@ -110,8 +110,60 @@ terraform {
 #########################################################################
 # Stage 20: High Assurance - Verified ID step-up with Conditional Access PLACEHOLDER
 #########################################################################
+module "HighAssurance_SSO" {
+  source        = "./modules/sso_app"
+  business_name = "${var.deployment_unique_name}-HighAssurance-OidcDebuggerSSO"
+  web_uri       = ["https://oidcdebugger.com/debug"]
+}
 
+module "HighAssurance_Policy" {
+  source                  = "./modules/conditional_access_verified_id"
+  business_name           = "${var.deployment_unique_name}-RequireVerifiedId"
+  included_applications   = [module.HighAssurance_SSO.client_id]
+  pilot_member_object_ids = ["e07763ba-b4bf-4129-9a9e-0ca94661804c"]
+  excluded_user_ids       = ["31e4ca81-5ef2-475e-9806-b84f0af78e32"]
+  state                   = "enabled"
+}
 
+output "high_assurance_client_id" {
+  value = module.HighAssurance_SSO.client_id
+}
+
+output "high_assurance_policy_id" {
+  value = module.HighAssurance_Policy.policy_id
+}
+
+output "high_assurance_pilot_group_id" {
+  value = module.HighAssurance_Policy.pilot_group_id
+}
+
+#########################################################################
+# Stage 21: Entra ID App Role PIM (Private Preview) PLACEHOLDER
+#########################################################################
+module "AppRolePim" {
+  source          = "./modules/pim_app_roles"
+  business_name   = "${var.deployment_unique_name}-AppRolePim"
+  app_role_values = ["reader", "operator", "admin"]
+  # Paste your test user object ID, e.g. ["00000000-0000-0000-0000-000000000000"]
+  eligible_member_object_ids = ["e07763ba-b4bf-4129-9a9e-0ca94661804c"]
+  standing_role_value        = "reader"
+}
+
+output "app_role_pim_client_id" {
+  value = module.AppRolePim.client_id
+}
+
+output "app_role_pim_service_principal_object_id" {
+  value = module.AppRolePim.service_principal_object_id
+}
+
+output "app_role_pim_eligible_group_id" {
+  value = module.AppRolePim.eligible_group_id
+}
+
+output "app_role_pim_app_role_ids" {
+  value = module.AppRolePim.app_role_ids
+}
 ##########################################################################
 # Stage 101: Verified ID — Credential Contract (Service Principal for dedicated stack) PLACEHOLDER
 #########################################################################
