@@ -1,82 +1,163 @@
-# Entra as Code Workshop
+# Microsoft Entra as Code Workshop 🚀
 
-Manage your Entra ID tenant using Infrastructure as Code. This workshop supports both Workforce and Customer (External ID) instances.
+[![COPY Workshop](https://img.shields.io/badge/COPY%20Workshop-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/new?template_owner=mjendza&template_name=workshop-entra-as-code-interactive&owner=%40me&name=workshop-entra-as-code&description=Workshop:+Entra+ID+as+Code&visibility=public)
+[![Terraform Version](https://img.shields.io/badge/Terraform-%3E%3D1.0-844FBA?style=flat-square&logo=terraform)](https://www.terraform.io/)
+[![Microsoft Entra](https://img.shields.io/badge/Microsoft-Entra%20ID-0078D4?style=flat-square&logo=microsoftazure)](https://learn.microsoft.com/entra/)
+[![Interactive Tracking](https://img.shields.io/badge/Mode-Interactive%20GitHub%20Issues-brightgreen?style=flat-square&logo=github)](https://github.com/mjendza/workshop-entra-as-code-interactive)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE.md)
 
-## Interactive Workshop Mode (via GitHub Template)
+---
 
-This workshop features **interactive progress tracking via GitHub Issues**. Each stage of the workshop automatically generates a dedicated issue containing:
-- Detailed documentation and instructions
-- Checkboxes to track your progress
-- Labels for easy filtering and organization
+<p align="center">
+  <img src="doc/workshop-overview.svg" alt="Microsoft Entra as Code Workshop - 3 Independent Paths: Workforce, External ID, Verified ID" width="100%" />
+</p>
 
-## Important Risks and Warnings
+---
 
-**Stage 7** applies changes at the tenant level, which will affect all users in your Entra ID tenant. Please exercise caution. We highly recommend running this step in a development tenant or skipping it entirely if you are using a production environment.
+## Welcome to Entra as Code!
 
-**Stage 8** utilizes Microsoft Graph beta endpoints. If you encounter any issues, please submit a ticket.
+Welcome to the **Microsoft Entra as Code Workshop** — your hands-on, end-to-end journey into managing Microsoft cloud identity declaratively using **Terraform**, **Microsoft Graph**, and modern Infrastructure as Code (IaC) engineering practices.
 
-### Getting Started with Interactive Mode
+Whether you are securing enterprise employee identities, building modern customer authentication flows into mobile and web apps, or issuing decentralized Verifiable Credentials, this repository is designed as **three completely independent, self-contained workshop tracks**:
 
-1. [![](https://img.shields.io/badge/COPY%20Workshop-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/new?template_owner=mjendza&template_name=workshop-entra-as-code-interactive&owner=%40me&name=workshop-entra-as-code&description=Workshop:+Entra+ID+as+Code&visibility=public)
+1. 🏢 **[Path 1: Microsoft Entra ID (Workforce Tenant)](#path-1-workforce-tenant-stages-0--21)** — 22 stages covering enterprise single sign-on, workload identity federation, conditional access, privileged identity management (PIM), tenant hardening, security baseline testing (Maester, ZTA, Lokka MCP), certificate-based auth, secret monitoring, Temporary Access Pass (TAP), high-assurance Verified ID step-up, and just-in-time app roles (App Role PIM).
+2. 👥 **[Path 2: Microsoft Entra External ID (Customer / CIAM Tenant)](#path-2-external-id-ciam-tenant)** — 3 stages focusing on customer-facing identity in a dedicated CIAM tenant: Native Authentication API (email + password), automated Pester test verification, and single sign-on for a Single Page Application (SPA) + backend API with dedicated user flows.
+3. 🪪 **[Path 3: Microsoft Entra Verified ID (Decentralized Identity)](#path-3-verified-id)** — 2 stages covering tenant-level DID authority onboarding, Azure Key Vault signing keys, and declarative issuance of W3C Verifiable Credential contracts via the custom `mjendza/verifiedid` Terraform provider.
 
-2. **Create your repository from the template.** Once created, a GitHub Actions pipeline will automatically generate the workshop issues for you.
-   - Navigate to the **Issues** tab in your new repository.
+> [!TIP]
+> **100% Independent Paths:** You do **not** need to complete Path 1 before tackling Path 2 or Path 3. Each path uses its own isolated Terraform root or stage sequence, dedicated service principals, and label sets. Pick the track that fits your current project or complete all three!
 
-3. **Track Your Progress:**
-   - Each stage is represented by a dedicated issue.
-   - Mark the checkboxes as you complete the corresponding tasks.
-   - Close the issue once all tasks in the stage are finished.
+---
 
-4. **Recommended Workflow:**
+## 🎯 Which Path Should You Choose?
 
-   | Step | Action                 |
-   |------|------------------------|
-   | 1    | Open the stage issue   |
-   | 2    | Read the documentation |
-   | 3    | Complete all tasks     |
-   | 4    | Check all checkboxes   |
-   | 5    | Close the issue        |
-   | 6    | Move to the next stage |
+| Track | Target Tenant | Stages | What You Will Learn | Who It Is For |
+|---|---|---|---|---|
+| 🏢 **Path 1: Workforce** | Microsoft Entra ID (Enterprise) | **00 – 21** + Cleanup | App registrations, Service Principals, Workload Identity Federation, Conditional Access, PIM, Tenant Hardening, Maester, EntraExporter, Drift detection, Lokka MCP, Cert Auth, TAP policy, High Assurance step-up, App Role PIM | Cloud Engineers, Identity Architects, SecOps, DevOps |
+| 👥 **Path 2: External ID** | Entra External ID (CIAM) | **Ext-00 – 02** | Dedicated `external_tenant/` root, Native Authentication API (headless email/password), Pester test automation, Customer SPA + API SSO, dedicated sign-up/sign-in user flows | App Developers, CIAM Engineers, Product Teams |
+| 🪪 **Path 3: Verified ID** | Entra ID + Azure Subscription | **VC-00 – 01** | Tenant DID authority onboarding, Azure Key Vault DID signing keys, W3C Verifiable Credential contracts via `mjendza/verifiedid` provider | Trust Architects, Decentralized Identity & Security Engineers |
 
-> **Tip:** Use the issue comments to jot down any problems encountered or lessons learned during each stage!
+---
 
-## Workshop Paths
+## 📋 Interactive Workshop Mode (Powered by GitHub Issues)
 
-This workshop is organized into **three independent paths**. Each is self-contained - pick
-whichever apply to you. They intentionally don't cross-link into each other's stage numbering
-(separate label sets, separate issue sequences when generated via the interactive mode).
+The most effective way to experience this workshop is via **Interactive Mode**. When you spawn your own copy of this repository using GitHub's template engine, an automated GitHub Actions pipeline instantly generates a dedicated **GitHub Issue for every single stage**.
 
-### Path 1: Workforce Tenant (Stages 0-20)
+```mermaid
+flowchart LR
+    A["1. Copy Workshop Template"] --> B["2. GitHub Actions Spawns Issues"]
+    B --> C["3. Open Stage Issue"]
+    C --> D["4. Write Terraform & Apply"]
+    D --> E["5. Mark Checkboxes & Close Issue"]
+    E --> F["6. Next Stage!"]
+    
+    style A fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#f8fafc
+    style B fill:#1e293b,stroke:#c084fc,stroke-width:2px,color:#f8fafc
+    style C fill:#1e293b,stroke:#34d399,stroke-width:2px,color:#f8fafc
+    style D fill:#1e293b,stroke:#f59e0b,stroke-width:2px,color:#f8fafc
+    style E fill:#1e293b,stroke:#10b981,stroke-width:2px,color:#f8fafc
+    style F fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc
+```
 
-| Step               | Title                                                          | Description                                                                                                                                                                                                                                                                        | Additional requirements |
-|--------------------|----------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------|
-| [0](doc/stage-00)  | Prerequisites                                                  | Create a Service Principal and client secret in the Azure Portal to be used in subsequent stages. Start with minimal permissions and retrieve your corresponding Entra ID administrative credentials.                                                                              |                         |
-| [01](doc/stage-01) | SSO Application                                                | Automate the deployment of an App Registration configured for Single Sign-On with the OIDC Debugger using Terraform. Manually generate a client secret for the application. You will then observe and test authentication flows.                                                   |                         |
-| [02](doc/stage-02) | Service Principal                                              | Automate the provisioning of a backend Service Principal using Terraform in Entra ID. This stage explores the manual component of application secret generation.                                                                                                                   |                         |
-| [03](doc/stage-03) | Workload Federation                                            | Provision a Service Principal in Entra ID using Terraform with Workload Identity Federation actively enabled. This demonstrates authentication without requiring explicit secret generation or management. Utilize the token issuer configuration for cross-system token exchange. |                         |
-| [04](doc/stage-04) | Conditional Access                                             | Automate the assignment of a Conditional Access policy specifically bound to the OidcDebugger SSO application. This will enforce rigid network segmentation. It also formally scopes authorization using a predefined geographic country configuration block.                      |                         |
-| [05](doc/stage-05) | Access Package                                                 | Provision an Entra ID Access Package structured to formalize onboarding mechanics routing into a centralized group. This facilitates the automated binding for self-service validated users.                                                                                       |                         |
-| [06](doc/stage-06) | Privileged Identity Management (PIM)                           | Utilize Privileged Identity Management to actively enforce Eligible Assignments rather than static access. Authorized users will physically elevate themselves directly into a higher-privileged tier.                                                                             |                         |
-| [07](doc/stage-07) | Tenant Security Hardening                                      | Restrict guest invitations and block standard users from creating app registrations and security groups. These restrictive tenant-wide resources will be applied using the microsoft/msgraph provider.                                                                             |                         |
-| [08](doc/stage-08) | Entra Agent Identity (Preview)                                 | Create an Agent Identity Blueprint via Terraform and provision an Agent Identity Blueprint Principal. Deploy an Agent Identity and optionally an Agent User using Microsoft Graph beta endpoints.                                                                                  |                         |
-| [09](doc/stage-09) | Maester                                                        | Automate the provisioning of a Service Principal with the required Maester permissions using Terraform. Run automated Maester tests to validate your tenant configuration against baseline security policies.                                                                      |                         |
-| [10](doc/stage-10) | EntraExporter                                                  | Establish a baseline snapshot of your current Entra ID configuration by provisioning a Service Principal using Terraform. Export your tenant's configuration to JSON files to understand its current state.                                                                        |                         |
-| [11](doc/stage-11) | Zero Trust Assessment                                          | Automate the provisioning of a Service Principal with the required ZeroTrustAssessment permissions using Terraform. Review the assessment results to proactively understand your tenant's security posture and identify areas for improvement.                                     |                         |
-| [12](doc/stage-12) | Diff                                                           | Combine Maester and EntraExporter to implement a diff-based workflow for configuration change detection. This will allow you to compare Entra ID configurations using diff analysis to detect changes between Terraform runs.                                                      |                         |
-| [13](doc/stage-13) | Lokka                                                          | Automate the provisioning of a Service Principal with Lokka MCP permissions using Terraform in Entra ID. Prepare configurations for GitHub Copilot VS Code and NanoBot. This allows you to explore Entra ID configurations using natural language.                                 |                         |
-| [14](doc/stage-14) | SPA SSO                                                        | Configure an Entra ID App Registration for Single Page Application (SPA) Single Sign-On. This includes defining SPA redirect URIs, custom API scopes, and identifier URIs. Validate the configuration and test authentication flows using the OIDC Debugger.                       |                         |
-| [15](doc/stage-15) | Application Roles (App Roles)                                  | Define application roles for role-based access control (RBAC) in your Entra ID App Registration. This stage demonstrates how to create app roles, assign them to users, and verify role claims in ID tokens using the OIDC Debugger.                                               |                         |
-| [16](doc/stage-16) | Use Certificate instead of Client Secret for Service Principal | Configure a Service Principal to use a certificate for authentication instead of a client secret. This enhances security by leveraging certificate-based authentication.                                                                                                           |                         |
-| [17](doc/stage-17) | CI/CD Pipelines                                                | Integrate your Terraform configurations and Maester tests into GitHub Actions pipelines. This stage demonstrates how to automate the deployment and security assessment of your Entra ID tenant on every code change, ensuring continuous compliance and security validation.      | GitHub Repository       |
-| [18](doc/stage-18) | Multitenant Secret Monitoring                                  | Monitor secrets across multiple tenants using a centralized approach. This stage demonstrates how to track and manage secrets in a multitenant environment, ensuring security and compliance via Multitenant App Registration and Federated Identity Credentials.                  | GitHub Repository       |
-| [19](doc/stage-19) | Temporary Access Pass (TAP)                                    | This stage demonstrates how to create and manage TAP policies for secure temporary access to your Entra ID tenant.                                                                                                                                                                 | External ID tenant      |
-| [20](doc/stage-20) | High Assurance - Verified ID with Conditional Access (Preview) | Create an SSO application (Service Principal) and a Conditional Access policy, via the msgraph provider, that requires identity verification: the user must present a Verified ID before accessing the app. Configure an identity verification profile scoped to a Terraform-managed pilot group.       | Verified ID onboarded (VC-00), P1 |
-| Cleanup            | Architecture Disassembly                                       | Execute a broad programmatic tracking destruction mapping using Terraform destroy. Formally complete the deployment workshop and zero the environment successfully. This safely removes all provisioned resources.                                                        |                         |
+### Why Interactive Mode?
+- 📝 **Dedicated Checklists:** Track every task in the stage directly with checkboxes.
+- 🏷️ **Clean Labeling:** Separate label categories for each path (`Workforce`, `External`, `VerifiedId`).
+- 💬 **Personal Lab Notes:** Use issue comments to paste Terraform outputs, token claims, or troubleshooting notes.
+- 🔄 **Preserved Links:** Stage documentation links automatically map to your own repository's issues!
+
+### Getting Started in 3 Steps
+
+1. Click the green badge below to create your repository:
+   <br>[![](https://img.shields.io/badge/COPY%20Workshop-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/new?template_owner=mjendza&template_name=workshop-entra-as-code-interactive&owner=%40me&name=workshop-entra-as-code&description=Workshop:+Entra+ID+as+Code&visibility=public)
+2. Wait ~30 seconds for the initial GitHub Actions workflow to run (`Create Workshop Issues`).
+3. Head over to the **Issues** tab in your new repository, pick your path, and begin with Stage 0!
+
+---
+
+## ⚠️ Important Risks, Warnings & Safety Guidelines
+
+Before executing Terraform commands against your tenant, please review these key boundaries:
+
+> [!WARNING]
+> **Stage 7 (Tenant Security Hardening):** Modifies singleton authorization policies at the tenant level (restricting guest user invitations, self-service app registrations, and group creation). While safe defaults are provided, **we strongly recommend running this in a dedicated sandbox or development tenant**.
+
+> [!NOTE]
+> **Stage 8 (Agent Identity Blueprint) & Stage 20 (High Assurance):** These stages leverage Microsoft Graph **beta endpoints** and preview features. If schema changes occur upstream in Microsoft Graph, refer to the respective stage documentation for updates.
+
+> [!CAUTION]
+> **Stage 21 (App Role PIM):** PIM for app roles is in **private preview**. Your tenant must be enrolled by Microsoft, and the eligible assignment and role settings are configured manually in the portal (no public Graph API yet).
+
+> [!WARNING]
+> **Stage 19 (Temporary Access Pass):** Manages the tenant-wide Authentication Methods policy singleton. You can scope the policy to a specific pilot group via `include_target_group_id` rather than all users.
+
+> [!IMPORTANT]
+> **Stage Cleanup:** Upon running `terraform destroy`, tenant-level singleton policies (such as the authorization policy in Stage 7 or TAP in Stage 19) are reverted back to their baseline default configuration, as tenant singletons cannot be physically deleted. Remember to revoke any active Access Package assignments prior to destroying Stage 5!
+
+---
+
+## 🗺️ Detailed Roadmaps
+
+### Path 1: Workforce Tenant (Stages 0 – 21)
+
+Path 1 uses the root Terraform configuration (`main.tf`, `variables.tf`, `provider.tf`) and manages core enterprise identity, access governance, and security posture in a standard Microsoft Entra ID tenant.
+
+#### Phase 1: Foundations & Identities (Stages 00 – 03)
+| Stage | Title | Description | Requirements |
+|:---:|---|---|---|
+| [00](doc/stage-00) | **Prerequisites** | Create the bootstrapping Service Principal and secret in Azure Portal with minimal required permissions. Retrieve tenant credentials. | Global Admin |
+| [01](doc/stage-01) | **SSO Application** | Automate the deployment of an App Registration configured for Single Sign-On with OIDC Debugger. Inspect token claims. | - |
+| [02](doc/stage-02) | **Service Principal** | Provision a backend Service Principal with programmatic credential management in Terraform. | - |
+| [03](doc/stage-03) | **Workload Identity Federation** | Configure passwordless Service Principal authentication using OIDC Federated Identity Credentials for external systems. | - |
+
+#### Phase 2: Access Governance & Zero Trust (Stages 04 – 06)
+| Stage | Title | Description | Requirements |
+|:---:|---|---|---|
+| [04](doc/stage-04) | **Conditional Access** | Automate Conditional Access policy deployment scoped to the SSO application with network and location boundary controls. | Entra ID P1, Security Defaults disabled |
+| [05](doc/stage-05) | **Access Package** | Provision Entra ID Entitlement Management Access Packages for structured, auditable self-service onboarding. | Entra ID P2 |
+| [06](doc/stage-06) | **Privileged Identity Management (PIM)** | Enforce just-in-time, eligible role assignments instead of permanent standing administrative privileges. | Entra ID P2 |
+
+#### Phase 3: Tenant Hardening & Modern Identities (Stages 07 – 08)
+| Stage | Title | Description | Requirements |
+|:---:|---|---|---|
+| [07](doc/stage-07) | **Tenant Security Hardening** | Restrict guest invitations, standard user app creation, and security group creation using the `microsoft/msgraph` provider. | Sandbox / Dev Tenant |
+| [08](doc/stage-08) | **Entra Agent Identity (Preview)** | Deploy an Agent Identity Blueprint, Blueprint Principal, and Agent Identity using Microsoft Graph beta endpoints. | Dev Tenant |
+
+#### Phase 4: Security Posture, Baselines & AI Operations (Stages 09 – 13)
+| Stage | Title | Description | Requirements |
+|:---:|---|---|---|
+| [09](doc/stage-09) | **Maester Security Tests** | Provision a dedicated Service Principal and execute automated Maester PowerShell test suites against Microsoft security baselines. | - |
+| [10](doc/stage-10) | **EntraExporter** | Export your entire tenant's configuration to version-controlled JSON snapshots for auditing and disaster recovery. | - |
+| [11](doc/stage-11) | **Zero Trust Assessment** | Automate provisioning for Zero Trust Assessment (ZTA) tool to audit maturity across identity pillars. | - |
+| [12](doc/stage-12) | **Configuration Drift (Diff)** | Combine Maester and EntraExporter into a continuous drift-detection workflow to catch out-of-band portal changes. | - |
+| [13](doc/stage-13) | **Lokka MCP** | Provision an MCP-enabled Service Principal to explore, query, and manage Entra ID using natural language in VS Code & NanoBot. | - |
+
+#### Phase 5: Application Security & Automation (Stages 14 – 17)
+| Stage | Title | Description | Requirements |
+|:---:|---|---|---|
+| [14](doc/stage-14) | **SPA SSO** | Configure a Single Page Application (SPA) with PKCE redirect URIs, custom API scopes, and identifier URIs. | - |
+| [15](doc/stage-15) | **Application Roles (App Roles)** | Define custom application roles for role-based access control (RBAC) and verify token role claims. | - |
+| [16](doc/stage-16) | **Certificate-Based Authentication** | Transition Service Principals from shared secrets to X.509 certificate authentication for elevated security. | OpenSSL / Cert |
+| [17](doc/stage-17) | **CI/CD Automation Pipelines** | Automate Terraform plans, applies, and Maester compliance tests inside GitHub Actions pipelines. | GitHub Repo |
+
+#### Phase 6: Advanced Operations & High Assurance (Stages 18 – 21)
+| Stage | Title | Description | Requirements |
+|:---:|---|---|---|
+| [18](doc/stage-18) | **Multitenant Secret Monitoring** | Centralize credential and secret expiration tracking across multiple Entra ID tenants using workload federation. | GitHub Repo |
+| [19](doc/stage-19) | **Temporary Access Pass (TAP)** | Manage the tenant-wide Authentication Methods policy to issue expiring passcodes for passwordless bootstrapping. | Sandbox / Dev Tenant |
+| [20](doc/stage-20) | **High Assurance - Verified ID with CA (Preview)** | Require users to present a Verified ID (W3C Verifiable Credential) via Conditional Access to access sensitive applications. | Entra ID P1, Verified ID (VC-00) |
+| [21](doc/stage-21) | **Entra ID App Role PIM (Private Preview)** | Replace standing app role assignments with PIM eligible assignments: users activate a privileged app role just-in-time (MFA, justification, approval) and the `roles` claim appears only while active. | Private preview enrollment, E7 / ID Governance |
+
+#### Phase 7: Disassembly & Bonus
+| Stage | Title | Description | Requirements |
+|:---:|---|---|---|
+| [Cleanup](doc/stage-cleanup) | **Architecture Disassembly** | Execute structured `terraform destroy` to tear down workshop resources and restore baseline tenant policies. | - |
+| [Next Steps](doc/stage-next) | **Bonus: Enterprise Scale** | Guidelines for remote state backends (Azure Blob), Spacelift.io orchestration, and production pipeline patterns. | - |
+
+---
 
 ### Path 2: External ID (CIAM) Tenant
 
-Native Authentication for a customer-facing Entra External ID tenant - a self-contained set of
-stages using their own dedicated Service Principal and Terraform root ([`external_tenant/`](external_tenant)).
+Path 2 is completely isolated inside the [`external_tenant/`](external_tenant) directory with its own Terraform provider configurations and dedicated Service Principal. It focuses on customer-facing identities and CIAM developer experiences.
 
 | Step                           | Title                              | Description                                                                                                                                                                                                                           |
 |--------------------------------|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -87,146 +168,149 @@ stages using their own dedicated Service Principal and Terraform root ([`externa
 | [external-04](doc/external-04) | Sign-up with extra attributes     | Collect first and last name plus two required custom boolean checkboxes (terms of use, privacy policy) during sign-up, using tenant-level custom user attributes created by Terraform. |
 | [external-05](doc/external-05) | Profile sync + token enrichment   | Custom authentication extensions: push the sign-up data (name + consents) to your own profile API on submit, and enrich ID/access tokens with profile claims on token issuance. Starts with a Stub Profile Implementation. |
 
+---
+
 ### Path 3: Verified ID
 
-Issue a W3C Verifiable Credential from your tenant's own authority - a self-contained pair of
-stages layered on top of the certificate-bound Service Principal pattern from Stage 16.
+Path 3 focuses on decentralized identity, Verifiable Credentials (VCs), and the decentralized identifier (DID) trust model. It operates in [`verified_id/`](verified_id) and integrates with the custom `mjendza/verifiedid` provider.
 
-| Step               | Title                                         | Description                                                                                                                                                                                                                    |
-|--------------------|-----------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [vc-00](doc/vc-00) | Prerequisites (Onboard Tenant to Verified ID) | One-time, tenant-level onboarding: custom domain & Quick Setup.                                                                                                                                                                |
-| [vc-01](doc/vc-01) | Verified ID - register first contract         | Extend the certificate-bound Service Principal pattern to the Microsoft Entra Verified ID Admin API. Use the `mjendza/verifiedid` Terraform provider to create a Verifiable Credential contract under your tenant's authority. |
+| Stage | Title | Description | Key Artifacts |
+|:---:|---|---|---|
+| [vc-00](doc/vc-00) | **Tenant Onboarding to Verified ID** | Complete tenant-level onboarding for Microsoft Entra Verified ID using Quick Setup and link your Azure Key Vault for DID signing keys. | Azure Key Vault, DID Authority |
+| [vc-01](doc/vc-01) | **Register VC Contract** | Extend the certificate-bound Service Principal to the Verified ID Admin API and author a declarative W3C Verifiable Credential contract via Terraform. | `mjendza/verifiedid` provider, Contract Rules & Display |
 
-> 🚀 **Next steps after this path:** use the dedicated
-> [workshop-verified-id](https://github.com/mjendza/workshop-verified-id) developer workshop to
-> actually issue, present, and verify the credential you created here from a real app.
+> 🚀 **Next Steps After Path 3:** To issue, present, and verify your credential from a live running application, check out the companion [workshop-verified-id](https://github.com/mjendza/workshop-verified-id) developer repository!
 
-## Changelog 
-| Version | Date       | Description                                                                                    |
-|---------|------------|------------------------------------------------------------------------------------------------|
-| v0.8    | 2025.04.28 | Alpha release                                                                                  |
-| v0.9    | 2025.05.07 | Beta - dryrun                                                                                  |
-| v0.9.1  | 2025.05.16 | Enhanced for self-paced workshops: added more images and detailed descriptions                 |
-| v0.10   | 2026.01.03 | Corrected typos, improved documentation, and updated provider versions                         |
-| v1.0    | 2026.01.05 | 🎆 Initial public release                                                                      |
-| v1.1    | 2026.02.19 | Added Stage 7 (Tenant configuration and security changes) using the microsoft/msgraph provider |
-| v1.2    | 2026.02.24 | Added Stage 8 (Entra ID Agent) using the microsoft/msgraph provider                            |
-| v1.3    | 2026.03.02 | Added Stage 9 (Maester)                                                                        |
-| v1.4    | 2026.03.03 | Added Stage 10 (EntraExporter)                                                                 |
-| v1.5    | 2026.03.04 | Added Stage 11 (Zero Trust Assessment)                                                         |
-| v1.6    | 2026.03.11 | Added Stage 12 DIFF via Maester (Maester + EntraExporter)                                      |
-| v1.6    | 2026.03.12 | Added Stage 13 (Lokka MCP)                                                                     |
-| v1.6.1  | 2026.03.13 | Updated Stage 13 Lokka MCP configurations for GitHub Copilot VS Code and NanoBot integrations  |
-| v1.7    | 2026.04.24 | Added Stage 14 (SPA SSO)                                                                       |
-| v1.7    | 2026.04.27 | Added Stage 15 (Application Roles)                                                             |
-| v1.7    | 2026.04.30 | Added Stage 16 (Use Certificate  for Service Principal)                                        |
-| v1.8    | 2026.05.06 | Added Stage 17 (CI/CD Pipelines for Maester and ZTA)                                           |
-| v1.9    | 2026.05.17 | Added Stage 18 (Multitenant Secret Monitoring) and 101 Verified ID                             |
-| v1.10   | 2026.06.23 | Added Stage 19 (Temporary Access Pass)                                                         |
-| v1.11   | 2026.07.04 | Added Stage Extra External ID - Native Authentication |
-| v2.0   | 2026.07.06 | 🎆 Reorganized into 3 independent paths (Workforce, External, Verified ID)  |
-| v2.1   | 2026.11.20 | Added Stage 20 (High Assurance - Verified ID step-up with Conditional Access)  |
+---
 
-## Frequently Asked Questions (FAQ)
+## 🛠️ Prerequisites & Tenant Requirements
 
-| Question                                                | Answer                                                                                                                                                                                                                                                                                  |
-|---------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Do I need an Entra ID Tenant?                           | Yes, if you are running the workshop on your own. No, if you are participating in a guided online or onsite session (one will be provided).                                                                                                                                             |
-| Do I need an Azure Subscription?                        | No for the Workforce and External ID paths - this workshop focuses exclusively on Entra ID there. The Verified ID path (VC-00) is the one exception: it needs an Azure Key Vault to store DID signing keys.                                                                            |
-| Do I need to have a Workforce or an External ID tenant? | The entire workshop is designed for a Workforce tenant. Stages 1-4 are also compatible with an External ID tenant.                                                                                                                                                                      |
-| Do I need the Global Admin role?                        | Yes, Global Administrator privileges are required.                                                                                                                                                                                                                                      |
-| Is the workshop designed to teach me Terraform?         | No, the primary focus is learning how to manage Entra ID using Infrastructure as Code (Terraform), rather than teaching Terraform from scratch.                                                                                                                                         |
-| Do I need to use terraform to complete all stages?      | No, while Terraform is the primary tool used in the workshop, some stages may involve using other tools or scripts (e.g., PowerShell for generating secrets). However, the majority of the workshop is designed around Terraform. Maester, ZTA, Lokka can be managed without Terraform. |
+### Technical Tooling (All Paths)
+- ✅ **Workstation:** Windows, macOS, or Linux.
+- ✅ [Visual Studio Code](https://code.visualstudio.com/) (recommended editor).
+- ✅ [Terraform](https://www.terraform.io/) **v1.0 or newer**.
+- ✅ [Git](https://git-scm.com/) installed and configured.
+- ✅ [PowerShell 7+](https://github.com/PowerShell/PowerShell) (used for Maester and Pester verification scripts).
 
+### Tenant Requirements by Path
 
-## Prerequisites
+```mermaid
+graph TD
+    classDef default fill:#1e293b,stroke:#475569,stroke-width:1.5px,color:#f8fafc;
+    classDef blue fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
+    classDef purple fill:#0f172a,stroke:#c084fc,stroke-width:2px,color:#f8fafc;
+    classDef green fill:#0f172a,stroke:#34d399,stroke-width:2px,color:#f8fafc;
 
-### Technical Requirements
-- ✅ An [Entra ID Tenant](https://www.microsoft.com/en-gb/security/business/identity-access/microsoft-entra-id).
-- ✅ **Global Administrator** or **Authentication Policy Administrator** role.
-- ✅ An **Entra ID P1 or P2 license** (required for Stages 4-6: Conditional Access, Access Packages, and PIM).
-- ✅ **Security Defaults MUST be disabled** in your tenant (required for Conditional Access in Stage 4).
+    subgraph P1["🏢 Path 1: Workforce Tenant"]
+        W1["Entra ID Tenant (Free / P1 / P2)"]:::blue
+        W2["Global Administrator Role (Stage 0)"]:::blue
+        W3["Security Defaults Disabled (for CA)"]:::blue
+    end
 
-- ✅ [Visual Studio Code](https://code.visualstudio.com/) (VS Code).
-- ✅ Terraform v1.0 or newer.
-- ✅ Git (for cloning the repository).
-- ✅ A workstation (All flows were tested on Windows, but macOS or Linux should also work).
+    subgraph P2["👥 Path 2: External ID Tenant"]
+        E1["Entra External ID (CIAM) Tenant"]:::purple
+        E2["Dedicated CIAM Service Principal"]:::purple
+        E3["Pester 5+ for Automated Tests"]:::purple
+    end
 
-### Recommended Basic Skills
-- ✅ Familiarity with scripting and command-line interfaces.
-- ✅ An understanding of Service Principal authentication concepts.
-- ✅ General experience navigating the Azure Portal or Entra Admin Center.
-
-## Workshop Objectives
-- Authenticate programmatically using a Service Principal.
-- Provision and configure core Entra ID resources using Terraform.
-- Understand the current limitations of Managing Entra ID via IaC.
-
-**Estimated Duration:** 180–240 minutes.
-
-## Workshop Outline
-1. Set up the workstation environment
-2. Create a Service Principal
-3. Prepare the Terraform file structure
-4. First Terraform resource and module 
-5. Execute Terraform Init, Plan, and Apply
-6. Provision multiple Entra ID resources
-7. Integrate with Spacelift.io for CI/CD
-
-## Environment Setup Guide
-
-### Installing Prerequisites
-
-#### Visual Studio Code
-```shell
-winget install Microsoft.VisualStudioCode
+    subgraph P3["🪪 Path 3: Verified ID"]
+        V1["Azure Subscription + Key Vault"]:::green
+        V2["Quick Setup / Onboarded Authority"]:::green
+        V3["mjendza/verifiedid Terraform Provider"]:::green
+    end
 ```
 
-#### Terraform
-```shell
+- **Path 1 (Workforce):**
+  - An [Entra ID Tenant](https://www.microsoft.com/security/business/identity-access/microsoft-entra-id) with **Global Administrator** access for initial setup.
+  - An **Entra ID P1 or P2 license** (Required for Stages 4–6: Conditional Access, Access Packages, and PIM). Free tier works for Stages 0–3 and 7–19!
+  - **Security Defaults MUST be disabled** if testing Conditional Access (Stage 4 & Stage 20).
+- **Path 2 (External ID):**
+  - An [Entra External ID tenant](https://learn.microsoft.com/entra/external-id/customers/how-to-create-external-tenant-portal) (free trial or pay-as-you-go).
+- **Path 3 (Verified ID):**
+  - An active **Azure Subscription** with permissions to deploy an **Azure Key Vault** (to store DID signing keys).
+
+---
+
+## ⚡ Environment Setup & Quick Reference
+
+### Install CLI Tools
+
+#### Windows (via winget)
+```powershell
+winget install Microsoft.VisualStudioCode
 winget install HashiCorp.Terraform
+winget install Git.Git
+winget install Microsoft.PowerShell
+```
+
+#### macOS (via Homebrew)
+```bash
+brew install --cask visual-studio-code
+brew install hashicorp/tap/terraform
+brew install git
+brew install --cask powershell
 ```
 
 ### Recommended VS Code Extensions
-- [Terraform](https://marketplace.visualstudio.com/items/?itemName=HashiCorp.terraform)
-- [REST Client](https://marketplace.visualstudio.com/items/?itemName=humao.rest-client)
- 
-### Basic Terraform Commands Reference
+- [HashiCorp Terraform](https://marketplace.visualstudio.com/items?itemName=HashiCorp.terraform) — Syntax highlighting, auto-formatting, and autocomplete.
+- [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) — For testing `.http` token queries.
+- [PowerShell](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell) — For executing Maester and Pester validation scripts.
 
-**Initialize a working directory:**
+### Terraform Quick Reference
+
 ```shell
+# Initialize provider plugins and working directories
 terraform init
-```
 
-**Generate and show an execution plan:**
-```shell
+# Review execution plan before making changes
 terraform plan
-```
 
-**Build or change infrastructure:**
-```shell
+# Apply infrastructure changes
 terraform apply
-```
 
-**Destroy previously-created infrastructure:**
-```shell
+# Clean up provisioned resources
 terraform destroy
 ```
 
-## Out of Scope
-- Licensing costs associated with Terraform configurations (if applicable).
-- Remote State Management for Terraform.
-- Advanced secret management practices for Entra ID tenant and Azure subscription credentials (e.g., securely storing `client_id` and `client_secret`).
+---
 
-## Troubleshooting
+## ❓ Frequently Asked Questions (FAQ)
 
-| Issue                                | Solution                                                                                                                  |
-|--------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
-| No changes in the Terraform plan.    | Ensure that you have saved your changes in the `main.tf` file before running the plan.                                    |
-| Can't remove(destroy) the resources. | Check your Access Package assignments. You must remove all active assignments to your package before it can be destroyed. |
-| `Error: Module not installed`        | Run `terraform init` to download and install all modules required by your configuration.                                  |
+| Question | Answer |
+|---|---|
+| **Do I need an Azure Subscription?** | **No** for Path 1 (Workforce) and Path 2 (External ID) — both focus exclusively on Microsoft Entra ID. **Yes** for Path 3 (Verified ID), which requires an Azure Key Vault to store DID cryptographic signing keys. |
+| **Can I use my organization's production tenant?** | **No, strongly discouraged.** We recommend creating a free [Microsoft 365 Developer Program](https://developer.microsoft.com/microsoft-365/dev-program) tenant or an Azure free trial tenant. Stages 7, 19, and 20 modify tenant-wide policies. |
+| **Do I need to do the paths in order?** | **No.** Path 1, Path 2, and Path 3 are 100% independent. You can do just External ID, just Verified ID, or just Workforce. |
+| **Is this workshop meant to teach Terraform from scratch?** | While basic Terraform usage is covered, the workshop focuses on **applying Infrastructure as Code to Entra ID architecture and identity security**, rather than general HCL syntax. |
+| **Can I run this on Linux or macOS?** | **Yes.** All Terraform modules and Microsoft Graph requests are platform-agnostic. PowerShell scripts (Maester/Pester) run seamlessly on PowerShell 7+ on Linux and macOS. |
+| **What happens to tenant-wide policies during `terraform destroy`?** | Singletons like authorization policies (Stage 7) and TAP (Stage 19) cannot be destroyed by Entra ID; Terraform safely restores them to their default permissive baseline configurations. |
 
-## Feedback and Support
-Did you find a bug, have a question, or want to suggest an improvement? Please open an issue in the interactive workshop repository:
+---
 
-**[https://github.com/mjendza/workshop-entra-as-code-interactive/issues](https://github.com/mjendza/workshop-entra-as-code-interactive/issues)**
+## 📜 Changelog
+
+| Version | Date | Description |
+|:---:|:---:|---|
+| **v2.2** | 2026.11.22 | 🧪 Added **Stage 21** (Entra ID App Role PIM - just-in-time app roles, private preview). |
+| **v2.1** | 2026.11.20 | 🌟 Added **Stage 20** (High Assurance: Require Verified ID with Conditional Access). |
+| **v2.0** | 2026.07.06 | 🎆 **Major Reorganization:** Restructured workshop into 3 independent paths (Workforce, External ID, Verified ID). |
+| **v1.11** | 2026.07.04 | Added **Stage Extra External ID** (Native Authentication & Pester testing). |
+| **v1.10** | 2026.06.23 | Added **Stage 19** (Temporary Access Pass Policy via `msgraph` PATCH). |
+| **v1.9** | 2026.05.17 | Added **Stage 18** (Multitenant Secret Monitoring) and 101 Verified ID track. |
+| **v1.8** | 2026.05.06 | Added **Stage 17** (CI/CD Pipelines for Maester and ZTA). |
+| **v1.7** | 2026.04.30 | Added **Stages 14–16** (SPA SSO, Application Roles, Certificate-based Service Principals). |
+| **v1.6** | 2026.03.13 | Added **Stage 12** (Configuration Drift with Maester + EntraExporter) and **Stage 13** (Lokka MCP). |
+| **v1.5** | 2026.03.04 | Added **Stage 11** (Zero Trust Assessment - ZTA). |
+| **v1.4** | 2026.03.03 | Added **Stage 10** (EntraExporter tenant snapshots). |
+| **v1.3** | 2026.03.02 | Added **Stage 9** (Maester automated security baseline tests). |
+| **v1.2** | 2026.02.24 | Added **Stage 8** (Entra ID Agent Identity Blueprint via Graph beta). |
+| **v1.1** | 2026.02.19 | Added **Stage 7** (Tenant Security Hardening via `microsoft/msgraph`). |
+| **v1.0** | 2026.01.05 | 🎆 Initial public interactive release. |
+
+---
+
+## 💬 Community, Feedback & Support
+
+- 🐛 **Found a bug or have a suggestion?** Please [open an issue](https://github.com/mjendza/workshop-entra-as-code-interactive/issues) in this repository.
+- ⭐ **Enjoying the workshop?** Star the repository to show support and help other identity engineers discover it!
+- 🤝 **Contributions:** Pull requests improving documentation, test suites, or new Entra features are warmly welcomed.
