@@ -1,4 +1,4 @@
-# Stage 17: Temporary Access Pass (TAP) Policy
+# Stage 19: Temporary Access Pass (TAP) Policy
 
 ## Rationale
 
@@ -110,4 +110,4 @@ Only users inside the policy's `includeTargets` (and not in `excludeTargets`) ca
 > **Report Issues:** Did you encounter a bug or hold a question? [Report your issue here](https://github.com/mjendza/workshop-entra-as-code-interactive/issues).
 
 ---
-**Navigation:** [← Previous: Stage 17:](../stage-18/README.md) | [Next → Stage Cleanup](../stage-cleanup/README.md)
+**Navigation:** [← Previous: Stage 18](../stage-18/README.md) | [Next → Stage 20: High Assurance](../stage-20/README.md)
