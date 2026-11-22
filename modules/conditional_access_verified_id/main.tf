@@ -57,6 +57,22 @@ variable "state" {
   }
 }
 
+variable "verified_id_profile_ids" {
+  description = "IDs of ALL identity verification profiles in the tenant, selected in the Verified ID authentication method (Authentication methods -> Verified ID). The profile API is delegated-only, so get them with scripts/stage-20/verify.ps1. Empty = leave the method untouched."
+  type        = list(string)
+  default     = []
+  validation {
+    condition     = alltrue([for id in var.verified_id_profile_ids : can(regex("^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$", id))])
+    error_message = "verified_id_profile_ids must contain profile IDs (UUIDs)."
+  }
+}
+
+variable "verified_id_method_target_id" {
+  description = "Group object ID targeted by the Verified ID authentication method, or 'all_users'. Profiles still scope users by their own groups."
+  type        = string
+  default     = "all_users"
+}
+
 variable "grant_control" {
   description = "Graph builtInControls value for 'Require identity verification' (preview). Not yet listed in the official Graph enum docs - confirm it by GET-ing a portal-created policy (see Stage 20 README)."
   type        = string
@@ -115,6 +131,32 @@ resource "msgraph_resource" "policy" {
     # permanent diff on builtInControls. To change the policy later, use:
     #   terraform apply -replace='module.<name>.msgraph_resource.policy'
     ignore_changes = [body]
+  }
+}
+
+# Tenant-wide singleton: enables the Verified ID authentication method and
+# selects every identity verification profile for the target. A PATCH updates
+# the existing configuration (same pattern as modules/auth_methods_tap).
+# Destroy doesn't revert it.
+resource "msgraph_resource_action" "verified_id_method" {
+  count        = length(var.verified_id_profile_ids) > 0 ? 1 : 0
+  resource_url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/verifiableCredentials"
+  api_version  = "beta"
+  method       = "PATCH"
+
+  body = {
+    "@odata.type" = "#microsoft.graph.verifiableCredentialsAuthenticationMethodConfiguration"
+    state         = "enabled"
+
+    includeTargets = [
+      {
+        "@odata.type"          = "#microsoft.graph.verifiableCredentialAuthenticationMethodTarget"
+        targetType             = "group"
+        id                     = var.verified_id_method_target_id
+        isRegistrationRequired = false
+        verifiedIdProfiles     = var.verified_id_profile_ids
+      }
+    ]
   }
 }
 

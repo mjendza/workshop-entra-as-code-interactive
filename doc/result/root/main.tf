@@ -414,6 +414,8 @@ module "HighAssurance_Policy" {
   included_applications   = [module.HighAssurance_SSO.client_id]
   pilot_member_object_ids = ["PUT_PILOT_USER_OBJECT_ID_HERE"]
   excluded_user_ids       = ["PUT_BREAK_GLASS_USER_OBJECT_ID_HERE"]
+  # After creating the profiles: all profile IDs from scripts/stage-20/verify.ps1
+  verified_id_profile_ids = []
   state                   = "enabled"
 }
 

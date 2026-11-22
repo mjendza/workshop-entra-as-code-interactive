@@ -52,6 +52,21 @@ foreach ($p in $profiles.value) {
     } | Format-List
 }
 
+if ($profiles.value) {
+    $ids = ($profiles.value | ForEach-Object { "`"$($_.id)`"" }) -join ', '
+    Write-Host "Paste into module `"HighAssurance_Policy`" in main.tf (all profiles):" -ForegroundColor Green
+    Write-Host "  verified_id_profile_ids = [$ids]`n"
+}
+
+Write-Host "=== Authentication method: Verified ID ===" -ForegroundColor Cyan
+$method = Invoke-MgGraphRequest -Method GET -Headers $headers `
+    -Uri 'https://graph.microsoft.com/beta/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/verifiableCredentials'
+[pscustomobject]@{
+    State    = $method.state
+    Targets  = ($method.includeTargets | ForEach-Object { $_.id }) -join ','
+    Profiles = ($method.includeTargets | ForEach-Object { $_.verifiedIdProfiles }) -join ','
+} | Format-List
+
 if ($PolicyId) {
     Write-Host "=== Conditional Access policy $PolicyId ===" -ForegroundColor Cyan
     $policy = Invoke-MgGraphRequest -Method GET -Headers $headers `
