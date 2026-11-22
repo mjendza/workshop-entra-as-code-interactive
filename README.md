@@ -99,7 +99,7 @@ Before executing Terraform commands against your tenant, please review these key
 
 ### Path 1: Workforce Tenant (Stages 0 – 21)
 
-Path 1 uses the root Terraform configuration (`main.tf`, `variables.tf`, `provider.tf`) and manages core enterprise identity, access governance, and security posture in a standard Microsoft Entra ID tenant.
+Path 1 uses the dedicated [`workforce/`](workforce/) Terraform root (`workforce/main.tf`, `workforce/variables.tf`, `workforce/provider.tf`, `workforce/modules/`) and manages core enterprise identity, access governance, and security posture in a standard Microsoft Entra ID tenant.
 
 #### Phase 1: Foundations & Identities (Stages 00 – 03)
 | Stage | Title | Description | Requirements |
@@ -258,7 +258,11 @@ brew install --cask powershell
 
 ### Terraform Quick Reference
 
+Run the commands inside the Terraform root of your path: `workforce/` (Path 1), `external_tenant/` (Path 2) or `verified_id/` (Path 3).
+
 ```shell
+cd workforce
+
 # Initialize provider plugins and working directories
 terraform init
 

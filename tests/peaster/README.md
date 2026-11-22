@@ -57,7 +57,7 @@ line to `$PeasterEnvDefaults`.
 
 | Value      | Source                                                                                   |
 |------------|------------------------------------------------------------------------------------------|
-| `ClientId` | `terraform output -raw sp_with_certificate_client_id` (run automatically from repo root) |
+| `ClientId` | `terraform output -raw sp_with_certificate_client_id` (run automatically in `workforce/`) |
 | `TenantId` | `$env:ARM_TENANT_ID`, then `$env:AZURE_TENANT_ID`, else the current `Get-MgContext`      |
 | Password   | `$env:CERT_PFX_PASSWORD` (defaulted by `PeasterConfig.ps1`)                              |
 

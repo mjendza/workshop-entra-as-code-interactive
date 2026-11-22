@@ -32,8 +32,9 @@ module "OidcDebugger_SSO" {
 }
 ```
 
-Run `terraform init` to download your provider requirements and initialize modules.
+Run `terraform init` inside the `workforce/` folder to download your provider requirements and initialize modules.
 ```bash
+cd workforce
 terraform init
 ```
 The output should resemble:

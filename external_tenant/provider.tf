@@ -14,7 +14,7 @@ terraform {
 # =============================================================================
 # Provider for the EXTERNAL (target) tenant — Tenant B
 # =============================================================================
-# This configuration runs against a DIFFERENT tenant than the repo root.
+# This configuration runs against a DIFFERENT tenant than workforce/.
 # Replace the three placeholders below with credentials of a Service Principal
 # that exists in Tenant B and has either:
 #   - Application Administrator, or

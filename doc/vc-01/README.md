@@ -46,7 +46,7 @@ This writes:
 
 If you already ran `scripts/stage-16/init.ps1`, the same cert is reused — skip this step.
 
-### 2. Add the Verified ID Service Principal to `main.tf` in root folder (will be used with dedicated stack in folder `verified_id`)
+### 2. Add the Verified ID Service Principal to `workforce/main.tf` (will be used with dedicated stack in folder `verified_id`)
 use https://permissions.factorlabs.pl and 'MS Other Apps Permissions' filter to find all expected permissions for the Verified ID Admin API:
 - `VerifiableCredential.Authority.ReadWrite`
 - `VerifiableCredential.Contract.ReadWrite`

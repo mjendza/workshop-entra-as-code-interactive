@@ -10,10 +10,10 @@
 #
 # Usage:
 #   scripts/ci/validate.sh                       # all solutions
-#   scripts/ci/validate.sh root external_tenant  # selected solutions
+#   scripts/ci/validate.sh workforce external_tenant  # selected solutions
 #   NO_FINAL=1 scripts/ci/validate.sh            # check starter files as-is
 #                                                # (CI runs both: matrix.variant)
-#   IN_PLACE=1 scripts/ci/validate.sh root       # CI: run in checkout, no copy
+#   IN_PLACE=1 scripts/ci/validate.sh workforce  # CI: run in checkout, no copy
 #
 # Local (Windows): run via WSL from the repo dir (verified path):
 #   wsl -e bash scripts/ci/install-tools.sh   # once
@@ -26,7 +26,7 @@ export PATH="$HOME/.local/bin:$PATH"   # where install-tools.sh puts binaries
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SOLUTIONS=("$@")
-[ ${#SOLUTIONS[@]} -eq 0 ] && SOLUTIONS=(root external_tenant verified_id)
+[ ${#SOLUTIONS[@]} -eq 0 ] && SOLUTIONS=(workforce external_tenant verified_id)
 
 if [ -n "${GITHUB_ACTIONS:-}" ]; then
   group()    { echo "::group::$*"; }
@@ -68,7 +68,7 @@ fi
 # --- Overlay final solution --------------------------------------------------
 overlay_final() {
   case "$1" in
-    root)            cp "$WORK/doc/result/root/main.tf"        "$WORK/main.tf" ;;
+    workforce)       cp "$WORK/doc/result/root/main.tf"        "$WORK/workforce/main.tf" ;;
     verified_id)     cp "$WORK/doc/result/verified_id/main.tf" "$WORK/verified_id/main.tf" ;;
     external_tenant) cp "$WORK"/doc/result/external_id/*.tf    "$WORK/external_tenant/" ;;
   esac
@@ -76,19 +76,15 @@ overlay_final() {
 
 solution_path() {
   case "$1" in
-    root) echo "." ;;
-    external_tenant|verified_id) echo "$1" ;;
-    *) err "unknown solution '$1' (root|external_tenant|verified_id)"; exit 2 ;;
+    workforce|external_tenant|verified_id) echo "$1" ;;
+    *) err "unknown solution '$1' (workforce|external_tenant|verified_id)"; exit 2 ;;
   esac
 }
 
-# Dirs with .tf files that belong to a solution (root excludes the other two).
+# Dirs with .tf files that belong to a solution.
 lint_dirs() {
   local p; p="$(solution_path "$1")"
-  local extra=()
-  [ "$1" = root ] && extra=(-not -path './doc/*' -not -path './external_tenant/*' -not -path './verified_id/*')
-  [ "$p" = . ] || p="./$p"
-  (cd "$WORK" && find "$p" -name '*.tf' -not -path '*/.terraform/*' "${extra[@]}" -printf '%h\n' | sort -u)
+  (cd "$WORK" && find "./$p" -name '*.tf' -not -path '*/.terraform/*' -printf '%h\n' | sort -u)
 }
 
 # --- Run ---------------------------------------------------------------------

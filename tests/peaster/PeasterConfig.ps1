@@ -120,7 +120,7 @@ function Resolve-PeasterLiveSp {
 
     # A client id is only accepted when terraform returns a single clean GUID; anything else
     # (warning box, empty, error) leaves ClientId $null and the live context skips.
-    $tf             = Get-PeasterTerraformOutputRaw -RepoRoot $RepoRoot -Name $OutputName
+    $tf             = Get-PeasterTerraformOutputRaw -RepoRoot (Join-Path $RepoRoot 'workforce') -Name $OutputName
     $terraformError = $tf.Error
     $guid           = '^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$'
     if ($tf.Value -and $tf.Value -match $guid) {

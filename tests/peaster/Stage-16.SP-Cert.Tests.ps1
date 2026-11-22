@@ -21,7 +21,7 @@
     Full usage:  $env:ARM_TENANT_ID = '<tenant-guid>'; Invoke-Pester ./tests/peaster
 
     Live inputs:
-      ClientId  - terraform output -raw sp_with_certificate_client_id  (run from repo root)
+      ClientId  - terraform output -raw sp_with_certificate_client_id  (run from workforce/)
       TenantId  - $env:ARM_TENANT_ID / $env:AZURE_TENANT_ID, else current Get-MgContext
       Password  - $env:CERT_PFX_PASSWORD, else 'Workshop123!' (init.ps1 default)
 #>
@@ -180,7 +180,7 @@ Describe "Stage 16: Certificate-Based SP Authentication" {
             # uploaded certificate is the same local cert proven by the offline tests; here we
             # assert Terraform recorded that upload and that its expiry is in the future.
             $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-            $endOut   = Get-PeasterTerraformOutputRaw -RepoRoot $repoRoot -Name 'sp_with_certificate_cert_end_date'
+            $endOut   = Get-PeasterTerraformOutputRaw -RepoRoot (Join-Path $repoRoot 'workforce') -Name 'sp_with_certificate_cert_end_date'
             $endOut.Value | Should -Not -BeNullOrEmpty -Because "Terraform must record the uploaded certificate's end date. $($endOut.Error)"
 
             $endDate = [DateTimeOffset]::Parse($endOut.Value, [System.Globalization.CultureInfo]::InvariantCulture).UtcDateTime
