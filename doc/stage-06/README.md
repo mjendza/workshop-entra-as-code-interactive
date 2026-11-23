@@ -48,7 +48,7 @@ An activation should render structurally resembling the prompt below:
 - [ ] I comprehend the structural significance applying PIM controls above static assignments.
 - [ ] I maintain an active P2 configuration scope (Or appropriately skipped execution).
 - [ ] I successfully verified Stage 5 elements persist cleanly.
-- [ ] I applied relevant PIM config logic integrating against `main.tf` seamlessly.
+- [ ] I applied relevant PIM config logic integrating against `stage-06.tf` seamlessly.
 - [ ] I formulated an exact infrastructure calculation via `terraform plan`.
 - [ ] I pushed these constraints resolving formally utilizing `terraform apply`.
 - [ ] I queried Azure Portal views actively verifying Eligibility requirements resolving successfully.

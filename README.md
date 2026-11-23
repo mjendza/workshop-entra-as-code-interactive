@@ -99,7 +99,7 @@ Before executing Terraform commands against your tenant, please review these key
 
 ### Path 1: Workforce Tenant (Stages 0 – 21)
 
-Path 1 uses the dedicated [`workforce/`](workforce/) Terraform root (`workforce/main.tf`, `workforce/variables.tf`, `workforce/provider.tf`, `workforce/modules/`) and manages core enterprise identity, access governance, and security posture in a standard Microsoft Entra ID tenant.
+Path 1 uses the dedicated [`workforce/`](workforce/) Terraform root (one file per stage `workforce/stage-NN.tf` + `workforce/vc-01.tf`, plus `workforce/variables.tf`, `workforce/provider.tf`, `workforce/modules/`; final per-stage solutions in [`doc/result/workforce/`](doc/result/workforce/)) and manages core enterprise identity, access governance, and security posture in a standard Microsoft Entra ID tenant.
 
 #### Phase 1: Foundations & Identities (Stages 00 – 03)
 | Stage | Title | Description | Requirements |

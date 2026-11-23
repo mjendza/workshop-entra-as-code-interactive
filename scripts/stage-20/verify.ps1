@@ -54,7 +54,7 @@ foreach ($p in $profiles.value) {
 
 if ($profiles.value) {
     $ids = ($profiles.value | ForEach-Object { "`"$($_.id)`"" }) -join ', '
-    Write-Host "Paste into module `"HighAssurance_Policy`" in main.tf (all profiles):" -ForegroundColor Green
+    Write-Host "Paste into module `"HighAssurance_Policy`" in stage-20.tf (all profiles):" -ForegroundColor Green
     Write-Host "  verified_id_profile_ids = [$ids]`n"
 }
 

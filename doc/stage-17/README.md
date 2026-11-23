@@ -47,7 +47,7 @@ Both pipelines authenticate via **OIDC / Workload Identity Federation** (no stor
 
 ## Step 2: Provision Infrastructure with Terraform
 
-Your `main.tf` should already include the Service Principal modules from previous stages. Here we need to combine with workload identity federation for OIDC-based authentication in the pipelines:
+Your `stage-09.tf`, `stage-10.tf` and `stage-11.tf` should already include the Service Principal modules from previous stages. Put the code below into `stage-17.tf`. Here we need to combine with workload identity federation for OIDC-based authentication in the pipelines:
 
 use terraform code and update with your details like OWNER, NAME_OF_YOUR_ENVIRONMENT, repository name (for example: my-entra-as-code)
 

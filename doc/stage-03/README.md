@@ -55,7 +55,7 @@ You can effectively analyze any generated Token Claims using [jwt.ms](https://jw
 
 ## Stage Completion Checklist
 - [ ] I have analyzed and understood this module's scope.
-- [ ] I have functionally added the Workload Identity Federation configuration to `main.tf`.
+- [ ] I have functionally added the Workload Identity Federation configuration to `stage-03.tf`.
 - [ ] I have accurately localized and supplied both the Issuer URL and matching Subject Identifier.
 - [ ] I have run `terraform plan` without surfacing warnings.
 - [ ] I have securely run `terraform apply`.

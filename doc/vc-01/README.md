@@ -31,7 +31,7 @@ This stage extends the certificate-bound Service Principal pattern from Stage 16
 
 We will reuse `./modules/service_principal_rich` (Stage 16) to provision a cert-bound SP, then wire `./modules/verified_id` to create the contract. The provider is `mjendza/verifiedid` — a thin wrapper over the Verified ID Admin API.
 
-> **Note:** The cert files live at the repo root (`<repo-root>/cert/`) so both Stage 16 and VC-01 can share them. Pick a unique `deployment_unique_name` in `main.tf` to keep contract names tenant-unique.
+> **Note:** The cert files live at the repo root (`<repo-root>/cert/`) so both Stage 16 and VC-01 can share them. Pick a unique `deployment_unique_name` in `terraform.tfvars` to keep contract names tenant-unique.
 
 ### 1. Generate the certificate
 
@@ -46,7 +46,7 @@ This writes:
 
 If you already ran `scripts/stage-16/init.ps1`, the same cert is reused — skip this step.
 
-### 2. Add the Verified ID Service Principal to `workforce/main.tf` (will be used with dedicated stack in folder `verified_id`)
+### 2. Add the Verified ID Service Principal to `workforce/vc-01.tf` (will be used with dedicated stack in folder `verified_id`)
 use https://permissions.factorlabs.pl and 'MS Other Apps Permissions' filter to find all expected permissions for the Verified ID Admin API:
 - `VerifiableCredential.Authority.ReadWrite`
 - `VerifiableCredential.Contract.ReadWrite`
@@ -110,7 +110,7 @@ Copy the authority `id` GUID from the output if you plan to use **Option B** bel
 
 The `mjendza/verifiedid` provider exposes a generic `data "verifiedid_resource"` that performs a GET against any Admin API path. We use it to list authorities and pick the first one — pure IaC, no copy/paste.
 
-Add to the top of `main.tf` if not already present:
+Add to the top of `verified_id/main.tf` if not already present:
 
 ```hcl
 terraform {
@@ -123,7 +123,7 @@ terraform {
 }
 ```
 
-Update provider configuration in `main.tf` with the SP details and generated in the portal secret:
+Update provider configuration in `verified_id/provider.tf` with the SP details and generated in the portal secret:
 
 ```hcl
 provider "verifiedid" {
@@ -182,7 +182,7 @@ here.
 
 ## Stage Completion Checklist
 - [ ] I have read and comprehended this stage.
-- [ ] I have inserted the `VerifiedId_SpVc` module config into my `main.tf` file.
+- [ ] I have inserted the `VerifiedId_SpVc` module config into my `workforce/vc-01.tf` file.
 - [ ] I have successfully run `terraform apply` and granted admin consent for the four Verified ID app roles.
 - [ ] I have onboarded my tenant to Verified ID (see [VC-00](../vc-00/README.md)).
 - [ ] I have run `./scripts/vc-01/demo.ps1` and seen at least one authority + DID printed.

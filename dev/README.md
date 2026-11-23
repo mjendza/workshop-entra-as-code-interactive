@@ -51,6 +51,11 @@ tflint --init
 cd workforce && tflint --recursive
 ```
 
+## Authentication with Azure CLI
+
+Use your active `az login` session for the `azuread` and `msgraph` providers instead of a Service
+Principal: [azure-cli-auth.md](azure-cli-auth.md).
+
 ## Terraform state
 
 Removing, re-creating and importing items in the state: [terraform.md](terraform.md).

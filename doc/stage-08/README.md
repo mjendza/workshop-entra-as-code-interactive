@@ -26,9 +26,9 @@ $me.Id
 ```
 *(Alternatively, find it in Entra ID Portal -> Users -> Find by email -> Object ID).*
 
-### Step 2: Add Logic to `main.tf`
+### Step 2: Add Logic to `stage-08.tf`
 
-Add the following to `main.tf` and replace placeholders with your info:
+Add the following to `stage-08.tf` and replace placeholders with your info:
 
 ```hcl
 module "EntraAgent" {
@@ -85,7 +85,7 @@ Navigate to [Microsoft Entra Admin Center](https://entra.microsoft.com) -> Enter
 
 ## Stage Completion Checklist
 - [ ] Found your user `Object ID`.
-- [ ] Added `EntraAgent` module to `main.tf`.
+- [ ] Added `EntraAgent` module to `stage-08.tf`.
 - [ ] Ran `terraform init -upgrade`, `plan`, and `apply`.
 - [ ] Verified the Agent Blueprint, Principal, and Agent Identity in the portal/PS.
 - [ ] Verified the Agent Identity Blueprint was created. It is a definition.

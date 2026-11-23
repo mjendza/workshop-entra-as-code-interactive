@@ -48,7 +48,7 @@ module "OidcDebugger_Policy" {
 - [ ] I have read and assessed the architectural mechanisms surrounding Conditional Access.
 - [ ] I maintain P1 Licensing metrics locally (otherwise skipping section).
 - [ ] I have manually disabled overarching Tenant Security Default configurations overriding Custom Policies.
-- [ ] I successfully mapped Conditional Access policies securely terminating into my static `main.tf` logic.
+- [ ] I successfully mapped Conditional Access policies securely terminating into my static `stage-04.tf` logic.
 - [ ] I reliably declared a functional CIDR Network Range paired safely into the SSO Application payload struct.
 - [ ] I generated a `terraform plan` simulating resource bindings.
 - [ ] I actively pushed these mappings effectively utilizing `terraform apply`.

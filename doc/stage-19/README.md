@@ -32,7 +32,7 @@ We will use the local module `./modules/auth_methods_tap`. It issues a single Mi
 
 By default the module enables TAP for all users (`include_target_group_id = "all_users"`). To scope the policy to a single group instead, replace the placeholder below with that group's object ID. The `default_lifetime_in_minutes` must fall between 10 and 43200 (30 days).
 
-Add the following block to your `main.tf`:
+Add the following block to your `stage-19.tf`:
 
 ```hcl
 #########################################################################
@@ -97,7 +97,7 @@ Only users inside the policy's `includeTargets` (and not in `excludeTargets`) ca
 
 ## Stage Completion Checklist
 - [ ] I have read and comprehended this stage.
-- [ ] I have added the `Tenant_TapPolicy` module block to my `main.tf` file.
+- [ ] I have added the `Tenant_TapPolicy` module block to my `stage-19.tf` file.
 - [ ] I have set `include_target_group_id` to `all_users` or a specific group object ID.
 - [ ] I have successfully run `terraform plan` without errors.
 - [ ] I have successfully run `terraform apply`.

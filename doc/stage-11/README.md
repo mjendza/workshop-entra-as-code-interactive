@@ -37,7 +37,7 @@ We will utilize the local `./modules/service_principal` module to provision a Se
 
 > **Note:** Ensure you define a unique business name for this Service Principal to prevent naming collisions within a shared workshop environment.
 
-Add the following module configuration to your `main.tf`:
+Add the following module configuration to your `stage-11.tf`:
 
 ```hcl
 #########################################################################
@@ -121,7 +121,7 @@ After Terraform successfully provisions the Service Principal, complete the foll
 ## Stage Completion Checklist
 
 - [ ] I have read and comprehended this stage.
-- [ ] I have added the ZeroTrustAssessment Service Principal module to `main.tf`.
+- [ ] I have added the ZeroTrustAssessment Service Principal module to `stage-11.tf`.
 - [ ] I have successfully run `terraform plan` without errors.
 - [ ] I have successfully run `terraform apply` and provisioned the Service Principal.
 - [ ] I have verified the App Registration and Enterprise Application exist in Entra ID.

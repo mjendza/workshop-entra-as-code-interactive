@@ -22,7 +22,7 @@ To create the Service Principal for the OIDC Debugger, we will leverage the loca
 
 > **Note:** Please designate a unique business name prefix for each application. This prevents naming conflicts when operating in a shared sandbox workshop tenant.
 
-Open [https://oidcdebugger.com/](https://oidcdebugger.com/) and identify the "Redirect URI" presented on the portal. Update the `web_uri` within your implementation below.
+Open [https://oidcdebugger.com/](https://oidcdebugger.com/) and identify the "Redirect URI" presented on the portal. Update the `web_uri` within your implementation below and paste it into [`workforce/stage-01.tf`](../../workforce/stage-01.tf).
 
 ```hcl
 module "OidcDebugger_SSO" {
@@ -76,7 +76,7 @@ Make sure to always run `terraform init` to prepare the workspace when working f
 
 ## Stage Completion Checklist
 - [ ] I have read and comprehended this stage.
-- [ ] I have inserted the OidcDebugger module config into my `main.tf` file.
+- [ ] I have inserted the OidcDebugger module config into my `stage-01.tf` file.
 - [ ] I have successfully run `terraform init`.
 - [ ] I have successfully run `terraform plan`.
 - [ ] I have successfully run `terraform apply`.

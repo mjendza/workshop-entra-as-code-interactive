@@ -47,7 +47,7 @@ The setup has three parts:
 
 ## Implementation & Code
 
-### 1. Add the SSO application and the Conditional Access policy to `main.tf`
+### 1. Add the SSO application and the Conditional Access policy to `stage-20.tf`
 
 We reuse `./modules/sso_app` (Stage 1) for the protected application. The new module `./modules/conditional_access_verified_id`:
 - creates the pilot security group `TF.Workshop.<name>.Pilot`, with your test user as a member,
@@ -96,7 +96,7 @@ output "high_assurance_oidc_debugger_link" {
 }
 ```
 
-The final solution in `doc/result/root/main.tf` uses the required variables
+The final solution in `doc/result/workforce/stage-20.tf` uses the required variables
 `high_assurance_pilot_user_ids` and `high_assurance_break_glass_user_ids` instead
 of these placeholders. Set both to lists of your tenant's user object IDs when
 using that solution.
@@ -147,7 +147,7 @@ The profile API is delegated-only, so Terraform can't list the profiles itself:
    pwsh ./scripts/stage-20/verify.ps1
    ```
    ```text
-   Paste into module "HighAssurance_Policy" in main.tf (all profiles):
+   Paste into module "HighAssurance_Policy" in stage-20.tf (all profiles):
      verified_id_profile_ids = ["<profile-id-1>", "<profile-id-2>"]
    ```
 2. Paste the line into the `HighAssurance_Policy` module and run `terraform apply`. The plan shows one `msgraph_resource_action.verified_id_method`.
@@ -215,7 +215,7 @@ Another Conditional Access policy applies (for example the Stage 4 location poli
 ## Stage Completion Checklist
 - [ ] I have read and understood the high assurance and identity verification concepts.
 - [ ] My tenant is onboarded to Verified ID (VC-00) and I have a P1 license.
-- [ ] I have added the `HighAssurance_SSO` and `HighAssurance_Policy` modules (with pilot user and break-glass IDs) to my `main.tf`.
+- [ ] I have added the `HighAssurance_SSO` and `HighAssurance_Policy` modules (with pilot user and break-glass IDs) to my `stage-20.tf`.
 - [ ] I have successfully run `terraform plan` and `terraform apply`.
 - [ ] I have created an identity verification profile (purpose Verification, Production mode) scoped to the pilot group.
 - [ ] I have set `verified_id_profile_ids` to all profile IDs and the Verified ID authentication method shows every profile selected.

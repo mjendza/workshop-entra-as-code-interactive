@@ -89,7 +89,7 @@ variable "github_repo" {
 }
 ```
 
-The Stage 18 module call in `main.tf` (already wired) reuses the existing `./modules/multitenant_workload_identity` module, drops the certificate path, and replaces the `User.Read.All` permission with **`Application.Read.All`** (`9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30`):
+The Stage 18 module call (paste it into [`workforce/stage-18.tf`](../../workforce/stage-18.tf); full solution in [`doc/result/workforce/stage-18.tf`](../result/workforce/stage-18.tf)) reuses the existing `./modules/multitenant_workload_identity` module, drops the certificate path, and replaces the `User.Read.All` permission with **`Application.Read.All`** (`9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30`):
 
 ```hcl
 module "SecretMonitor" {
@@ -188,7 +188,7 @@ Trigger it manually with **Actions → Stage 18 - Multitenant Secret Monitor →
 ## Troubleshooting
 
 **`AADSTS70021: No matching federated identity record found for presented assertion`**
-The OIDC subject from GitHub does not match the FIC subject. Check the workflow is running on `refs/heads/main`. To monitor from other branches or environments, add more entries to `federated_identity_credentials` in `main.tf` (e.g. `repo:OWNER/REPO:environment:production`).
+The OIDC subject from GitHub does not match the FIC subject. Check the workflow is running on `refs/heads/main`. To monitor from other branches or environments, add more entries to `federated_identity_credentials` in `workforce/stage-18.tf` (e.g. `repo:OWNER/REPO:environment:production`).
 
 **`AADSTS500011: The resource principal named ... was not found in the tenant`**
 The Service Principal has not been provisioned in this target tenant. Run `terraform apply` inside `external_tenant/` for that tenant, or use the portal **Grant admin consent** button on the Enterprise application.

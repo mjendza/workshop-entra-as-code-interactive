@@ -33,7 +33,7 @@ Why PATCH? The `authorization_policy` is a singleton resource in Microsoft Graph
 
 ## Configuration
 
-Add the following to your `main.tf`:
+Add the following to your `stage-07.tf`:
 
 ```hcl
 module "tenant_security" {
@@ -98,7 +98,7 @@ Install and run Maester to validate the following controls:
 ---
 
 ## Stage Completion Checklist
-- [ ] Added `tenant_security` module to `main.tf`.
+- [ ] Added `tenant_security` module to `stage-07.tf`.
 - [ ] Ran `terraform init -upgrade`, `plan`, and `apply`.
 - [ ] Verified policies via PowerShell and/or Azure Portal.
 

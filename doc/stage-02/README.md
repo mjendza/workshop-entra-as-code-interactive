@@ -37,7 +37,7 @@ module "Demo_ServicePrincipal" {
 
 ## Stage Completion Checklist
 - [ ] I have read and comprehended this stage.
-- [ ] I have added the respective Service Principal module into `main.tf`.
+- [ ] I have added the respective Service Principal module into `stage-02.tf`.
 - [ ] I have successfully localized the exact Graph API permission GUID.
 - [ ] I have run `terraform plan` without errors.
 - [ ] I have run `terraform apply` confirming successful provisioning.
