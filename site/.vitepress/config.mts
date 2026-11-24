@@ -88,6 +88,11 @@ export default withMermaid({
     ['meta', { property: 'og:title', content: 'Entra as Code · Identity, declared in Terraform' }],
     ['meta', { property: 'og:description', content: 'A hands-on workshop: Workforce, External ID and Verified ID as code with Terraform and Microsoft Graph.' }]
   ],
+  vite: {
+    // mermaid imports the CommonJS package "fastdom" (+ its promised extension), which vitepress-plugin-mermaid does not
+    // pre-bundle. Without this the dev server serves it raw and the whole app fails to boot (white page).
+    optimizeDeps: { include: ['fastdom', 'fastdom/extensions/fastdom-promised.js'] }
+  },
   markdown: {
     // Match GitHub's heading anchors so links written for GitHub keep working.
     anchor: { slugify: slug },
