@@ -22,6 +22,8 @@ function stageLabel(it: { num: string; short: string; tenantWide?: boolean; prev
 
 const overviewItem = { text: `<span class="ec-side-top">${icons.book}<span>Overview</span></span>`, link: '/overview' }
 
+const notesItem = { text: `<span class="ec-side-top">${icons.book}<span>Notes</span></span>`, link: '/notes' }
+
 const pathGroups: DefaultTheme.SidebarItem[] = paths.map(p => {
     const count = p.groups.reduce((n, g) => n + g.items.length, 0)
     const toItem = (it: any) => ({ text: stageLabel(it), link: `/${it.dir}/` })
@@ -53,7 +55,8 @@ const pathGroups: DefaultTheme.SidebarItem[] = paths.map(p => {
 // (VitePress picks the key the page path starts with): /stage-, /external-, /vc-.
 // The overview keeps all three paths.
 const sidebar: DefaultTheme.SidebarMulti = {
-  '/overview': [overviewItem, ...pathGroups],
+  '/overview': [overviewItem, notesItem, ...pathGroups],
+  '/notes': [overviewItem, notesItem, ...pathGroups],
   ...Object.fromEntries(paths.map((p, i) => {
     const prefix = '/' + p.groups[0].items[0].dir.replace(/[^-]+$/, '') // "stage-00" -> "/stage-"
     return [prefix, [overviewItem, pathGroups[i]]]
@@ -124,7 +127,8 @@ export default withMermaid({
       { text: 'Overview', link: '/overview' },
       { text: `<span class="ec-nav ec-c-wf">${icons.wf}<span>Workforce</span></span>`, link: '/paths/workforce', activeMatch: '^/(stage-|paths/workforce)' },
       { text: `<span class="ec-nav ec-c-ext">${icons.ext}<span>External ID</span></span>`, link: '/paths/external', activeMatch: '^/(external-|paths/external)' },
-      { text: `<span class="ec-nav ec-c-vc">${icons.vc}<span>Verified ID</span></span>`, link: '/paths/verified-id', activeMatch: '^/(vc-|paths/verified-id)' }
+      { text: `<span class="ec-nav ec-c-vc">${icons.vc}<span>Verified ID</span></span>`, link: '/paths/verified-id', activeMatch: '^/(vc-|paths/verified-id)' },
+      { text: 'Notes', link: '/notes' }
     ],
     sidebar,
     outline: { level: [2, 3], label: 'On this page' },
