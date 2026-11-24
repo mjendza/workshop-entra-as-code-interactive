@@ -66,7 +66,7 @@ jobs:
                   { file: 'doc/stage-18/README.md', title: 'Stage 18: Multitenant Secret Monitoring', label: 'stage-18' },
                   { file: 'doc/stage-19/README.md', title: 'Stage 19: Temporary Access Pass (TAP)', label: 'stage-19' },
                   { file: 'doc/stage-20/README.md', title: 'Stage 20: High Assurance - Verified ID with Conditional Access (Preview)', label: 'stage-20' },
-                  { file: 'doc/stage-21/README.md', title: 'Stage 21: Entra ID App Role PIM (Private Preview)', label: 'stage-21' }
+                  { file: 'doc/stage-21/README.md', title: 'Stage 21: Entra ID App Role PIM (Preview)', label: 'stage-21' }
                 ]
               },
               {

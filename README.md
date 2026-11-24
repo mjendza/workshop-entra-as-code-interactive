@@ -146,7 +146,7 @@ Path 1 uses the dedicated [`workforce/`](workforce/) Terraform root (`workforce/
 | [18](doc/stage-18) | **Multitenant Secret Monitoring** | Centralize credential and secret expiration tracking across multiple Entra ID tenants using workload federation. | GitHub Repo |
 | [19](doc/stage-19) | **Temporary Access Pass (TAP)** | Manage the tenant-wide Authentication Methods policy to issue expiring passcodes for passwordless bootstrapping. | Sandbox / Dev Tenant |
 | [20](doc/stage-20) | **High Assurance - Verified ID with CA (Preview)** | Require users to present a Verified ID (W3C Verifiable Credential) via Conditional Access to access sensitive applications. | Entra ID P1, Verified ID (VC-00) |
-| [21](doc/stage-21) | **Entra ID App Role PIM (Private Preview)** | Replace standing app role assignments with PIM eligible assignments: users activate a privileged app role just-in-time (MFA, justification, approval) and the `roles` claim appears only while active. | Private preview enrollment, E7 / ID Governance |
+| [21](doc/stage-21) | **Entra ID App Role PIM (Preview)** | Replace standing app role assignments with PIM eligible assignments: users activate a privileged app role just-in-time (MFA, justification, approval) and the `roles` claim appears only while active. | Private preview enrollment, E7 / ID Governance |
 
 #### Phase 7: Disassembly & Bonus
 | Stage | Title | Description | Requirements |

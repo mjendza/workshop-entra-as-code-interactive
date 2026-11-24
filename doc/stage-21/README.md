@@ -1,4 +1,4 @@
-# Stage 21: Entra ID App Role PIM - Just-in-Time App Roles (Private Preview)
+# Stage 21: Entra ID App Role PIM - Just-in-Time App Roles (Preview)
 
 > 🧪 **PRIVATE PREVIEW:** Privileged Identity Management (PIM) for app roles is in private preview. Your tenant must be enrolled in the preview by Microsoft before the App Roles (Preview) blade appears in PIM. Features, UI labels, licensing and APIs can change before general availability. Don't use it in production, and use a sandbox/dev tenant for this stage.
 
@@ -57,7 +57,7 @@ The new module `./modules/pim_app_roles`:
 
 ```hcl
 #########################################################################
-# Stage 21: Entra ID App Role PIM (Private Preview)
+# Stage 21: Entra ID App Role PIM (Preview)
 #########################################################################
 module "AppRolePim" {
   source                     = "./modules/pim_app_roles"
