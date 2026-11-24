@@ -8,10 +8,16 @@ the website and the GitHub Issues created by `create-workshop-issues.yml`.
 
 | What | Where |
 |---|---|
-| Sidebar / stage order | `paths` in `scripts/prepare.mjs` (keep in sync with `create-workshop-issues.yml`) |
-| Site config, nav, search | `.vitepress/config.mts` |
-| Theme, colors, "Copy the template" banner | `.vitepress/theme/` |
-| Home page, logo | `pages/` |
+| Stage order, phases, per-stage badges (license, preview, tenant-wide) | `workshop.mjs` (keep in sync with `create-workshop-issues.yml`) |
+| Site config, sidebar, nav, search, task-list checkboxes | `.vitepress/config.mts` |
+| Design tokens + all styling | `.vitepress/theme/custom.css` |
+| Stage header + "Copy the template" banner | `.vitepress/theme/StageHeader.vue` |
+| Home page, path roadmap pages | `.vitepress/theme/HomePage.vue`, `Flow.vue`, `PathPage.vue` |
+| Home page entry, logo | `pages/` |
+
+The design comes from the "Entra as Code Workshop Site" design canvas (Geist / Geist Mono, dark default,
+path accents sky / purple / green). Each stage's H1 and "Estimated Time" heading are lifted out of the
+Markdown at build time and rendered by the stage header.
 
 Link rules applied by `prepare.mjs`: `doc/<stage>/README.md` → `/<stage>/`, images are copied, and any
 other repo file (`.tf`, `.ps1`, folders, ...) links to GitHub. Missing targets are printed as warnings,

@@ -15,38 +15,11 @@ const SRC = path.join(SITE_DIR, 'src')
 const REPO_URL = 'https://github.com/mjendza/workshop-entra-as-code-interactive'
 const BRANCH = 'main'
 
-// Sidebar order mirrors .github/workflows/create-workshop-issues.yml and the README roadmap.
-const paths = [
-  {
-    key: 'workforce',
-    text: '🏢 Path 1: Workforce',
-    groups: [
-      { text: 'Foundations & Identities', items: [['stage-00', '00 · Prerequisites'], ['stage-01', '01 · SSO Application'], ['stage-02', '02 · Service Principal'], ['stage-03', '03 · Workload Identity Federation']] },
-      { text: 'Access Governance & Zero Trust', items: [['stage-04', '04 · Conditional Access'], ['stage-05', '05 · Access Package'], ['stage-06', '06 · PIM']] },
-      { text: 'Tenant Hardening & Modern Identities', items: [['stage-07', '07 · Tenant Security Hardening'], ['stage-08', '08 · Agent Identity (Preview)']] },
-      { text: 'Security Posture & AI Operations', items: [['stage-09', '09 · Maester'], ['stage-10', '10 · EntraExporter'], ['stage-11', '11 · Zero Trust Assessment'], ['stage-12', '12 · Configuration Drift'], ['stage-13', '13 · Lokka MCP']] },
-      { text: 'Application Security & Automation', items: [['stage-14', '14 · SPA SSO'], ['stage-15', '15 · App Roles'], ['stage-16', '16 · Certificate Auth'], ['stage-17', '17 · CI/CD Pipelines']] },
-      { text: 'Advanced Operations & High Assurance', items: [['stage-18', '18 · Secret Monitoring'], ['stage-19', '19 · Temporary Access Pass'], ['stage-20', '20 · High Assurance (Preview)'], ['stage-21', '21 · App Role PIM (Private Preview)']] },
-      { text: 'Disassembly & Bonus', items: [['stage-cleanup', 'Cleanup'], ['stage-next', 'Next Steps: Enterprise Scale']] }
-    ]
-  },
-  {
-    key: 'external',
-    text: '👥 Path 2: External ID',
-    groups: [
-      { text: 'External ID (CIAM)', items: [['external-00', 'Ext-00 · Prerequisites'], ['external-01', 'Ext-01 · Native Authentication'], ['external-02', 'Ext-02 · SSO for CustomerHelpdesk'], ['external-03', 'Ext-03 · Passwordless + MFA (SMS)'], ['external-04', 'Ext-04 · Sign-up Attributes'], ['external-05', 'Ext-05 · Profile Sync + Token Enrichment']] }
-    ]
-  },
-  {
-    key: 'verified-id',
-    text: '🪪 Path 3: Verified ID',
-    groups: [
-      { text: 'Verified ID', items: [['vc-00', 'VC-00 · Tenant Onboarding'], ['vc-01', 'VC-01 · Register VC Contract']] }
-    ]
-  }
-]
+// The workshop structure (order, phases, per-stage metadata) lives in ../workshop.mjs.
+import { paths, allStages } from '../workshop.mjs'
 
-const pageDirs = new Set(paths.flatMap(p => p.groups.flatMap(g => g.items.map(([dir]) => dir))))
+const stages = allStages()
+const pageDirs = new Set(stages.map(st => st.dir))
 const warnings = []
 const IMAGE = /\.(png|jpe?g|gif|svg|webp)$/i
 
@@ -134,18 +107,37 @@ fs.rmSync(SRC, { recursive: true, force: true })
 fs.mkdirSync(SRC, { recursive: true })
 copyAssets(path.join(REPO_ROOT, 'doc'), SRC)
 
-// First/last stage of each path: no prev/next link crossing into another path.
-const firstOfPath = new Set(paths.map(p => p.groups[0].items[0][0]))
-const lastOfPath = new Set(paths.map(p => p.groups.at(-1).items.at(-1)[0]))
-
-for (const dir of pageDirs) {
+for (const st of stages) {
+  const dir = st.dir
   const readme = readmeIn(path.join(REPO_ROOT, 'doc', dir))
   if (!readme) throw new Error(`doc/${dir} has no README.md`)
   const sourceRel = `doc/${dir}/${readme}`
-  const md = fs.readFileSync(path.join(REPO_ROOT, sourceRel), 'utf8')
+  let md = fs.readFileSync(path.join(REPO_ROOT, sourceRel), 'utf8').replace(/\r\n?/g, '\n')
+
+  // The stage header component renders the H1 and the estimated time, so take them out of the body.
+  const title = md.match(/^# (.+)$/m)?.[1].trim() ?? st.short
+  md = md.replace(/^# .+\n/m, '')
+  const time = md.match(/^#{2,3}\s*(?:⏱️\s*)?Estimated Time:\s*(.+)$/m)?.[1].trim()
+  md = md.replace(/^#{2,3}\s*(?:⏱️\s*)?Estimated Time:.*\n/m, '')
+
+  const { dir: _d, ...meta } = st
+  const fm = {
+    title,
+    source: sourceRel,
+    stage: { ...meta, ...(time && { time }) },
+    // No prev/next link crossing into another path.
+    ...(st.index === 0 && { prev: false }),
+    ...(st.index === st.total - 1 && { next: false })
+  }
   fs.mkdirSync(path.join(SRC, dir), { recursive: true })
-  fs.writeFileSync(path.join(SRC, dir, 'index.md'),
-    frontmatter({ source: sourceRel, ...(firstOfPath.has(dir) && { prev: false }), ...(lastOfPath.has(dir) && { next: false }) }) + transform(md, `doc/${dir}`, dir))
+  fs.writeFileSync(path.join(SRC, dir, 'index.md'), frontmatter(fm) + transform(md, `doc/${dir}`, dir))
+}
+
+// One landing page per path (/paths/<key>), rendered by the PathPage component.
+fs.mkdirSync(path.join(SRC, 'paths'), { recursive: true })
+for (const p of paths) {
+  fs.writeFileSync(path.join(SRC, 'paths', `${p.key}.md`),
+    frontmatter({ title: `Path ${p.n}: ${p.name}`, layout: 'page', pageClass: 'ec-landing', sidebar: false, aside: false }) + `<PathPage path-key="${p.key}" />\n`)
 }
 
 // Root README -> overview page. Drop the H1 + badge block (the home hero covers it).
@@ -157,7 +149,6 @@ fs.writeFileSync(path.join(SRC, 'overview.md'),
 // Hand-written pages (home page, public assets) live in site/pages.
 fs.cpSync(path.join(SITE_DIR, 'pages'), SRC, { recursive: true })
 
-fs.writeFileSync(path.join(SITE_DIR, '.vitepress', 'paths.generated.json'), JSON.stringify(paths, null, 2))
 
 for (const w of warnings) console.warn(`⚠️  ${w}`)
-console.log(`Staged ${pageDirs.size + 1} pages into ${path.relative(REPO_ROOT, SRC)}`)
+console.log(`Staged ${pageDirs.size + paths.length + 1} pages into ${path.relative(REPO_ROOT, SRC)}`)
