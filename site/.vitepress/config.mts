@@ -20,9 +20,9 @@ function stageLabel(it: { num: string; short: string; tenantWide?: boolean; prev
   return `${num}<span class="ec-label">${esc(it.short)}</span>${badges}`
 }
 
-const sidebar: DefaultTheme.SidebarItem[] = [
-  { text: `<span class="ec-side-top">${icons.book}<span>Overview</span></span>`, link: '/overview' },
-  ...paths.map(p => {
+const overviewItem = { text: `<span class="ec-side-top">${icons.book}<span>Overview</span></span>`, link: '/overview' }
+
+const pathGroups: DefaultTheme.SidebarItem[] = paths.map(p => {
     const count = p.groups.reduce((n, g) => n + g.items.length, 0)
     const toItem = (it: any) => ({ text: stageLabel(it), link: `/${it.dir}/` })
     const head = `<span class="ec-side-path ec-c-${p.accent}">${icons[p.accent]}<span class="ec-side-path__name">${p.name}</span><span class="ec-count">${count}</span></span>`
@@ -41,7 +41,17 @@ const sidebar: DefaultTheme.SidebarItem[] = [
       ]
     }
   })
-]
+
+// One sidebar per path: a stage page shows only its own path. Keys are URL prefixes
+// (VitePress picks the key the page path starts with): /stage-, /external-, /vc-.
+// The overview keeps all three paths.
+const sidebar: DefaultTheme.SidebarMulti = {
+  '/overview': [overviewItem, ...pathGroups],
+  ...Object.fromEntries(paths.map((p, i) => {
+    const prefix = '/' + p.groups[0].items[0].dir.replace(/[^-]+$/, '') // "stage-00" -> "/stage-"
+    return [prefix, [overviewItem, pathGroups[i]]]
+  }))
+}
 
 // ---- markdown: GitHub task lists ("- [ ] item") as read-only checkboxes -----------------------
 function taskLists(md: MarkdownIt) {
