@@ -1,0 +1,6 @@
+node_modules/
+src/
+.vitepress/dist/
+.vitepress/cache/
+.vitepress/paths.generated.json
+.vitepress/.temp/
