@@ -5,6 +5,7 @@ name: Publish Workshop Site (GitHub Pages)
 # Only the upstream repository publishes the site. Copies created from the template
 # ("COPY Workshop") get this workflow too, but the job-level guard skips it there,
 # so workshop participants only get their GitHub Issues - no Pages deployment.
+# The site is built even when Pages is disabled, but deployment is skipped.
 
 on:
   push:
@@ -56,7 +57,7 @@ jobs:
           path: site/.vitepress/dist
 
   deploy:
-    if: github.repository == 'mjendza/workshop-entra-as-code-interactive'
+    if: github.repository == 'mjendza/workshop-entra-as-code-interactive' && github.event.repository.has_pages
     needs: build
     runs-on: ubuntu-latest
     environment:
