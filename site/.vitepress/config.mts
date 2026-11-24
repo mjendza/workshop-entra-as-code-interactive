@@ -2,7 +2,7 @@ import { slug } from 'github-slugger'
 import { withMermaid } from 'vitepress-plugin-mermaid'
 import type { DefaultTheme } from 'vitepress'
 import type MarkdownIt from 'markdown-it'
-import { paths, phaseRange, REPO_URL } from '../workshop.mjs'
+import { paths, phases, phaseRange, setupStage, REPO_URL } from '../workshop.mjs'
 import { icons } from './theme/icons.mjs'
 
 const BASE = '/workshop-entra-as-code-interactive/'
@@ -26,14 +26,21 @@ const pathGroups: DefaultTheme.SidebarItem[] = paths.map(p => {
     const count = p.groups.reduce((n, g) => n + g.items.length, 0)
     const toItem = (it: any) => ({ text: stageLabel(it), link: `/${it.dir}/` })
     const head = `<span class="ec-side-path ec-c-${p.accent}">${icons[p.accent]}<span class="ec-side-path__name">${p.name}</span><span class="ec-count">${count}</span></span>`
+    // The 00 stage is required configuration: always visible on its own, above the phases.
+    const setup = setupStage(p)
+    const groups = phases(p)
     return {
       text: head,
       collapsed: false,
       items: [
         { text: `<span class="ec-side-roadmap">Roadmap</span>`, link: `/paths/${p.key}` },
-        ...(p.groups.length === 1
-          ? p.groups[0].items.map(toItem)
-          : p.groups.map(g => ({
+        ...(setup ? [{
+          text: `<span class="ec-side-setup"><span class="ec-num">${setup.num}</span><span class="ec-label">${esc(setup.short)}</span><span class="ec-badge ec-badge--required">Required</span></span>`,
+          link: `/${setup.dir}/`
+        }] : []),
+        ...(groups.length === 1
+          ? groups[0].items.map(toItem)
+          : groups.map(g => ({
               text: `<span class="ec-side-phase"><span>${esc(g.name)}</span>${g.items.some(i => i.tenantWide) ? `<span class="ec-tw" aria-hidden="true">${icons.shieldAlert}</span>` : ''}<span class="ec-count">${phaseRange(g)}</span></span>`,
               collapsed: true,
               items: g.items.map(toItem)

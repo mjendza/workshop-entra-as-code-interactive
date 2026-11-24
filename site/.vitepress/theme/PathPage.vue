@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { withBase } from 'vitepress'
-import { paths, phaseRange, TEMPLATE_URL } from '../../workshop.mjs'
+import { paths, phases, phaseRange, setupStage, TEMPLATE_URL } from '../../workshop.mjs'
 import { icon } from './icons.mjs'
 
 const props = defineProps<{ pathKey: string }>()
 const p = computed(() => paths.find(x => x.key === props.pathKey)!)
 const count = computed(() => p.value.groups.reduce((n, g) => n + g.items.length, 0))
 const first = computed(() => p.value.groups[0].items[0])
+// The 00 stage is required setup: shown on its own (step 0) above the numbered phases.
+const setup = computed(() => setupStage(p.value))
+const groups = computed(() => phases(p.value))
 const label = (num: string) => (num === '—' ? '—' : num)
 </script>
 
@@ -39,7 +42,7 @@ const label = (num: string) => (num === '—' ? '—' : num)
       <div class="ec-roadmap__head">
         <div class="ec-section__head">
           <span class="ec-kicker">ROADMAP</span>
-          <h2>{{ p.groups.length > 1 ? `${p.groups.length} phases, ${count} pages` : `${count} pages` }}</h2>
+          <h2>{{ groups.length > 1 ? `Setup + ${groups.length} phases, ${count} pages` : `Setup + ${count - 1} ${count - 1 === 1 ? 'stage' : 'stages'}` }}</h2>
         </div>
         <div class="ec-legend">
           <span><span class="ec-tw" v-html="icon('shieldAlert', 15)" />Changes tenant-wide policy</span>
@@ -49,7 +52,23 @@ const label = (num: string) => (num === '—' ? '—' : num)
       </div>
 
       <ol class="ec-rail">
-        <li v-for="(g, gi) in p.groups" :key="g.name" class="ec-rail__phase">
+        <li v-if="setup" class="ec-rail__phase ec-rail__phase--setup">
+          <span class="ec-rail__dot" aria-hidden="true">0</span>
+          <div class="ec-rail__body">
+            <div class="ec-rail__title"><h3>Setup</h3><span class="ec-badge ec-badge--required">Required</span></div>
+            <p class="ec-rail__note">Configure this once before any other stage in the path.</p>
+            <ul class="ec-rail__stages">
+              <li>
+                <a :href="withBase(`/${setup.dir}/`)">
+                  <span class="ec-num">{{ setup.num }}</span>
+                  <span class="ec-rail__name">{{ setup.short }}</span>
+                  <span class="ec-rail__go" v-html="icon('arrow', 16)" />
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li v-for="(g, gi) in groups" :key="g.name" class="ec-rail__phase">
           <span class="ec-rail__dot" aria-hidden="true">{{ gi + 1 }}</span>
           <div class="ec-rail__body">
             <div class="ec-rail__title"><h3>{{ g.name }}</h3><span class="ec-count">{{ phaseRange(g) }}</span></div>

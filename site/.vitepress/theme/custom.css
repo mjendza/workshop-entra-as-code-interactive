@@ -164,6 +164,16 @@ body { -webkit-font-smoothing: antialiased; }
 }
 .ec-badge--preview { color: var(--ec-warn); background: var(--ec-warn-bg); border: 1px solid var(--ec-warn-ln); }
 .ec-badge--private { color: var(--ec-imp); background: var(--ec-imp-bg); border: 1px solid var(--ec-imp-ln); }
+.ec-badge--required { color: var(--vp-c-brand-1); background: var(--vp-c-brand-soft); border: 1px solid var(--vp-c-brand-soft); }
+
+/* required setup stage (00): a standalone boxed item above the phases */
+.ec-side-setup { display: flex; align-items: center; width: 100%; }
+.ec-side-setup .ec-label { flex: 1; font-weight: 600; color: var(--vp-c-text-1); }
+.VPSidebarItem .item:has(.ec-side-setup) {
+  margin: 6px 0 8px; padding: 0 8px; border: 1px solid var(--vp-c-border); border-radius: 8px; background: var(--vp-c-bg-soft);
+}
+.VPSidebarItem.is-active > .item:has(.ec-side-setup) { border-color: var(--vp-c-brand-1); }
+.VPSidebarItem .item:has(.ec-side-setup) .indicator { display: none; }
 
 /* ---- stage header + template banner (doc-before slot) --------------------------------------- */
 .ec-banner {
@@ -563,3 +573,9 @@ body { -webkit-font-smoothing: antialiased; }
 .ec-lic { font-family: var(--vp-font-family-mono); font-size: 11px; padding: 1px 7px; border: 1px solid var(--vp-c-border); border-radius: 5px; color: var(--vp-c-text-2); white-space: nowrap; }
 .ec-rail__go { display: inline-flex; color: var(--vp-c-text-3); transition: transform 0.2s, color 0.2s; }
 @media (max-width: 640px) { .ec-lic { display: none; } .ec-rail__phase { gap: 14px; } }
+
+/* roadmap: required setup step */
+.ec-rail__phase--setup .ec-rail__dot { background: var(--vp-c-brand-soft); border-color: var(--vp-c-brand-1); color: var(--vp-c-brand-1); }
+.ec-rail__phase--setup .ec-rail__stages { border-color: var(--vp-c-brand-1); }
+.ec-rail__phase--setup .ec-rail__title .ec-badge { margin-left: 0; }
+.ec-rail__note { margin: -4px 0 0; font-size: 14px; color: var(--vp-c-text-2); }

@@ -3,7 +3,8 @@
 // Order mirrors .github/workflows/create-workshop-issues.yml and the README roadmap - keep them in sync.
 //
 // Stage fields: dir (doc/<dir>), num (label in sidebar), short (sidebar title),
-//   license, tenantWide (changes tenant-wide singleton policy), preview: 'preview' | 'private'.
+//   license, tenantWide (changes tenant-wide singleton policy), preview: 'preview' | 'private',
+//   setup: the path's required 00 configuration stage - always shown on its own, above the phases.
 
 const s = (dir, num, short, extra = {}) => ({ dir, num, short, ...extra })
 
@@ -26,7 +27,7 @@ export const paths = [
     needs: ['A sandbox Entra ID tenant', 'Entra ID P1 or P2 licenses, depending on the stage', 'Security Defaults disabled'],
     licenseSummary: 'P1 / P2',
     groups: [
-      { name: 'Foundations & Identities', items: [s('stage-00', '00', 'Prerequisites'), s('stage-01', '01', 'SSO Application'), s('stage-02', '02', 'Service Principal'), s('stage-03', '03', 'Workload Identity Federation')] },
+      { name: 'Foundations & Identities', items: [s('stage-00', '00', 'Prerequisites', { setup: true }), s('stage-01', '01', 'SSO Application'), s('stage-02', '02', 'Service Principal'), s('stage-03', '03', 'Workload Identity Federation')] },
       { name: 'Access Governance & Zero Trust', items: [s('stage-04', '04', 'Conditional Access', { license: 'Entra ID P1' }), s('stage-05', '05', 'Access Package', { license: 'Entra ID P2' }), s('stage-06', '06', 'PIM', { license: 'Entra ID P2' })] },
       { name: 'Tenant Hardening & Modern Identities', items: [s('stage-07', '07', 'Tenant Security Hardening', { tenantWide: true }), s('stage-08', '08', 'Agent Identity', { preview: 'preview' })] },
       { name: 'Security Posture & AI Operations', items: [s('stage-09', '09', 'Maester'), s('stage-10', '10', 'EntraExporter'), s('stage-11', '11', 'Zero Trust Assessment'), s('stage-12', '12', 'Configuration Drift'), s('stage-13', '13', 'Lokka MCP')] },
@@ -49,7 +50,7 @@ export const paths = [
     needs: ['An Entra External ID (CIAM) tenant', 'A dedicated CIAM service principal (Ext-00)', 'Pester 5+ for the automated tests'],
     licenseSummary: 'Free trial',
     groups: [
-      { name: 'External ID (CIAM)', items: [s('external-00', '00', 'Prerequisites'), s('external-01', '01', 'Native Authentication'), s('external-02', '02', 'SSO for CustomerHelpdesk'), s('external-03', '03', 'Passwordless + MFA (SMS)'), s('external-04', '04', 'Sign-up Attributes'), s('external-05', '05', 'Profile Sync + Token Enrichment')] }
+      { name: 'External ID (CIAM)', items: [s('external-00', '00', 'Prerequisites', { setup: true }), s('external-01', '01', 'Native Authentication'), s('external-02', '02', 'SSO for CustomerHelpdesk'), s('external-03', '03', 'Passwordless + MFA (SMS)'), s('external-04', '04', 'Sign-up Attributes'), s('external-05', '05', 'Profile Sync + Token Enrichment')] }
     ]
   },
   {
@@ -66,7 +67,7 @@ export const paths = [
     needs: ['An Entra ID tenant', 'An Azure subscription (Key Vault holds the signing keys)'],
     licenseSummary: 'Azure sub',
     groups: [
-      { name: 'Verified ID', items: [s('vc-00', '00', 'Tenant Onboarding'), s('vc-01', '01', 'Register VC Contract')] }
+      { name: 'Verified ID', items: [s('vc-00', '00', 'Tenant Onboarding', { setup: true }), s('vc-01', '01', 'Register VC Contract')] }
     ]
   }
 ]
@@ -74,14 +75,24 @@ export const paths = [
 /** Flat list of every stage with its path, phase and position. */
 export function allStages() {
   return paths.flatMap(p => {
-    const items = p.groups.flatMap(g => g.items.map(it => ({ ...it, phase: g.name })))
+    const items = p.groups.flatMap(g => g.items.map(it => ({ ...it, phase: it.setup ? 'Setup (required)' : g.name })))
     const lastNum = items.filter(it => /^\d+$/.test(it.num)).at(-1)?.num
     return items.map((it, index) => ({ ...it, path: p.key, index, total: items.length, lastNum }))
   })
 }
 
+/** The path's required setup stage (00). */
+export function setupStage(path) {
+  return path.groups.flatMap(g => g.items).find(it => it.setup)
+}
+
+/** Phase groups without the setup stage (it is rendered separately); empty groups dropped. */
+export function phases(path) {
+  return path.groups.map(g => ({ ...g, items: g.items.filter(it => !it.setup) })).filter(g => g.items.length)
+}
+
 export function phaseRange(group) {
-  const nums = group.items.map(it => it.num).filter(n => /^\d+$/.test(n))
+  const nums = group.items.filter(it => !it.setup).map(it => it.num).filter(n => /^\d+$/.test(n))
   if (!nums.length) return String(group.items.length)
   return nums.length === 1 ? nums[0] : `${nums[0]}–${nums.at(-1)}`
 }
