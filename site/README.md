@@ -32,3 +32,5 @@ npm run build    # output in site/.vitepress/dist
 
 Deployment: `.github/workflows/pages.yml` runs on pushes to `main` that touch `README.md`, `doc/**` or `site/**`.
 It runs **only** in `mjendza/workshop-entra-as-code-interactive`; copies made from the template skip it.
+To deploy, enable Pages in the repository's **Settings → Pages** and select **GitHub Actions** as the build source.
+The build can run without this setting, but the deploy job requires it.
