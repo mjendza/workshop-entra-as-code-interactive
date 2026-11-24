@@ -1,0 +1,71 @@
+name: Publish Workshop Site (GitHub Pages)
+
+# Builds README.md + doc/** into a VitePress site (see site/) and deploys it to GitHub Pages.
+#
+# Only the upstream repository publishes the site. Copies created from the template
+# ("COPY Workshop") get this workflow too, but the job-level guard skips it there,
+# so workshop participants only get their GitHub Issues - no Pages deployment.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'README.md'
+      - 'doc/**'
+      - 'site/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'mjendza/workshop-entra-as-code-interactive'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/.vitepress/dist
+
+  deploy:
+    if: github.repository == 'mjendza/workshop-entra-as-code-interactive'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

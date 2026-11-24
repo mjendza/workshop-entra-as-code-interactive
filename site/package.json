@@ -1,0 +1,18 @@
+{
+  "name": "workshop-entra-as-code-site",
+  "private": true,
+  "type": "module",
+  "description": "GitHub Pages site for the Microsoft Entra as Code workshop (built from README.md + doc/**).",
+  "scripts": {
+    "prepare-docs": "node scripts/prepare.mjs",
+    "dev": "npm run prepare-docs && vitepress dev",
+    "build": "npm run prepare-docs && vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "github-slugger": "2.0.0",
+    "mermaid": "11.17.2",
+    "vitepress": "1.6.4",
+    "vitepress-plugin-mermaid": "2.0.17"
+  }
+}

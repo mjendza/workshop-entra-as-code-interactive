@@ -1,6 +1,7 @@
 # Microsoft Entra as Code Workshop 🚀
 
 [![COPY Workshop](https://img.shields.io/badge/COPY%20Workshop-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/new?template_owner=mjendza&template_name=workshop-entra-as-code-interactive&owner=%40me&name=workshop-entra-as-code&description=Workshop:+Entra+ID+as+Code&visibility=public)
+[![Workshop Website](https://img.shields.io/badge/Website-Read%20the%20Docs-0078D4?style=for-the-badge&logo=githubpages&logoColor=white)](https://mjendza.github.io/workshop-entra-as-code-interactive/)
 [![Terraform Version](https://img.shields.io/badge/Terraform-%3E%3D1.0-844FBA?style=flat-square&logo=terraform)](https://www.terraform.io/)
 [![Microsoft Entra](https://img.shields.io/badge/Microsoft-Entra%20ID-0078D4?style=flat-square&logo=microsoftazure)](https://learn.microsoft.com/entra/)
 [![Interactive Tracking](https://img.shields.io/badge/Mode-Interactive%20GitHub%20Issues-brightgreen?style=flat-square&logo=github)](https://github.com/mjendza/workshop-entra-as-code-interactive)
