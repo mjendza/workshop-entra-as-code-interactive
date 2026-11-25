@@ -86,7 +86,7 @@ Before executing Terraform commands against your tenant, please review these key
 > **Stage 8 (Agent Identity Blueprint) & Stage 20 (High Assurance):** These stages leverage Microsoft Graph **beta endpoints** and preview features. If schema changes occur upstream in Microsoft Graph, refer to the respective stage documentation for updates.
 
 > [!CAUTION]
-> **Stage 21 (App Role PIM):** PIM for app roles is in **private preview**. Your tenant must be enrolled by Microsoft, and the eligible assignment and role settings are configured manually in the portal (no public Graph API yet).
+> **Stage 21 (App Role PIM):** PIM for app roles is in **preview**. The eligible assignment and role settings are configured manually in the portal.
 
 > [!WARNING]
 > **Stage 19 (Temporary Access Pass):** Manages the tenant-wide Authentication Methods policy singleton. You can scope the policy to a specific pilot group via `include_target_group_id` rather than all users.
@@ -146,7 +146,7 @@ Path 1 uses the dedicated [`workforce/`](workforce/) Terraform root (`workforce/
 | [18](doc/stage-18) | **Multitenant Secret Monitoring** | Centralize credential and secret expiration tracking across multiple Entra ID tenants using workload federation. | GitHub Repo |
 | [19](doc/stage-19) | **Temporary Access Pass (TAP)** | Manage the tenant-wide Authentication Methods policy to issue expiring passcodes for passwordless bootstrapping. | Sandbox / Dev Tenant |
 | [20](doc/stage-20) | **High Assurance - Verified ID with CA (Preview)** | Require users to present a Verified ID (W3C Verifiable Credential) via Conditional Access to access sensitive applications. | Entra ID P1, Verified ID (VC-00) |
-| [21](doc/stage-21) | **Entra ID App Role PIM (Preview)** | Replace standing app role assignments with PIM eligible assignments: users activate a privileged app role just-in-time (MFA, justification, approval) and the `roles` claim appears only while active. | Private preview enrollment, E7 / ID Governance |
+| [21](doc/stage-21) | **Entra ID App Role PIM (Preview)** | Replace standing app role assignments with PIM eligible assignments: users activate a privileged app role just-in-time (MFA, justification, approval) and the `roles` claim appears only while active. | E7 / ID Governance |
 
 #### Phase 7: Disassembly & Bonus
 | Stage | Title | Description | Requirements |
@@ -296,7 +296,7 @@ terraform destroy
 
 | Version | Date | Description |
 |:---:|:---:|---|
-| **v2.2** | 2026.11.22 | 🧪 Added **Stage 21** (Entra ID App Role PIM - just-in-time app roles, private preview). |
+| **v2.2** | 2026.11.22 | 🧪 Added **Stage 21** (Entra ID App Role PIM - just-in-time app roles, preview). |
 | **v2.1** | 2026.11.20 | 🌟 Added **Stage 20** (High Assurance: Require Verified ID with Conditional Access). |
 | **v2.0** | 2026.07.06 | 🎆 **Major Reorganization:** Restructured workshop into 3 independent paths (Workforce, External ID, Verified ID). |
 | **v1.11** | 2026.07.04 | Added **Stage Extra External ID** (Native Authentication & Pester testing). |

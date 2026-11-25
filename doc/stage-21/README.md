@@ -1,6 +1,6 @@
 # Stage 21: Entra ID App Role PIM - Just-in-Time App Roles (Preview)
 
-> 🧪 **PRIVATE PREVIEW:** Privileged Identity Management (PIM) for app roles is in private preview. Your tenant must be enrolled in the preview by Microsoft before the App Roles (Preview) blade appears in PIM. Features, UI labels, licensing and APIs can change before general availability. Don't use it in production, and use a sandbox/dev tenant for this stage.
+> 🧪 **PREVIEW:** Privileged Identity Management (PIM) for app roles is in preview. Features, UI labels, licensing and APIs can change before general availability. Use a sandbox/dev tenant for this stage.
 
 ## Rationale
 
@@ -15,7 +15,7 @@ In [Stage 15](../stage-15/README.md) you defined app roles and assigned a user t
 
 The application still defines what each role allows. PIM only controls when a user holds it.
 
-> ⚠️ **Why is part of this stage manual?** During the private preview there's no public, documented Microsoft Graph API and no `azuread`/`msgraph` Terraform resource for PIM app role eligibility schedules or app role PIM policies. Terraform owns the application, the roles, the eligible group and the standing assignment. You create the eligible assignment and the role settings in the portal. When Microsoft publishes the API, these steps are candidates for `msgraph_resource`, like Stage 7 and Stage 20.
+> ⚠️ **Why is part of this stage manual?** Terraform owns the application, the roles, the eligible group and the standing assignment. This stage uses the portal to create the eligible assignment and configure the role settings.
 
 ## ⏱️ Estimated Time: 30 minutes
 
@@ -35,7 +35,7 @@ The application still defines what each role allows. PIM only controls when a us
 - [azuread_app_role_assignment (Terraform)](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/app_role_assignment)
 
 ## Prerequisites
-- Tenant enrolled in the PIM for app roles private preview. Check that ID Governance → Privileged Identity Management → App Roles (Preview) exists in the [Microsoft Entra admin center](https://entra.microsoft.com). If it doesn't, you can still run the Terraform part, but you can't complete the PIM steps.
+- Check that ID Governance → Privileged Identity Management → App Roles (Preview) exists in the [Microsoft Entra admin center](https://entra.microsoft.com). If it doesn't, you can still run the Terraform part, but you can't complete the PIM steps.
 - Licensing: Microsoft's preview docs list E7 licenses for PIM for app roles, and Microsoft Entra ID Governance for activation. Assigning an app role to a group also needs Entra ID P1 or higher.
 - Completed [Stage 15](../stage-15/README.md) (you know how app roles and the `roles` claim work).
 - New for this stage: add these Application permissions to your workshop Service Principal manually in the Entra admin center (App registrations → your SP → API permissions → Add a permission → Grant admin consent), the same way as in Stage 0:
@@ -103,7 +103,7 @@ terraform apply
 
 The plan should show the application with three `app_role` blocks, the Service Principal, the `Eligible` group, and one `azuread_app_role_assignment.standing`.
 
-### 2. Configure PIM role settings for `admin` (manual - private preview)
+### 2. Configure PIM role settings for `admin` (manual - preview)
 
 1. Sign in to the [Microsoft Entra admin center](https://entra.microsoft.com).
 2. Go to ID Governance → Privileged Identity Management → App Roles (Preview).
@@ -117,7 +117,7 @@ The plan should show the application with three `app_role` blocks, the Service P
 6. On the Assignment tab, keep Allow permanent eligible assignment on for the workshop. In production, set an expiry.
 7. Select Update and wait for Role setting update succeeded.
 
-### 3. Create the eligible assignment (manual - private preview)
+### 3. Create the eligible assignment (manual - preview)
 
 1. In the same application, under Manage, select Roles → Add assignments.
 2. Select role: `admin`.
@@ -177,7 +177,7 @@ Repeat step 4 in a new private window. The app needs a new token. The old one do
 ## Troubleshooting
 
 `App Roles (Preview) isn't shown in PIM.`
-Your tenant isn't enrolled in the private preview, or you're missing a license. Contact your Microsoft account team. The Terraform part still works.
+Check that your tenant has the required license and your account has the necessary permissions. The Terraform part still works.
 
 `The application isn't listed in App Roles (Preview).`
 Search by the Service Principal object ID. The app must define at least one app role and must have a Service Principal in your tenant.
@@ -201,7 +201,7 @@ It shouldn't. PIM assignments aren't managed by this configuration. If you see a
 
 ## Stage Completion Checklist
 - [ ] I understand the difference between active (standing) and eligible (just-in-time) app role assignments.
-- [ ] I know that PIM for app roles is in private preview and my tenant is enrolled.
+- [ ] I know that PIM for app roles is in preview and have checked the licensing requirements.
 - [ ] I have added the `AppRolePim` module (with my test user ID) to my `main.tf` and run `terraform apply`.
 - [ ] I have configured the PIM settings for `admin` (max duration, MFA, justification).
 - [ ] I have created an eligible assignment of `admin` to the `Eligible` group.

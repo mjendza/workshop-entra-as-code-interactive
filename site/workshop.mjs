@@ -32,7 +32,7 @@ export const paths = [
       { name: 'Tenant Hardening & Modern Identities', items: [s('stage-07', '07', 'Tenant Security Hardening', { tenantWide: true }), s('stage-08', '08', 'Agent Identity', { preview: 'preview' })] },
       { name: 'Security Posture & AI Operations', items: [s('stage-09', '09', 'Maester'), s('stage-10', '10', 'EntraExporter'), s('stage-11', '11', 'Zero Trust Assessment'), s('stage-12', '12', 'Configuration Drift'), s('stage-13', '13', 'Lokka MCP')] },
       { name: 'Application Security & Automation', items: [s('stage-14', '14', 'SPA SSO'), s('stage-15', '15', 'App Roles'), s('stage-16', '16', 'Certificate Auth'), s('stage-17', '17', 'CI/CD Pipelines')] },
-      { name: 'Advanced Operations & High Assurance', items: [s('stage-18', '18', 'Secret Monitoring'), s('stage-19', '19', 'Temporary Access Pass', { tenantWide: true }), s('stage-20', '20', 'High Assurance', { license: 'Entra ID P1', tenantWide: true, preview: 'preview' }), s('stage-21', '21', 'App Role PIM', { license: 'ID Governance', preview: 'private' })] },
+      { name: 'Advanced Operations & High Assurance', items: [s('stage-18', '18', 'Secret Monitoring'), s('stage-19', '19', 'Temporary Access Pass', { tenantWide: true }), s('stage-20', '20', 'High Assurance', { license: 'Entra ID P1', tenantWide: true, preview: 'preview' }), s('stage-21', '21', 'App Role PIM', { license: 'ID Governance', preview: 'preview' })] },
       { name: 'Disassembly & Bonus', items: [s('stage-cleanup', '—', 'Cleanup'), s('stage-next', '—', 'Next Steps')] }
     ]
   },
