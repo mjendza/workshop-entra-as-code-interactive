@@ -3,6 +3,7 @@
 //
 //   doc/<dir>/README.md  -> src/<dir>/index.md      (page at /<dir>/)
 //   README.md            -> src/overview.md         (page at /overview)
+//   doc/notes/README.md  -> src/notes.md            (page at /notes)
 //   doc/**/<asset>       -> src/**/<asset>          (images etc. referenced by pages)
 //   links to repo files outside the site (.tf, .ps1, folders, ...) -> GitHub blob/tree URLs
 import fs from 'node:fs'
@@ -47,6 +48,7 @@ function mapTarget(repoRel, pageRepoDir, pageSrcDir) {
   }
 
   if (repoRel === 'README.md') return '/overview'
+  if (/^doc\/notes(\/readme\.md)?\/?$/i.test(repoRel)) return '/notes'
   if (!exists) warnings.push(`missing link target "${repoRel}" (from ${pageRepoDir || '/'}) -> linked to GitHub`)
   return `${REPO_URL}/${isDir ? 'tree' : 'blob'}/${BRANCH}/${repoRel.replace(/\/$/, '')}`
 }
@@ -146,9 +148,14 @@ readme = readme.replace(/^# .*\n(?:\s*\n|\[!\[.*\n)*/, '# Workshop Overview\n\n'
 fs.writeFileSync(path.join(SRC, 'overview.md'),
   frontmatter({ source: 'README.md' }) + transform(readme, '', ''))
 
+// Cross-cutting notes (not a stage) -> /notes.
+const NOTES = 'doc/notes/README.md'
+fs.writeFileSync(path.join(SRC, 'notes.md'),
+  frontmatter({ source: NOTES }) + transform(fs.readFileSync(path.join(REPO_ROOT, NOTES), 'utf8'), 'doc/notes', ''))
+
 // Hand-written pages (home page, public assets) live in site/pages.
 fs.cpSync(path.join(SITE_DIR, 'pages'), SRC, { recursive: true })
 
 
 for (const w of warnings) console.warn(`⚠️  ${w}`)
-console.log(`Staged ${pageDirs.size + paths.length + 1} pages into ${path.relative(REPO_ROOT, SRC)}`)
+console.log(`Staged ${pageDirs.size + paths.length + 2} pages into ${path.relative(REPO_ROOT, SRC)}`)

@@ -277,6 +277,8 @@ terraform apply
 terraform destroy
 ```
 
+> 📝 More tips in the [Notes](doc/notes/README.md) - e.g. running Terraform with your Azure CLI sign-in and checking the active tenant with `az account show`.
+
 ---
 
 ## ❓ Frequently Asked Questions (FAQ)
