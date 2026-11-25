@@ -21,13 +21,13 @@ Application roles enable:
 
 ## Implementation & Code
 
-### Update your main.tf
+### Update your stage-15.tf
 
 Modify the existing `Demo_Roles_OidcDebugger_SSO` module from Stage 14 as a new Application Registration with the `app_role_values` variable:
 
 ```hcl
 #########################################################################
-# Stage 15: Application Roles for SPA SSO PLACEHOLDER
+# Stage 15: Application Roles for SPA SSO
 #########################################################################
 module "Demo_Roles_OidcDebugger_SSO" {
   source                       = "./modules/sso_app_rich"

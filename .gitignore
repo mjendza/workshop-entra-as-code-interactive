@@ -6,6 +6,9 @@
 
 *.tfstate*
 
+# Local provider overrides (e.g. Azure CLI auth, see dev/azure-cli-auth.md)
+*_override.tf
+
 # Test results
 test/TestResults.xml
 test/TestResults*.xml

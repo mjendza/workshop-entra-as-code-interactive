@@ -44,7 +44,7 @@ module "EntraDeveloper_Package" {
 ## Stage Completion Checklist
 - [ ] I carefully comprehend the structural scope binding Entitlement controls within Entra interactions.
 - [ ] I actively validated functional licensing mechanisms extending P2 controls locally (or manually circumvented sections gracefully).
-- [ ] I applied relevant Access Package references binding variables against my `main.tf` logic successfully.
+- [ ] I applied relevant Access Package references binding variables against my `stage-05.tf` logic successfully.
 - [ ] I generated a clean structural `terraform plan` output effectively.
 - [ ] I resolved infrastructure mappings fully relying on standard `terraform apply` operations confidently.
 - [ ] I utilized the portal logic actively observing packages listed structurally resolving to users correctly.

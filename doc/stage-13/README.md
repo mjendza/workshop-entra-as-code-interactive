@@ -48,7 +48,7 @@ You can search and map the required limited permissions via the web tool: [permi
 
 > ⚠️ **Security Note:** Lokka should initially be configured with read-only permissions. Only grant write permissions if you intend to use Lokka for automated remediation. For exploration and analysis, read-only is recommended.
 
-Add the following module configuration to your `main.tf`:
+Add the following module configuration to your `stage-13.tf`:
 
 ```hcl
 #########################################################################
@@ -113,7 +113,7 @@ I asked the question: `Is there any naming convension for App Registrations? use
 ## Stage Completion Checklist
 
 - [ ] I have read and comprehended this stage.
-- [ ] I have added the Lokka Service Principal module to `main.tf`.
+- [ ] I have added the Lokka Service Principal module to `stage-13.tf`.
 - [ ] I have successfully run `terraform plan` without errors.
 - [ ] I have successfully run `terraform apply` and provisioned the Service Principal.
 - [ ] I have verified the App Registration and Enterprise Application exist in Entra ID.

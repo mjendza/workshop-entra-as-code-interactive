@@ -38,7 +38,7 @@ We will utilize the local `./modules/service_principal` module to provision a Se
 
 You can review the required permissions in the [EntraExporter documentation](https://github.com/microsoft/EntraExporter?tab=readme-ov-file#using-the-module).
 
-Add the following module configuration to your `main.tf`:
+Add the following module configuration to your `stage-10.tf`:
 
 ```hcl
 #########################################################################
@@ -127,7 +127,7 @@ An example walkthrough script is also available in `scripts\entra-exporter\works
 ## Stage Completion Checklist
 
 - [ ] I have read and comprehended this stage.
-- [ ] I have added the EntraExporter Service Principal module to `main.tf`.
+- [ ] I have added the EntraExporter Service Principal module to `stage-10.tf`.
 - [ ] I have successfully run `terraform plan` without errors.
 - [ ] I have successfully run `terraform apply` and provisioned the Service Principal.
 - [ ] I have verified the App Registration and Enterprise Application exist in Entra ID.

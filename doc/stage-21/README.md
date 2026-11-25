@@ -47,7 +47,7 @@ The application still defines what each role allows. PIM only controls when a us
 
 ## Implementation & Code
 
-### 1. Add the application, roles and eligible group to `main.tf`
+### 1. Add the application, roles and eligible group to `stage-21.tf`
 
 The new module `./modules/pim_app_roles`:
 - creates an SPA app registration (`https://oidcdebugger.com/debug`) with the app roles you pass in `app_role_values`,
@@ -202,7 +202,7 @@ It shouldn't. PIM assignments aren't managed by this configuration. If you see a
 ## Stage Completion Checklist
 - [ ] I understand the difference between active (standing) and eligible (just-in-time) app role assignments.
 - [ ] I know that PIM for app roles is in private preview and my tenant is enrolled.
-- [ ] I have added the `AppRolePim` module (with my test user ID) to my `main.tf` and run `terraform apply`.
+- [ ] I have added the `AppRolePim` module (with my test user ID) to my `stage-21.tf` and run `terraform apply`.
 - [ ] I have configured the PIM settings for `admin` (max duration, MFA, justification).
 - [ ] I have created an eligible assignment of `admin` to the `Eligible` group.
 - [ ] Before activation, the ID token contained only `reader`.

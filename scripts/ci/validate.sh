@@ -68,7 +68,7 @@ fi
 # --- Overlay final solution --------------------------------------------------
 overlay_final() {
   case "$1" in
-    workforce)       cp "$WORK/doc/result/root/main.tf"        "$WORK/workforce/main.tf" ;;
+    workforce)       cp "$WORK"/doc/result/workforce/*.tf      "$WORK/workforce/" ;;
     verified_id)     cp "$WORK/doc/result/verified_id/main.tf" "$WORK/verified_id/main.tf" ;;
     external_tenant) cp "$WORK"/doc/result/external_id/*.tf    "$WORK/external_tenant/" ;;
   esac

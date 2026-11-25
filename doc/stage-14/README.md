@@ -13,11 +13,11 @@ Enabling Single Sign-On (SSO) for Single Page Applications (SPA) is a common req
 ## Implementation & Code
 We will utilize the local module located at `./modules/sso_app_rich`. This module supports SPA URIs, Identifier URIs, and dynamic scope creation natively.
 
-Add the following module configuration to your `main.tf`:
+Add the following module configuration to your `stage-14.tf`:
 
 ```hcl
 #########################################################################
-# Stage 14: SPA SSO for Application PLACEHOLDER
+# Stage 14: SPA SSO for Application
 #########################################################################
 module "SPA_OidcDebugger_SSO" {
   source                       = "./modules/sso_app_rich"
@@ -65,7 +65,7 @@ To verify the SPA functionality works correctly:
 
 ## Stage Completion Checklist
 - [ ] I have read and comprehended this stage.
-- [ ] I have inserted the SPA_OidcDebugger_SSO module config into my `main.tf` file.
+- [ ] I have inserted the SPA_OidcDebugger_SSO module config into my `stage-14.tf` file.
 - [ ] I have successfully run `terraform apply`.
 - [ ] I have verified the SPA Redirect URIs in Entra ID.
 - [ ] I have verified the exposed API scope `Helpdesk` in Entra ID.

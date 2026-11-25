@@ -47,7 +47,7 @@ Stage 12 uses a **5-step workflow** combining EntraExporter exports, Terraform c
 
 #### Step 2: Update Configuration (Make Changes to Entra ID)
 
-Edit `main.tf` to add or modify a stage (for example, Stage 7 - Tenant Security):
+Edit a stage file to add or modify a stage (for example, `stage-07.tf` - Tenant Security):
 
 ```hcl
 #########################################################################
@@ -132,7 +132,7 @@ Invoke-Maester -Tag 'DIFF'
 
 - [ ] **Step 1**: I ran `.\export-for-diff.ps1` and created baseline files.
 - [ ] **Step 1**: Baseline files are present in the `diff/baseline-*` directories.
-- [ ] **Step 2**: I updated my configuration in `main.tf` (added or modified Stage 7 or another stage).
+- [ ] **Step 2**: I updated my configuration in a stage file such as `stage-07.tf` (added or modified Stage 7 or another stage).
 - [ ] **Step 2**: I ran `terraform plan` and reviewed the changes.
 - [ ] **Step 2**: I ran `terraform apply` to apply the changes to Entra ID.
 - [ ] **Step 3**: I ran `.\export-for-diff.ps1 -Prefix current` to capture the current state.

@@ -46,7 +46,7 @@ To map these permission names to their corresponding IDs for Terraform, you can 
 
 ![search](search-for-permissions.png)
 
-Add the following module configuration to your `main.tf`:
+Add the following module configuration to your `stage-09.tf`:
 
 ```hcl
 #########################################################################
@@ -114,7 +114,7 @@ After Terraform successfully provisions the Service Principal, complete the foll
 ## Stage Completion Checklist
 
 - [ ] I have read and comprehended this stage.
-- [ ] I have added the Maester Service Principal module to `main.tf`.
+- [ ] I have added the Maester Service Principal module to `stage-09.tf`.
 - [ ] I have successfully run `terraform plan` without errors.
 - [ ] I have successfully run `terraform apply` and provisioned the Service Principal.
 - [ ] I have verified the App Registration and Enterprise Application exist in Entra ID.

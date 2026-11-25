@@ -77,7 +77,9 @@ git --version
 
 ## Code Configuration
 
-All Workforce (Path 1) Terraform code lives in the [`workforce/`](../../workforce/) folder. Run every `terraform` command from inside it (`cd workforce`); file names in Stages 00 – 21 (`main.tf`, `provider.tf`, `terraform.tfvars`, `./modules/...`) are relative to that folder.
+All Workforce (Path 1) Terraform code lives in the [`workforce/`](../../workforce/) folder. Run every `terraform` command from inside it (`cd workforce`); file names in Stages 00 – 21 (`stage-NN.tf`, `provider.tf`, `terraform.tfvars`, `./modules/...`) are relative to that folder.
+
+Each stage has its own file - `workforce/stage-01.tf` … `workforce/stage-21.tf` (plus `workforce/vc-01.tf` for VC-01). The files ship with only a header; paste the stage code into the matching file. Terraform loads every `*.tf` file in the folder, so splitting stages into files does not change resource addresses. The full solution for every stage is in [`doc/result/workforce/`](../result/workforce/).
 
 Update the **workforce/terraform.tfvars** file. Set a unique prefix (such as your initials) as the value for `deployment_unique_name`.
 ```hcl

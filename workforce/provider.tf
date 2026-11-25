@@ -1,3 +1,16 @@
+terraform {
+  required_providers {
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "= 3.7.0"
+    }
+    msgraph = {
+      source  = "microsoft/msgraph"
+      version = "~> 0.6.0"
+    }
+  }
+}
+
 ## Configure the Azure Active Directory Provider
 provider "azuread" {
 

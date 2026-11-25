@@ -38,7 +38,7 @@ This writes:
 - `cert/cert.pfx` — public + private key, password `Workshop123!` (used by `auth.ps1`)
 - `cert/cert.thumbprint.txt` — thumbprint, read by `auth.ps1`
 
-### 2. Add the stage-16 module to your `main.tf`
+### 2. Add the stage-16 module to your `stage-16.tf`
 
 ```hcl
 #########################################################################
@@ -148,7 +148,7 @@ Admin consent for `User.Read.All` is missing. Grant it from the API permissions 
 ## Stage Completion Checklist
 - [ ] I have read and comprehended this stage.
 - [ ] I have run `./scripts/stage-16/init.ps1` and verified `cert/cert.pem` was created.
-- [ ] I have inserted the `Workload_CertSp` module config into my `main.tf` file.
+- [ ] I have inserted the `Workload_CertSp` module config into my `stage-16.tf` file.
 - [ ] I have successfully run `terraform apply`.
 - [ ] I have verified the certificate appears in the App Registration's Certificates blade with the matching thumbprint.
 - [ ] I have granted admin consent for the SP's Graph permissions.
