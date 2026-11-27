@@ -1,4 +1,4 @@
-# Stage 8: Entra Agent Identity (Preview)
+# Stage 8: Entra Agent Identity
 
 ## ⏱️ Estimated Time: 15-20 minutes
 
@@ -9,7 +9,9 @@
 
 ## Prerequisites
 - **Permissions:** `Application.ReadWrite.All`, `AgentIdentityBlueprint.Create`, `AgentIdentityBlueprintPrincipal.Create`, `AgentIdentityBlueprint.AddRemoveCreds.All`, `AgentIdentityBlueprint.ReadWrite.All`, and `AgentIdentity.Create.All`.
-- **Provider:** `microsoft/msgraph` (using MS Graph **beta** endpoints).
+- **Provider:** `microsoft/msgraph` (Blueprint, Principal and Agent Identity use MS Graph **v1.0**; the optional Agent User still uses **beta**).
+
+> **Note:** Microsoft Entra Agent ID is generally available. The optional **Agent User** (agent's user account) is still in preview and only works in tenants enrolled in the [Frontier preview program](https://www.microsoft.com/microsoft-365-copilot/frontier-program). If your tenant isn't enrolled, set `create_agent_user = false`.
 
 ---
 
@@ -64,7 +66,7 @@ Connect-MgGraph -Scopes "Application.Read.All"
 
 # Check Blueprint
 $blueprint = Invoke-MgGraphRequest -Method GET `
-    -Uri "https://graph.microsoft.com/beta/applications" -OutputType PSObject
+    -Uri "https://graph.microsoft.com/v1.0/applications/microsoft.graph.agentIdentityBlueprint" -OutputType PSObject
 $myBlueprint = $blueprint.value | Where-Object { $_.displayName -like "*MyAgent.AgentBlueprint" }
 $myBlueprint | Format-List displayName, appId, id
 

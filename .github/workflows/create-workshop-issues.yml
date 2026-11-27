@@ -53,7 +53,7 @@ jobs:
                   { file: 'doc/stage-05/README.md', title: 'Stage 5: Access Package', label: 'stage-5' },
                   { file: 'doc/stage-06/README.md', title: 'Stage 6: PIM (Privileged Identity Management)', label: 'stage-6' },
                   { file: 'doc/stage-07/README.md', title: 'Stage 7: Tenant Security', label: 'stage-7' },
-                  { file: 'doc/stage-08/README.md', title: 'Stage 8: Entra ID Agent (Preview)', label: 'stage-8' },
+                  { file: 'doc/stage-08/README.md', title: 'Stage 8: Entra ID Agent', label: 'stage-8' },
                   { file: 'doc/stage-09/README.md', title: 'Stage 9: Maester', label: 'stage-9' },
                   { file: 'doc/stage-10/README.md', title: 'Stage 10: Entra Exporter', label: 'stage-10' },
                   { file: 'doc/stage-11/README.md', title: 'Stage 11: Zero Trust Assessment', label: 'stage-11' },

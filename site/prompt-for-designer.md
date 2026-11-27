@@ -91,7 +91,7 @@ The full root README: path comparison table, detailed roadmaps per phase, risks,
 ### 5.3 Stage page template (`/stage-00/` … `/stage-21/`, `/external-00/` … `/external-05/`, `/vc-00/`, `/vc-01/`)
 - **Sidebar:** three collapsible path groups, with Path 1 further grouped into 7 phases (Foundations & Identities, Access Governance & Zero Trust, Tenant Hardening & Modern Identities, Security Posture & AI Operations, Application Security & Automation, Advanced Operations & High Assurance, Disassembly & Bonus). Stage labels look like "06 · PIM" and "Ext-02 · SSO for CustomerHelpdesk".
 - **The current path should be obvious**, for example through path color, a breadcrumb, or a "Stage 6 of 21" progress indicator.
-- **Badges for preview and private-preview stages:** Stage 8 Agent Identity (Preview), Stage 20 High Assurance (Preview) and Stage 21 App Role PIM (Private Preview). Visually mark stages that change tenant-wide policy: 7, 19 and 20.
+- **Badges for preview and private-preview stages:** Stage 20 High Assurance (Preview) and Stage 21 App Role PIM (Private Preview). Visually mark stages that change tenant-wide policy: 7, 19 and 20.
 - **"Copy the template" banner or callout** at the top.
 - **Right-hand outline** ("On this page").
 - **Prev/next stage navigation** that stays within the same path.

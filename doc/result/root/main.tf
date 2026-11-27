@@ -84,7 +84,7 @@ module "tenant_security" {
 }
 
 #########################################################################
-# Stage 8: Entra ID Agent (Preview) PLACEHOLDER
+# Stage 8: Entra ID Agent PLACEHOLDER
 #########################################################################
 module "EntraAgent" {
   source = "./modules/entra_agent"

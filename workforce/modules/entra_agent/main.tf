@@ -53,12 +53,12 @@ variable "microsoft_graph_sp_id" {
 
 resource "msgraph_resource" "agent_blueprint" {
   url         = "applications/graph.agentIdentityBlueprint"
-  api_version = "beta"
+  api_version = "v1.0"
 
   body = {
     displayName           = "TF.${var.deployment_env_name}.${var.business_name}.AgentBlueprint"
-    "sponsors@odata.bind" = ["https://graph.microsoft.com/beta/users/${var.sponsor_user_id}"]
-    "owners@odata.bind"   = ["https://graph.microsoft.com/beta/users/${var.sponsor_user_id}"]
+    "sponsors@odata.bind" = ["https://graph.microsoft.com/v1.0/users/${var.sponsor_user_id}"]
+    "owners@odata.bind"   = ["https://graph.microsoft.com/v1.0/users/${var.sponsor_user_id}"]
   }
 
   response_export_values = {
@@ -70,7 +70,7 @@ resource "msgraph_resource" "agent_blueprint" {
 # Add OAuth2 permission scope to make the agent visible in the portal
 resource "msgraph_resource_action" "agent_blueprint_api_scope" {
   resource_url = "applications/${msgraph_resource.agent_blueprint.output.id}"
-  api_version  = "beta"
+  api_version  = "v1.0"
   method       = "PATCH"
 
   body = {
@@ -94,7 +94,7 @@ resource "msgraph_resource_action" "agent_blueprint_api_scope" {
 
 resource "msgraph_resource" "agent_blueprint_principal" {
   url         = "serviceprincipals/graph.agentIdentityBlueprintPrincipal"
-  api_version = "beta"
+  api_version = "v1.0"
 
   body = {
     appId = msgraph_resource.agent_blueprint.output.appId
@@ -111,7 +111,7 @@ resource "msgraph_resource" "agent_blueprint_principal" {
 resource "msgraph_resource_action" "agent_blueprint_graph_permissions" {
   count        = length(var.graph_permissions) > 0 ? 1 : 0
   resource_url = "applications/${msgraph_resource.agent_blueprint.output.id}"
-  api_version  = "beta"
+  api_version  = "v1.0"
   method       = "PATCH"
 
   body = {
@@ -133,12 +133,12 @@ resource "msgraph_resource_action" "agent_blueprint_graph_permissions" {
 
 resource "msgraph_resource" "agent_identity" {
   url         = "serviceprincipals/graph.agentIdentity"
-  api_version = "beta"
+  api_version = "v1.0"
 
   body = {
     displayName              = "TF.${var.deployment_env_name}.${var.business_name}.AgentIdentity"
     agentIdentityBlueprintId = msgraph_resource.agent_blueprint.output.appId
-    "sponsors@odata.bind"    = ["https://graph.microsoft.com/beta/users/${var.sponsor_user_id}"]
+    "sponsors@odata.bind"    = ["https://graph.microsoft.com/v1.0/users/${var.sponsor_user_id}"]
   }
 
   depends_on = [
@@ -154,6 +154,7 @@ resource "msgraph_resource" "agent_identity" {
 
 
 # Create Agent User (optional)
+# Agent users are still in preview (Frontier program tenants only), so this call stays on the beta endpoint.
 resource "msgraph_resource" "agent_user" {
   count       = var.create_agent_user ? 1 : 0
   url         = "users"

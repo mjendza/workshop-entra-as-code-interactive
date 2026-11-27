@@ -121,7 +121,7 @@ Path 1 uses the dedicated [`workforce/`](workforce/) Terraform root (`workforce/
 | Stage | Title | Description | Requirements |
 |:---:|---|---|---|
 | [07](doc/stage-07) | **Tenant Security Hardening** | Restrict guest invitations, standard user app creation, and security group creation using the `microsoft/msgraph` provider. | Sandbox / Dev Tenant |
-| [08](doc/stage-08) | **Entra Agent Identity (Preview)** | Deploy an Agent Identity Blueprint, Blueprint Principal, and Agent Identity using Microsoft Graph beta endpoints. | Dev Tenant |
+| [08](doc/stage-08) | **Entra Agent Identity** | Deploy an Agent Identity Blueprint, Blueprint Principal, and Agent Identity using Microsoft Graph v1.0 endpoints (optional Agent User is still preview). | Dev Tenant |
 
 #### Phase 4: Security Posture, Baselines & AI Operations (Stages 09 – 13)
 | Stage | Title | Description | Requirements |
